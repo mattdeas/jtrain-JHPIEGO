@@ -204,7 +204,7 @@ export const StaffSearch = () => {
         }
     )}
                         </TableBody>
-                        <Link to="/staffdetail-add">
+                        <Link to="/staff_add">
     <button>Add New Staff</button>
 </Link>
       

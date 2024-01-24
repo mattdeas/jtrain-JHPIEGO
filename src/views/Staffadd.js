@@ -84,6 +84,16 @@ const mutation = {
     data: ({ newEntity }) => newEntity,
 };
 
+// const mutation = {
+//     resource: 'trackedEntityInstances',
+//     id: ({ id }) => id,
+//     type: 'update',
+//     data: ({ orgUnit, attributes }) => ({
+//         orgUnit,
+//         attributes,
+//     }),
+// }
+
 const handleUpdate = () => {
 };
 
@@ -101,6 +111,8 @@ const qryTrackedEntityInstance = {
         },
     },
 };
+
+
 
 export const Staffadd = () => {
     const { id } = useParams();
@@ -130,47 +142,6 @@ export const Staffadd = () => {
         }));
     };
 
-    // const handleFormSubmit = async (event) => {
-    //     event.preventDefault();
-    //     console.log('formFields', formFields);
-        
-    //     try {
-    //         const response = await mutate({ data: formFields });
-    
-    //         console.log('Data uploaded successfully', response);
-    //     } catch (error) {
-    //         console.error('Error uploading data', error);
-    //     }
-    // };
-
-    // const handleFormSubmit = async (event) => {
-    //     event.preventDefault();
-    
-    //     // Transform formFields into the structure expected by the API
-    //     const attributes = Object.entries(formFields).reduce((obj, [attribute, value]) => {
-    //         obj[attribute] = value;
-    //         return obj;
-    //     }, {});
-    
-    //     // Define the mutation object
-    //     const updateMutation = {
-    //         type: 'update',
-    //         resource: 'trackedEntityInstance',
-    //         id: id, // Replace with the ID of the tracked entity instance you want to update
-    //         attributes
-    //     };
-    
-    //     console.log('updateMutation', updateMutation);
-    
-    //     try {
-    //         const response = await mutate(updateMutation);
-    
-    //         console.log('Data uploaded successfully', response);
-    //     } catch (error) {
-    //         console.error('Error uploading data', error);
-    //     }
-    //};
-    
     //const handleAdd = () => {
     const handleFormSubmit = async (event) => {
         event.preventDefault();

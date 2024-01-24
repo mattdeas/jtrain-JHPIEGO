@@ -222,39 +222,20 @@ const createMutation = (id, attributes) => ({
     },
 });
 
-const mutationWorking = {
-    resource: 'programs',
-    id: ({ id }) => id,
-    type: 'update',
-    partial: true,
-    data: ({ name }) => ({
-        name,
-    }),
-}
-
 const mutation = {
     resource: 'trackedEntityInstances',
-    id: ({ id }) => id,
-    type: 'update',
+    type: 'create',
     data: ({ orgUnit, attributes }) => ({
         orgUnit,
         attributes,
     }),
 }
 
-export const Staffview = () => {
-    const { id } = useParams();
+export const Staff_add = () => {
     const dSysConstants = useDataQuery(qryConstants)
     const [trackedEntityInstance, setTrackedEntityInstance] = useState(null);
     const [formFields, setFormFields] = useState({});
     const [mutate, { loading, error }] = useDataMutation(mutation)
-    const { loading: loadingEntity, error: errorEntity, data: dataEntity } = useDataQuery(qryTrackedEntityInstance, {
-        variables: {
-         id,
-        },
-    });
-
-
 
      const qryProgramDataElements = {
          "qPDE": {
@@ -266,17 +247,6 @@ export const Staffview = () => {
 
          },
     }
-
-    // Define the query outside the component
-const EVENTS_QUERY = {
-    events: {
-        resource: 'events',
-        params: {
-            fields: ['event', 'dataValues[dataElement,value]'],
-            event: ({ eventIds }) => eventIds.join(';'),
-        },
-    },
-};
 
     const dataProgramDE  = useDataQuery(qryProgramDataElements);
 
@@ -292,22 +262,11 @@ const EVENTS_QUERY = {
         }   
         }, [eventsData, loadingEvents, errorEvents]);
 
-    const createMutation = (tei_id, attributes) => ({
-        resource: 'trackedEntityInstances',
-        id: tei_id,
-        type: 'update',
-        data: {
-            orgUnit: 'VgrqnQEtyOP',
-            attributes: Object.entries(attributes).map(([attribute, value]) => ({ attribute, value }))
-        },
-    });
-    console.log('eventsData', eventsData)
     let defOrgUnit = null;
     if (dSysConstants && dSysConstants.data && dSysConstants.data.attributes && dSysConstants.data.attributes.constants) {
         const defOrgUnitObj = dSysConstants.data.attributes.constants.find(constant => constant.displayName === 'jtrain-DefaultStaffOrgUnit');
         defOrgUnit = defOrgUnitObj ? defOrgUnitObj.code : null;
     }
-    
     
     const attributes = Object.entries(formFields).map(([attribute, value]) => ({ attribute, value }));
 
@@ -315,7 +274,7 @@ const EVENTS_QUERY = {
         try {
                         // Pass the mutation object to the mutate function
                         //const response = await mutate(MutateTEI);
-                        const response = await mutate({ id: id,
+                        const response = await mutate({ 
                          orgUnit: defOrgUnit, 
                          attributes });
                         if (!response || (error && error.length > 0)) {
