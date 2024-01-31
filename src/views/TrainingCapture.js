@@ -12,6 +12,23 @@ import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { CourseDetails } from './CourseDetails';
 
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+};
+
+const handleResize = debounce(() => {
+}, 200);
+
+window.addEventListener('resize', handleResize);
+
 const query = {
     instances: {
         resource: 'trackedEntityInstances',
@@ -61,7 +78,7 @@ export const TrainingCapture = () => {
                 
                 <div onClick={() => setSearchTableExpanded(!isSearchTableExpanded)}>
                 
-                <p>{isSearchTableExpanded ? 'Collapse Table' : 'Expand Table'}</p>
+                <p>{isSearchTableExpanded ? <strong>Collapse Table</strong> : 'Expand Table'}</p>
                 
                 {isSearchTableExpanded && data?.instances?.trackedEntityInstances && (
                     <>
@@ -115,8 +132,9 @@ export const TrainingCapture = () => {
                 
                 </div>
             )}
-
-            {selectedCourse && <CourseDetails course={selectedCourse} />}
+            <div style={{ verticalAlign: 'top' }}>
+                {selectedCourse && <CourseDetails course={selectedCourse} />}
+            </div>
         </div>
     )
 }

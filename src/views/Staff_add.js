@@ -12,6 +12,24 @@ import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} 
 import React, {useState, useEffect} from 'react'
 
 
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+};
+
+const handleResize = debounce(() => {
+}, 200);
+
+window.addEventListener('resize', handleResize);
+
 const today = new Date();
 //const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 

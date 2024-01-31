@@ -12,42 +12,25 @@ import React, { useState } from 'react'
 import { Link, BrowserRouter, Switch, Route } from 'react-router-dom'
 
 
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+};
+
+const handleResize = debounce(() => {
+}, 200);
+
+window.addEventListener('resize', handleResize);
+
 const itemsPerPage = 10;
 //const [currentPage, setCurrentPage] = useState(1);
-
-
-/**
- * This defined the data that we want to get
- * The `app-runtime` will be explained in a another session after this one,
- * so you don't have to worry about the specifics for now
- */
-const qryTrackedEntityTypes = {
-    // One query object in the whole query
-    attributes: {
-        // The `attributes` endpoint should be used
-        resource: 'trackedEntityTypes',
-        params: {
-            // Paging is disabled
-            paging: false,
-            // Only the attribute properties that are required should be loaded
-            fields: 'id, displayName',
-        },
-    },
-}
-
-const qryPrograms = {
-    // One query object in the whole query
-    attributes: {
-        // The `attributes` endpoint should be used
-        resource: 'programs',
-        params: {
-            // Paging is disabled
-            paging: false,
-            // Only the attribute properties that are required should be loaded
-            fields: 'id, displayName',
-        },
-    },
-}
 
 const qryConstants = {
     // One query object in the whole query
@@ -63,19 +46,6 @@ const qryConstants = {
     },
 }
 
-const query4 = {
-    programs: {
-        resource: 'programs',
-        params: ({ pageSize }) => ({
-            order: 'displayName:asc',
-            pageSize,
-            page: 1
-        }),
-    },
-
-
-}
-
 
 const query = {
     // "page" variable below can be dinamically passed via refetch (see "handlePageChange" below)
@@ -88,7 +58,7 @@ const query = {
     },
 }
 
-const mutation = {
+const mutationRelationships = {
     resource: 'relationships',
     type: 'create',
     data: ({ trackedEntityInstance, courseId, score, type }) => ({
@@ -103,16 +73,18 @@ const mutation = {
                 trackedEntityInstance: trackedEntityInstance,
             },
         },
-        attributes: [
-            // { attribute: 'doBSFVq27w0', value: score },
-            // { attribute: 'HGDoE1RsvNF', value: score },
-            { attribute: 'typeAttributeId', value: type },
-        ],
+        
     }),
 };
 
+//yuAHL6dRErF
+//k7bpJin78fB
 
-
+const mutation = {
+    resource: 'events',
+    type: 'create',
+    data: ({ event }) => event,
+};
 //https://dhis2.af.jhpiego.org/api/trackedEntityInstances?ou=x0Zl6eKgC7B&trackedEntityType=W9FNXXgGbm7
 
 export const StaffSearchAttendees = ({eventID}) => {
@@ -123,7 +95,7 @@ export const StaffSearchAttendees = ({eventID}) => {
     // * data will be null while the data is being loaded or if something fails
     // * data will be an object once loading is done with the following path
     //   data.attributes.attributes <- That's an array of objects
-    const [mutate, { loading: mutationLoading, error: mutationError }] = useDataMutation(mutation);
+    //const [mutate, { loading: mutationLoading, error: mutationError }] = useDataMutation(mutationRelationships);
     const dSysConstants = useDataQuery(qryConstants)
 
     let staffMemberid, defaultStaffOrgUnit;
@@ -227,6 +199,9 @@ export const StaffSearchAttendees = ({eventID}) => {
                         <button onClick={() => mutate({ trackedEntityInstance, courseId: eventID, score: 99, type: 'ZBUwOGosqI0' })}>
                             Assign
                         </button>
+                        {/* <button >
+                            Assign
+                        </button> */}
                     </TableCell>
                 </TableRow>
             );

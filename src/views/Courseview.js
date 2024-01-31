@@ -10,7 +10,22 @@ import {
 } from '@dhis2/ui'
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import React, {useState, useEffect} from 'react'
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+};
 
+const handleResize = debounce(() => {
+}, 200);
+
+window.addEventListener('resize', handleResize);
 /**
  * This defined the data that we want to get
  * The `app-runtime` will be explained in a another session after this one,

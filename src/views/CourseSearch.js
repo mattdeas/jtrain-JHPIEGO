@@ -1,4 +1,5 @@
 import { useDataQuery } from '@dhis2/app-runtime'
+import { CalendarInput } from '@dhis2-ui/calendar'
 import {
     Table,
     TableBody,
@@ -30,7 +31,7 @@ export const CourseSearch = () => {
             program: 'P59PhQsB6tb',
         },
     })
-
+    console.log(Intl.DateTimeFormat().resolvedOptions().timeZone)
     const [searchTerm, setSearchTerm] = useState('');
 
     const handleSearchTermChange = (event) => {
@@ -41,8 +42,33 @@ export const CourseSearch = () => {
         <div>
             <h1>Search Courses </h1>
 
-            <input type="text" value={searchTerm} onChange={handleSearchTermChange} />
+            <select placeholder="Thematic Area">
+                <option value="">Select Thematic Area</option>
+                <option value="">QI</option>
+                <option value="">CI</option>
+            </select>
 
+            <input type="text" value={searchTerm} onChange={handleSearchTermChange} placeholder="Course Name" />
+
+
+            {/* <CalendarInput
+    date="2021-10-13"
+    dir="ltr"
+    locale="en-CA"
+    timeZone="Africa/Johannesburg"
+    weekDayFormat="short"
+/> */}
+            <label >
+                Start Date:
+                <input type="date" />
+            </label>
+
+            <label>
+                End Date:
+                <input type="date" />
+            </label>
+
+            <button>Search</button>
             {loading && 'Loading...'}
             {error && error.message}
             {data?.instances?.trackedEntityInstances && (
@@ -57,7 +83,7 @@ export const CourseSearch = () => {
                     </TableHead>
                     <TableBody>
                         {data.instances.trackedEntityInstances
-                            .filter(item => item.attributes.some(attr => attr.displayName === 'Course Thematic Area' && attr.value.toLowerCase().includes(searchTerm.toLowerCase())))
+                            .filter(item => item.attributes.some(attr => attr.displayName === 'Course Name' && attr.value.toLowerCase().includes(searchTerm.toLowerCase())))
                             .slice(0, 10)
                             .map(
                                 ({ trackedEntityInstance, attributes }) => {
@@ -72,7 +98,7 @@ export const CourseSearch = () => {
                                             <TableCell>{attributesObj['Course Name']}</TableCell>
                                             <TableCell>{attributesObj['']}</TableCell>
                                             <TableCell>
-                                                <Link to={`/staffview/${trackedEntityInstance}`}>View Details</Link>
+                                                <Link to={`/courseview/${trackedEntityInstance}`}>View Details</Link>
                                             </TableCell>
                                         </TableRow>
                                     );

@@ -12,6 +12,24 @@ import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} 
 import React, {useState, useEffect} from 'react'
 
 
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+};
+
+const handleResize = debounce(() => {
+}, 200);
+
+window.addEventListener('resize', handleResize);
+
 const today = new Date();
 //const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
@@ -97,63 +115,6 @@ const qryTrackedEntityInstance = {
     },
 };
 
-const mutationTest = {
-    resource: 'trackedEntityInstances',
-    type: 'create',
-    data: {
-        trackedEntityInstances: [
-            {
-                orgUnit: 'VgrqnQEtyOP',
-                trackedEntityInstance: 'HuZ5Kc4GSUe',
-                trackedEntityType: 'W9FNXXgGbm7',
-                attributes: [
-                    { attribute: 'jv1fu2pDYKE', value: '01' },
-                    { attribute: 'zh91RcBXyEf', value: '2004-01-01' },
-                    { attribute: 'esA6f27JSQM', value: '55' },
-                    { attribute: 'ggdR2bH42l3', value: '1' },
-                    { attribute: 'Zb9icCay6Ka', value: '0' },
-                ],
-            },
-        ],
-    },
-};
-
-
-const mutationIndicatorOld = {
-    resource: 'indicators',
-    id: 'vwgKIIhIbk8',
-    type: 'update',
-    partial: true,
-    data: ({ name }) => ({
-        name,
-    }),
-}
-
-
-
-const mutationIndicator = {
-    resource: 'trackedEntityInstances',
-    id: ({ trackedEntityInstance }) => trackedEntityInstance,
-    type: 'update',
-    partial: true,
-    data: ({ orgUnit, trackedEntityType, attributes }) => ({
-        orgUnit,
-        trackedEntityType,
-        attributes,
-    }),
-};
-
-
-// const testMutate = {
-//         "resource": "programs",
-//         "type": "update",
-//         id: "KHOQp4q1r2B",
-//         "data": {
-//             "name": "A program - Updated1",
-//             "shortName": "A program - Updated",
-//             "programType": "WITH_REGISTRATION"
-//         }
-// }
 
 
 const testMutate = {

@@ -5,6 +5,40 @@ import { Home, Course,  CourseSearch, StaffSearch, Staffadd, TrainingCapture, St
 
 import styles from './App.module.css';
 import logo from './image/jtrainlogo.png';
+import { ResizeObserver } from '@juggle/resize-observer';
+
+const ro = new ResizeObserver((entries, observer) => {
+// Changing the body size inside of the observer
+// will cause a resize loop and the next observation will be skipped
+document.body.style.width = '50%';
+});
+
+// Listen for errors
+//window.addEventListener('error', e => console.log(e.message));
+window.addEventListener('error', e => {});
+
+// Observe the body
+ro.observe(document.body);
+
+
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+};
+
+const handleResize = debounce(() => {
+}, 200);
+
+window.addEventListener('resize', handleResize);
+
 //yarn start --proxy https://dhis2.af.jhpiego.org --proxyPort 8082
 const MainContent = () => {
     const [selectedTab, setSelectedTab] = useState('');
@@ -42,6 +76,7 @@ const MainContent = () => {
 const MyApp = () => {
     const [selectedTab, setSelectedTab] = useState('Home');
 
+    
     return (
         <Router>
             <div>
@@ -62,6 +97,9 @@ const MyApp = () => {
                             </Tab>
                             <Tab onClick={() => setSelectedTab('TrainingCapture')}>
                                 <Link to="/trainingcapture">Training Capture</Link>
+                            </Tab>
+                            <Tab onClick={() => setSelectedTab('TrainingCapture')}>
+                                <Link to="/trainingcapture">Settings</Link>
                             </Tab>
                         </TabBar>
                         </div>

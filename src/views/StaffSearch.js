@@ -10,7 +10,26 @@ import {
 } from '@dhis2/ui'
 import React, { useState } from 'react'
 import { Link, BrowserRouter, Switch, Route } from 'react-router-dom'
+import { ResizeObserver } from '@juggle/resize-observer';
 
+
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+};
+
+const handleResize = debounce(() => {
+}, 200);
+
+window.addEventListener('resize', handleResize);
 
 const itemsPerPage = 10;
 //const [currentPage, setCurrentPage] = useState(1);
@@ -148,7 +167,29 @@ export const StaffSearch = () => {
         <div>
             <h1>Search Staff </h1>
 
-            <input type="text" value={searchTerm} onChange={handleSearchTermChange} />
+            {/* <input type="text" value={searchTerm} onChange={handleSearchTermChange} /> */}
+            <input type="text" value={searchTerm} onChange={handleSearchTermChange} placeholder="Family Name" />
+
+<input type="text" onChange={handleSearchTermChange} placeholder="First Name" />
+
+<select >
+    <option value="">Select Gender</option>
+    <option value="male">Male</option>
+    <option value="female">Female</option>
+    <option value="other">Other</option>
+</select>
+
+<label>
+    Date of Birth Range Start :
+    <input type="date" onChange={handleSearchTermChange} />
+</label>
+
+<label>
+    To:
+    <input type="date" onChange={handleSearchTermChange} />
+</label>
+
+<input type="number" onChange={handleSearchTermChange} placeholder="Age" />
 
             {
                 // display that the data is being loaded
