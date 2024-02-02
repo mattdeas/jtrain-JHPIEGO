@@ -179,7 +179,7 @@ export const Courseview = () => {
 
     const { loading: loadingEntity, error: errorEntity, data: dataEntity } = useDataQuery(qryTrackedEntityInstance, {
         variables: {
-         //   id: "HuZ5Kc4GSUe", // Replace with the ID of the tracked entity instance you want to fetch
+         //   id: "1", // Replace with the ID of the tracked entity instance you want to fetch
          id,
         },
     });

@@ -122,7 +122,7 @@ const mutationTest = {
         trackedEntityInstances: [
             {
                 orgUnit: 'VgrqnQEtyOP',
-                trackedEntityInstance: 'HuZ5Kc4GSUe',
+                trackedEntityInstance: '1',
                 trackedEntityType: 'W9FNXXgGbm7',
                 attributes: [
                     { attribute: 'jv1fu2pDYKE', value: '01' },
@@ -177,7 +177,7 @@ const mutationIndicator = {
 const testMutate = {
             "resource": "trackedEntityInstances",
             "type": "update",
-            id: "HuZ5Kc4GSUe",
+            id: "1",
             "data": {
                 orgUnit: 'VgrqnQEtyOP',
                 attributes: [

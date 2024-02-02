@@ -1,13 +1,15 @@
 import { useDataQuery, useDataMutation } from '@dhis2/app-runtime'
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableCellHead,
-    TableHead,
-    TableRow,
-    TableRowHead,
-} from '@dhis2/ui'
+import { CourseDetails } from './CourseDetails';
+import { CourseDetailsStaffView } from './CourseDetailsStaffView';
+
+// Move the courses section to the right
+const Courses = () => {
+    return (
+        <div style={{ float: 'right' }}>
+            {/* Your courses section code here */}
+        </div>
+    );
+}
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import React, {useState, useEffect} from 'react'
 
@@ -120,7 +122,7 @@ const qryTrackedEntityInstance = {
 const testMutate = {
             "resource": "trackedEntityInstances",
             "type": "update",
-            id: "HuZ5Kc4GSUe",
+            id: "1",
             "data": {
                 orgUnit: 'VgrqnQEtyOP',
                 attributes: [
@@ -336,10 +338,13 @@ const EVENTS_QUERY = {
     const [events, setEvents] = useState([]);
 
     const transposedEvents = events.map(event => {
+        console.log('event', event)
         const eventObj = { event: event.event };
         event.dataValues.forEach(dataValue => {
             if (dataProgramDE && dataProgramDE.data && dataProgramDE.data.qPDE) {
+                console.log('dataProgramDE', dataProgramDE)
                 const matchingElement = dataProgramDE.data.qPDE.programStageDataElements.find(element => element.dataElement.id === dataValue.dataElement);
+
                 if (matchingElement) {
                     eventObj[matchingElement.dataElement.displayName] = dataValue.value;
                     eventObj.sortOrder = matchingElement.sortOrder;
@@ -402,7 +407,9 @@ const EVENTS_QUERY = {
     };
     
     return (
-  <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+  <div style={{ flex: '0 0 50%' }}>
+  
     <h1>Staff Details</h1>
 
     {
@@ -412,16 +419,13 @@ const EVENTS_QUERY = {
     }
 
     {
-      // display the error message
-      // is an error occurred
       error && error.message
-      //https://dhis2.af.jhpiego.org/api/programStages/ud3llulRwwt?fields=programStageDataElements
-//https://dhis.tz.jhpiego.org/api/programStages/CVIIukA6xQx.json?fields=programStageDataElements[dataElement[name,id]]
     }
 
     {
     // if there is any data available
     data?.program?.programTrackedEntityAttributes && (
+            
         <form onSubmit={handleFormSubmit}>
             <table>
                 <thead>
@@ -467,32 +471,64 @@ const EVENTS_QUERY = {
             </table>
             <button type="submit">Submit</button>
             <p>{responseMessage}</p>
-            <h2>Courses</h2>
-            <Link to="/trainingcapture">
-    <button>Go to Training Capture</button>
-</Link>
             
-    <table>
-        <thead>
-            <tr>
-                {transposedEvents[0] && Object.keys(transposedEvents[0]).map(key => key !== 'event' && key !== 'sortOrder' && <th key={key}>{key}</th>)}
-            </tr>
-        </thead>
-        <tbody>
-            {transposedEvents.map((eventObj, index) => (
-                <tr key={index}>
-                    {/* <td>{eventObj.event}</td> */}
-                    {Object.keys(eventObj).map(key => key !== 'event' && key !== 'sortOrder' && <td key={key}>{eventObj[key]}</td>)}
-                </tr>
-            ))}
-        </tbody>
-
-        </table>
+            
+   
         </form>
 
         
     )
 }
   </div>
+  <div style={{ flex: '0 0 50%' }}>
+    <h2>Courses</h2>
+        <Link to="/trainingcapture">
+            <button style={{
+                background: 'linear-gradient(to right, darkblue, cyan)',
+                border: 'none',
+                color: 'white',
+                padding: '15px 32px',
+                textAlign: 'center',
+                textDecoration: 'none',
+                display: 'inline-block',
+                fontSize: '16px',
+                borderRadius: '12px'
+            }}>Go to Training Capture</button>
+        </Link>
+    <table>
+        <thead>
+        <tr>
+  {dataProgramDE?.data?.qPDE?.programStageDataElements ? (
+    dataProgramDE.data.qPDE.programStageDataElements.map(({ dataElement }) => (
+      <th key={dataElement.id}>{dataElement.displayName}</th>
+    ))
+  ) : null}
+</tr>
+        </thead>
+        <tbody>
+  {transposedEvents.map((eventObj, index) => (
+    <tr key={eventObj.event}>
+      {Object.keys(eventObj).map((key, cellIndex) => {
+        if (key === 'event' || key === 'sortOrder') {
+          return null;
+        }
+        if (cellIndex === 1) {
+          return (
+            <td key={key} style={{ textAlign: 'center' }}>
+              {eventObj[key]}
+              <CourseDetailsStaffView course={eventObj[key]} />
+            </td>
+          );
+        }
+        return <td key={key} style={{ textAlign: 'center' }}>{eventObj[key]}</td>;
+      })}
+    </tr>
+  ))}
+</tbody>
+    </table>
+  </div>
+  </div>
 )
 }
+
+

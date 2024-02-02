@@ -80,6 +80,8 @@ const mutationRelationships = {
 //yuAHL6dRErF
 //k7bpJin78fB
 
+
+
 const mutation = {
     resource: 'events',
     type: 'create',
@@ -96,6 +98,7 @@ export const StaffSearchAttendees = ({eventID}) => {
     // * data will be an object once loading is done with the following path
     //   data.attributes.attributes <- That's an array of objects
     //const [mutate, { loading: mutationLoading, error: mutationError }] = useDataMutation(mutationRelationships);
+    
     const dSysConstants = useDataQuery(qryConstants)
 
     let staffMemberid, defaultStaffOrgUnit;
@@ -135,6 +138,43 @@ export const StaffSearchAttendees = ({eventID}) => {
         setSearchTerm(event.target.value);
     }
 
+    const today = new Date();
+        const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+    const mutation = {
+        resource: 'events',
+        type: 'create',
+        data: ({ trackedEntityInstance }) => ({
+            events: [
+                {
+                    trackedEntityInstance,
+                    program: 'Ss21byybIqu',
+                    programStage: 'Y6scAJvghc0',
+                    enrollment: 'qIuyPn7AVu2',
+                    orgUnit: 'VgrqnQEtyOP',
+                    dataValues: [
+                        {
+                            dataElement: 'tsU3YD7kfYU',
+                            value: eventID,
+                        },
+                    ],
+                    status: 'ACTIVE',
+                    eventDate: formattedDate,
+                },
+            ],
+        }),
+    };
+    const [mutate, { loading: mutationLoading, error: mutationError }] = useDataMutation(mutation);
+
+    const handleAssign = async (trackedEntityInstance) => {
+        const { error } = await mutate({ trackedEntityInstance });
+        console.log('mutation', mutate)
+        if (error) {
+            console.error('Error creating event:', error);
+        } else {
+            console.log('Event created successfully');
+        }
+    };
     
 
     return (
@@ -196,12 +236,12 @@ export const StaffSearchAttendees = ({eventID}) => {
                     </TableCell>
                     <TableCell>{trackedEntityInstance}</TableCell>
                     <TableCell>
-                        <button onClick={() => mutate({ trackedEntityInstance, courseId: eventID, score: 99, type: 'ZBUwOGosqI0' })}>
-                            Assign
-                        </button>
-                        {/* <button >
+                        {/* <button onClick={() => mutate({ trackedEntityInstance, courseId: eventID, score: 99, type: 'ZBUwOGosqI0' })}>
                             Assign
                         </button> */}
+                        <button onClick={() => handleAssign(trackedEntityInstance)}>
+                            Assign
+                        </button>
                     </TableCell>
                 </TableRow>
             );

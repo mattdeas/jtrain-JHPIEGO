@@ -5,7 +5,7 @@ const UploadDataToDHIS2 = () => {
   const jsonToUpload = {
     "trackedEntityInstances": [{
       "orgUnit": "VgrqnQEtyOP",
-      "trackedEntityInstance": "HuZ5Kc4GSUe",
+      "trackedEntityInstance": "1",
       "trackedEntityType": "W9FNXXgGbm7",
       "attributes": [{
         "attribute": "jv1fu2pDYKE",

@@ -78,8 +78,12 @@ export const TrainingCapture = () => {
                 
                 <div onClick={() => setSearchTableExpanded(!isSearchTableExpanded)}>
                 
-                <p>{isSearchTableExpanded ? <strong>Collapse Table</strong> : 'Expand Table'}</p>
-                
+                <p style={{ backgroundColor: isSearchTableExpanded ? 'lightblue' : 'lightgrey', width: '100%', height: '50px' }}>
+        <strong>Course Type Selection</strong>
+        <span style={{ float: 'left', border: '1px solid black' }}>
+            {isSearchTableExpanded ? '-' : '+'}
+        </span>
+    </p>          
                 {isSearchTableExpanded && data?.instances?.trackedEntityInstances && (
                     <>
                     <h3>Select Subject Area </h3>
