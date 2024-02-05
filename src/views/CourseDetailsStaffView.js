@@ -10,17 +10,28 @@ import {
 } from '@dhis2/ui';
 import React, { useState } from 'react';
 
+// const eventQuery = {
+//     events: {
+//         resource: 'events',
+//         params: ({ trackedEntityInstance }) => ({
+//             program: 'P59PhQsB6tb',
+//             orgUnit: 'VgrqnQEtyOP',
+//             trackedEntityInstance,
+//             fields: 'event,eventDate,dataValues[dataElement,value]'
+//         })
+//     }
+// };
+
 const eventQuery = {
     events: {
-        resource: 'events',
-        params: ({ trackedEntityInstance }) => ({
-            program: 'P59PhQsB6tb',
-            orgUnit: 'VgrqnQEtyOP',
-            trackedEntityInstance,
-            fields: 'event,eventDate,dataValues[dataElement,value]'
-        })
-    }
-};
+      resource: 'events',
+      id: ({ id }) => id,
+      params: {
+        fields: 'event,eventDate,dataValues[dataElement,value]',
+      },
+    },
+  };
+  
 
 const qryConstants = {
     // One query object in the whole query
@@ -37,32 +48,28 @@ const qryConstants = {
 }
 
 export const CourseDetailsStaffView = ({ course }) => {
-    const { loading, error, data } = useDataQuery(eventQuery, {
-        variables: {
-            trackedEntityInstance: course.trackedEntityInstance
-        }
-    });
+    const { loading, error, data } = useDataQuery({
+        programStages: {
+          resource: 'programStages/r0gHZqEq6DE',
+          params: {
+            fields: 'programStageDataElements[sortOrder,dataElement[id,displayName]]',
+          },
+        },
+      });
+    console.log('dataStages', data);
     const [selectedCourseDate, setSelectedCourseDate] = useState(''); 
 
     const dSysConstants = useDataQuery(qryConstants);
     console.log(dSysConstants);
 
-    // Check if data is loaded
-    if (loading) return 'Loading...';
-    if (error) return error.message;
-    if (!data || !data.events) return 'No data';
-        // Transform the data into an array of objects where each object represents a row in the table
-    const rows = data.events.events.map(({ event, eventDate, dataValues }) => {
-        const row = { event, eventDate };
-        dataValues.forEach(({ dataElement, value }) => {
-            row[dataElement] = value;
-        });
-        return row;
-    });
+    const { loading: eventLoading, error: eventError, data: eventData } = useDataQuery(eventQuery, {
+        variables: { id: course },
+      });
+      if (eventLoading) return 'Loading event data...';
+        if (eventError) return `Error: ${eventError.message}`;
+    
 
-    const dataElements = [...new Set(data.events.events.flatMap(({ dataValues }) => dataValues.map(({ dataElement }) => dataElement)))];
-
-    // Check if dSysConstants data is loaded
+      console.log(eventData)
     if (dSysConstants.loading) return 'Loading...';
     if (dSysConstants.error) return dSysConstants.error.message;
     if (!dSysConstants.data.attributes || !dSysConstants.data.attributes.constants) return 'No constants data';
@@ -81,22 +88,45 @@ export const CourseDetailsStaffView = ({ course }) => {
                 <div style={{ width: '100%' }}>
                   {loading && 'Loading...'}
                   {error && error.message}
-                  {data?.events && (
-                    <Table>
-                      <TableBody>
-                        <TableRow>
-                          {dataElements.map(dataElement => (
-                            <TableCell key={dataElement}>{dataElement}</TableCell>
-                          ))}
-                        </TableRow>
-                        <TableRow>
-                          {dataElements.map(dataElement => (
-                            <TableCell key={dataElement}>{selectedCourseDate[dataElement]}</TableCell>
-                          ))}
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  )}
+                  {data?.programStages && (
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    {data.programStages.programStageDataElements
+                      .sort((a, b) => a.sortOrder - b.sortOrder)
+                      .map(({ dataElement }) => (
+                        <TableCell key={dataElement.id}>{dataElement.displayName}</TableCell>
+                      ))}
+                  </TableRow>
+                  
+                </TableHead>
+                {/* <TableBody>
+                    {eventData?.events?.dataValues.map(({ dataElement, value }) => (
+                    <TableRow key={dataElement}>
+                        <TableCell>{dataElement}</TableCell>
+                        <TableCell>{value}</TableCell>
+                    </TableRow>
+                    ))}
+                </TableBody> */}
+                <TableBody>
+  {eventData?.events && (
+    <TableRow>
+      {data.programStages.programStageDataElements
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map(({ dataElement }) => {
+          // Create a mapping of dataElement to value
+          const dataElementToValue = eventData.events.dataValues.reduce((map, { dataElement, value }) => {
+            map[dataElement] = value;
+            return map;
+          }, {});
+
+          return <TableCell key={dataElement.id}>{dataElementToValue[dataElement.id]}</TableCell>;
+        })}
+    </TableRow>
+  )}
+</TableBody>
+              </Table>
+            )}
                 </div>
               </td>
             </tr>

@@ -119,17 +119,6 @@ const qryTrackedEntityInstance = {
 
 
 
-const testMutate = {
-            "resource": "trackedEntityInstances",
-            "type": "update",
-            id: "1",
-            "data": {
-                orgUnit: 'VgrqnQEtyOP',
-                attributes: [
-                    { attribute: 'esA6f27JSQM', value: '11111' }
-                ]
-            }
-    }
 
 
 const eventsQuery = (id) => ({
@@ -337,41 +326,39 @@ const EVENTS_QUERY = {
     
     const [events, setEvents] = useState([]);
 
-    const transposedEvents = events.map(event => {
-        console.log('event', event)
-        const eventObj = { event: event.event };
-        event.dataValues.forEach(dataValue => {
-            if (dataProgramDE && dataProgramDE.data && dataProgramDE.data.qPDE) {
-                console.log('dataProgramDE', dataProgramDE)
-                const matchingElement = dataProgramDE.data.qPDE.programStageDataElements.find(element => element.dataElement.id === dataValue.dataElement);
-
-                if (matchingElement) {
-                    eventObj[matchingElement.dataElement.displayName] = dataValue.value;
-                    eventObj.sortOrder = matchingElement.sortOrder;
-                }
-            }
-        });
-        return eventObj;
-    });
-
-    
-
-    let sortedProgramStageDataElements = [];
-    if (dataProgramDE && dataProgramDE.data && dataProgramDE.data.qPDE) {
-        sortedProgramStageDataElements = [...dataProgramDE.data.qPDE.programStageDataElements].sort((a, b) => a.sortOrder - b.sortOrder);
-    }
-    
-    // Create a new array where each element is an object with properties for each data value
     // const transposedEvents = events.map(event => {
+    //     console.log('event', event)
     //     const eventObj = { event: event.event };
     //     event.dataValues.forEach(dataValue => {
-    //         const matchingElement = sortedProgramStageDataElements.find(element => element.dataElement.id === dataValue.dataElement);
-    //         if (matchingElement) {
-    //             eventObj[matchingElement.dataElement.displayName] = dataValue.value;
+    //         if (dataProgramDE && dataProgramDE.data && dataProgramDE.data.qPDE) {
+    //             console.log('dataProgramDE', dataProgramDE)
+    //             const matchingElement = dataProgramDE.data.qPDE.programStageDataElements.find(element => element.dataElement.id === dataValue.dataElement);
+    //             //console.log('element.dataElement.id', element.dataElement.id)
+    //             console.log('dataValue.dataElement',dataValue.dataElement)
+    //             if (matchingElement) {
+    //                 eventObj[matchingElement.dataElement.displayName] = dataValue.value;
+    //                 eventObj.sortOrder = matchingElement.sortOrder;
+    //             }
     //         }
     //     });
+    //     console.log('eventObj', eventObj)
     //     return eventObj;
     // });
+
+    
+    const transposedEvents = events.map(event => {
+        const eventObj = { event: event.event };
+        event.dataValues.forEach(dataValue => {
+          const matchingElement = dataProgramDE.data.qPDE.programStageDataElements.find(element => element.dataElement.id === dataValue.dataElement);
+          if (matchingElement) {
+            eventObj[matchingElement.dataElement.displayName] = dataValue.value;
+          }
+        });
+        return eventObj;
+      });
+
+    
+ 
    
     useEffect(() => {
         if (!loadingEntity && !errorEntity && dataEntity?.trackedEntityInstance?.attributes) {
@@ -413,8 +400,6 @@ const EVENTS_QUERY = {
     <h1>Staff Details</h1>
 
     {
-      // display that the data is being loaded
-      // when loading is true
       loading1 && 'Loading...'
     }
 
@@ -481,47 +466,41 @@ const EVENTS_QUERY = {
 }
   </div>
   <div style={{ flex: '0 0 50%' }}>
-    <h2>Courses</h2>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <h2>Courses</h2>
         <Link to="/trainingcapture">
             <button style={{
-                background: 'linear-gradient(to right, darkblue, cyan)',
-                border: 'none',
-                color: 'white',
-                padding: '15px 32px',
-                textAlign: 'center',
-                textDecoration: 'none',
-                display: 'inline-block',
-                fontSize: '16px',
-                borderRadius: '12px'
+            background: 'linear-gradient(to right, darkblue, cyan)',
+            border: 'none',
+            color: 'white',
+            padding: '15px 32px',
+            textAlign: 'center',
+            textDecoration: 'none',
+            display: 'inline-block',
+            fontSize: '16px',
+            borderRadius: '12px'
             }}>Go to Training Capture</button>
         </Link>
+        </div>
     <table>
-        <thead>
-        <tr>
-  {dataProgramDE?.data?.qPDE?.programStageDataElements ? (
-    dataProgramDE.data.qPDE.programStageDataElements.map(({ dataElement }) => (
-      <th key={dataElement.id}>{dataElement.displayName}</th>
-    ))
-  ) : null}
+ 
+<thead>
+<tr>
+  {dataProgramDE?.data?.qPDE?.programStageDataElements.map(({ dataElement }) => (
+    <th key={dataElement.id}>
+      {dataElement.displayName === 'jtrain_course_eventid' ? 'Training Event' : dataElement.displayName}
+    </th>
+  ))}
 </tr>
-        </thead>
-        <tbody>
+</thead>
+<tbody>
   {transposedEvents.map((eventObj, index) => (
     <tr key={eventObj.event}>
-      {Object.keys(eventObj).map((key, cellIndex) => {
-        if (key === 'event' || key === 'sortOrder') {
-          return null;
-        }
-        if (cellIndex === 1) {
-          return (
-            <td key={key} style={{ textAlign: 'center' }}>
-              {eventObj[key]}
-              <CourseDetailsStaffView course={eventObj[key]} />
-            </td>
-          );
-        }
-        return <td key={key} style={{ textAlign: 'center' }}>{eventObj[key]}</td>;
-      })}
+      {dataProgramDE?.data?.qPDE?.programStageDataElements.map(({ dataElement }, cellIndex) => (
+        <td key={dataElement.id} style={{ textAlign: 'center' }}>
+          {cellIndex === 0 ? <CourseDetailsStaffView course={eventObj[dataElement.displayName]} /> : eventObj[dataElement.displayName]}
+        </td>
+      ))}
     </tr>
   ))}
 </tbody>

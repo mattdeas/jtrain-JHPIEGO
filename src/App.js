@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import { TabBar, Tab } from '@dhis2-ui/tab';
-import { Home, Course,  CourseSearch, StaffSearch, Staffadd, TrainingCapture, Staffview, } from './views';
+import { Home, Course,  CourseSearch, StaffSearch, Staffadd, TrainingCapture, Staffview, CourseDetailsStaffView } from './views';
 
 import styles from './App.module.css';
 import logo from './image/jtrainlogo.png';
 import { ResizeObserver } from '@juggle/resize-observer';
+import { Courseview } from './views/Courseview';
 
 const ro = new ResizeObserver((entries, observer) => {
 // Changing the body size inside of the observer
@@ -63,15 +64,16 @@ const MainContent = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/course" element={<Course />} />
                 <Route path="/coursesearch" element={<CourseSearch />} />
-                {/* <Route path="/courseview/:id" element={<Staffview />} /> */}
                 <Route path="/staffsearch" element={<StaffSearch />} />
                 <Route path="/staffview/:id" element={<Staffview />} /> 
                 <Route path="/trainingcapture" element={<TrainingCapture />} />
                 <Route path="/staffadd" element={<Staffadd />} />
+                <Route path="/courseview/:id" element={<Courseview />} />
             </Routes>
         </div>
     );
 };
+
 
 const MyApp = () => {
     const [selectedTab, setSelectedTab] = useState('Home');

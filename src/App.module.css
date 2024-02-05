@@ -40,3 +40,5 @@
     padding-left: 2%;
     font-size: 20px;
 }
+
+iframe#webpack-dev-server-client-overlay{display:none!important}
