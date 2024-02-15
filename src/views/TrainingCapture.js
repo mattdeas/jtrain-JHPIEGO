@@ -69,7 +69,7 @@ export const TrainingCapture = () => {
     
 
     return (
-        <div>
+        <div style={{ position: 'float', top: '20%', width: '95%' }}>
             
 
             {loading && 'Loading...'}

@@ -54,20 +54,6 @@ const qryTrackedEntityTypes = {
     },
 }
 
-const qryPrograms = {
-    // One query object in the whole query
-    attributes: {
-        // The `attributes` endpoint should be used
-        resource: 'programs',
-        params: {
-            // Paging is disabled
-            paging: false,
-            // Only the attribute properties that are required should be loaded
-            fields: 'id, displayName',
-        },
-    },
-}
-
 const qryConstants = {
     // One query object in the whole query
     attributes: {
@@ -82,18 +68,7 @@ const qryConstants = {
     },
 }
 
-const query4 = {
-    programs: {
-        resource: 'programs',
-        params: ({ pageSize }) => ({
-            order: 'displayName:asc',
-            pageSize,
-            page: 1
-        }),
-    },
 
-
-}
 
 
 const query = {
@@ -178,16 +153,6 @@ export const StaffSearch = () => {
     <option value="female">Female</option>
     <option value="other">Other</option>
 </select>
-
-<label>
-    Date of Birth Range Start :
-    <input type="date" onChange={handleSearchTermChange} />
-</label>
-
-<label>
-    To:
-    <input type="date" onChange={handleSearchTermChange} />
-</label>
 
 <input type="number" onChange={handleSearchTermChange} placeholder="Age" />
 

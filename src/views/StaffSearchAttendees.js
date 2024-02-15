@@ -61,11 +61,11 @@ const query = {
 const mutationRelationships = {
     resource: 'relationships',
     type: 'create',
-    data: ({ trackedEntityInstance, courseId, score, type }) => ({
-        relationshipType: 'ZBUwOGosqI0',
+    data: ({ trackedEntityInstance, eventID, type }) => ({
+        relationshipType: type,
         from: {
-            trackedEntityInstance: {
-                trackedEntityInstance: courseId,
+            event: {
+                event: eventID,
             },
         },
         to: {
@@ -77,27 +77,13 @@ const mutationRelationships = {
     }),
 };
 
-//yuAHL6dRErF
-//k7bpJin78fB
-
-
-
 const mutation = {
     resource: 'events',
     type: 'create',
     data: ({ event }) => event,
 };
-//https://dhis2.af.jhpiego.org/api/trackedEntityInstances?ou=x0Zl6eKgC7B&trackedEntityType=W9FNXXgGbm7
 
 export const StaffSearchAttendees = ({eventID}) => {
-    // This is yet another functionality provided by the `@dhis2/app-runtime`
-    // For the time being it does not matter what this does exactly
-    // * loading will be true while the data is being loaded
-    // * error will be an instance of `Error` if something fails
-    // * data will be null while the data is being loaded or if something fails
-    // * data will be an object once loading is done with the following path
-    //   data.attributes.attributes <- That's an array of objects
-    //const [mutate, { loading: mutationLoading, error: mutationError }] = useDataMutation(mutationRelationships);
     
     const dSysConstants = useDataQuery(qryConstants)
 
@@ -118,8 +104,6 @@ export const StaffSearchAttendees = ({eventID}) => {
         console.log('Constants Loaded')// Log the values to the console
         
     }
-    //console.log({ dSysConstants });
-
     //const { loading, error, data } = useDataQuery(qryTrackedEntityTypes)
     //console.log({ loading, error, data });
     console.log({ staffMemberid, defaultStaffOrgUnit });
@@ -165,8 +149,20 @@ export const StaffSearchAttendees = ({eventID}) => {
         }),
     };
     const [mutate, { loading: mutationLoading, error: mutationError }] = useDataMutation(mutation);
+    const [mutateRelationships, { loading: mutationRelationshipsLoading, error: mutationRelationshipsError }] = useDataMutation(mutationRelationships);
 
     const handleAssign = async (trackedEntityInstance) => {
+        
+    
+        const type = 'ZBUwOGosqI0';
+        const { error: relationshipsError, data: relationshipsData } = await mutateRelationships({ trackedEntityInstance, eventID, type});
+        if (relationshipsError) {
+            console.error('Error creating relationship:', relationshipsError);
+        } else {
+            console.log('Relationship created successfully');
+            console.log('Relationship data:', relationshipsData);
+        }
+
         const { error } = await mutate({ trackedEntityInstance });
         console.log('mutation', mutate)
         if (error) {
@@ -175,8 +171,8 @@ export const StaffSearchAttendees = ({eventID}) => {
             console.log('Event created successfully');
         }
     };
-    
-
+    //https://dhis2.af.jhpiego.org/api/tracker/relationships?event=JW708OHzDhU
+   
     return (
         <div>
             <h3>Search Staff to Assign </h3>

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import { TabBar, Tab } from '@dhis2-ui/tab';
-import { Home, Course,  CourseSearch, StaffSearch, Staffadd, TrainingCapture, Staffview, CourseDetailsStaffView } from './views';
+import { Home, Course,  CourseSearch, StaffSearch, Staffadd, TrainingCapture, Staffview, Settings,
+    CourseDetailsStaffView, CourseDetailsCourseView, CourseAttendee} from './views';
 
 import styles from './App.module.css';
 import logo from './image/jtrainlogo.png';
@@ -69,6 +70,8 @@ const MainContent = () => {
                 <Route path="/trainingcapture" element={<TrainingCapture />} />
                 <Route path="/staffadd" element={<Staffadd />} />
                 <Route path="/courseview/:id" element={<Courseview />} />
+                <Route path="/testcomponent/:id" element={<CourseAttendee />} />
+                <Route path="/settings" element={<Settings />} />
             </Routes>
         </div>
     );
@@ -100,8 +103,8 @@ const MyApp = () => {
                             <Tab onClick={() => setSelectedTab('TrainingCapture')}>
                                 <Link to="/trainingcapture">Training Capture</Link>
                             </Tab>
-                            <Tab onClick={() => setSelectedTab('TrainingCapture')}>
-                                <Link to="/trainingcapture">Settings</Link>
+                            <Tab onClick={() => setSelectedTab('Settomgs')}>
+                                <Link to="/settings">Settings</Link>
                             </Tab>
                         </TabBar>
                         </div>

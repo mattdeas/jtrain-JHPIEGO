@@ -1,18 +1,10 @@
 import { useDataQuery, useDataMutation } from '@dhis2/app-runtime'
-import { CourseDetails } from './CourseDetails';
 import { CourseDetailsStaffView } from './CourseDetailsStaffView';
-
-// Move the courses section to the right
-const Courses = () => {
-    return (
-        <div style={{ float: 'right' }}>
-            {/* Your courses section code here */}
-        </div>
-    );
-}
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import React, {useState, useEffect} from 'react'
-
+// import delicon from './image/delete_icon.png'; 
+// import magnify from './image/magnifying.png';
+// import logo from './image/jtrainlogo.png';
 
 
 function debounce(func, wait) {
@@ -33,35 +25,10 @@ const handleResize = debounce(() => {
 window.addEventListener('resize', handleResize);
 
 const today = new Date();
-//const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-const qryTrackedEntityTypes = {
-    // One query object in the whole query
-    attributes: {
-        // The `attributes` endpoint should be used
-        resource: 'trackedEntityTypes',
-        params: {
-            // Paging is disabled
-            paging: false,
-            // Only the attribute properties that are required should be loaded
-            fields: 'id, displayName',
-        },
-    },
-}
 
-const qryPrograms = {
-    // One query object in the whole query
-    attributes: {
-        // The `attributes` endpoint should be used
-        resource: 'programs',
-        params: {
-            // Paging is disabled
-            paging: false,
-            // Only the attribute properties that are required should be loaded
-            fields: 'id, displayName',
-        },
-    },
-}
+
 
 const qryConstants = {
     // One query object in the whole query
@@ -76,18 +43,6 @@ const qryConstants = {
         },
     },
 }
-
-const query = {
-    // "page" variable below can be dinamically passed via refetch (see "handlePageChange" below)
-    instances: {
-        resource: 'trackedEntityInstances',
-        params: ({ ou ,trackedEntityType }) => ({
-            ou : ou,
-            trackedEntityType : trackedEntityType,
-        }),
-    },
-}
-
 
   const qryProgramFields = {
     program: {
@@ -184,6 +139,52 @@ const mutationWorking = {
     }),
 }
 
+
+const handleAssign = async (trackedEntityInstance) => {
+        
+    
+    const type = 'ZBUwOGosqI0';
+    // const { error: relationshipsError, data: relationshipsData } = await mutateRelationships({ trackedEntityInstance, eventID, type});
+    // if (relationshipsError) {
+    //     console.error('Error creating relationship:', relationshipsError);
+    // } else {
+    //     console.log('Relationship created successfully');
+    //     console.log('Relationship data:', relationshipsData);
+    // }
+
+    const { error } = await mutate({ trackedEntityInstance });
+    console.log('mutation', mutate)
+    if (error) {
+        console.error('Error creating event:', error);
+    } else {
+        console.log('Event created successfully');
+    }
+};
+
+const newEvent = {
+    resource: 'events',
+    type: 'create',
+    data: ({ trackedEntityInstance }) => ({
+        events: [
+            {
+                trackedEntityInstance,
+                program: 'Ss21byybIqu',
+                programStage: 'Y6scAJvghc0',
+                enrollment: 'qIuyPn7AVu2',
+                orgUnit: 'VgrqnQEtyOP',
+                dataValues: [
+                    {
+                        dataElement: 'tsU3YD7kfYU',
+                        value: eventID,
+                    },
+                ],
+                status: 'ACTIVE',
+                eventDate: formattedDate,
+            },
+        ],
+    }),
+};
+
 const mutation = {
     resource: 'trackedEntityInstances',
     id: ({ id }) => id,
@@ -200,6 +201,7 @@ export const Staffview = () => {
     const [trackedEntityInstance, setTrackedEntityInstance] = useState(null);
     const [formFields, setFormFields] = useState({});
     const [mutate, { loading, error }] = useDataMutation(mutation)
+    console.log(id);
     const { loading: loadingEntity, error: errorEntity, data: dataEntity } = useDataQuery(qryTrackedEntityInstance, {
         variables: {
          id,
@@ -293,7 +295,6 @@ const EVENTS_QUERY = {
         console.log(event)
 
         const { name, value } = event.target;
-        console.log('value', value)
         setFormFields(prevFields => ({
             ...prevFields,
             [name]: value,
@@ -301,6 +302,11 @@ const EVENTS_QUERY = {
         console.log('formfields', formFields)
     };
 
+    const handleInputChangeSelect = (event) => {
+        const { name, value } = event.target;
+        //console.log(`Option ID/Code: ${name}, Option Name: ${value}`);
+        setFormFields(prevFields => ({ ...prevFields, [name]: value }));
+    };
     
 
     let staffMemberid, defaultStaffOrgUnit, defaultStaffProg;
@@ -346,16 +352,23 @@ const EVENTS_QUERY = {
     // });
 
     
-    const transposedEvents = events.map(event => {
+    let transposedEvents = [];
+
+if (dataProgramDE && dataProgramDE.data && dataProgramDE.data.qPDE && dataProgramDE.data.qPDE.programStageDataElements) {
+    transposedEvents = events.map(event => {
         const eventObj = { event: event.event };
         event.dataValues.forEach(dataValue => {
-          const matchingElement = dataProgramDE.data.qPDE.programStageDataElements.find(element => element.dataElement.id === dataValue.dataElement);
-          if (matchingElement) {
-            eventObj[matchingElement.dataElement.displayName] = dataValue.value;
-          }
+            const matchingElement = dataProgramDE.data.qPDE.programStageDataElements.find(element => element.dataElement.id === dataValue.dataElement);
+            if (matchingElement) {
+                eventObj[matchingElement.dataElement.displayName] = dataValue.value;
+            }
         });
         return eventObj;
-      });
+    });
+} else {
+    // Fetch the necessary data here
+    // This will depend on how you're fetching data in your application
+}
 
     
  
@@ -396,7 +409,6 @@ const EVENTS_QUERY = {
     return (
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
   <div style={{ flex: '0 0 50%' }}>
-  
     <h1>Staff Details</h1>
 
     {
@@ -417,7 +429,7 @@ const EVENTS_QUERY = {
                     <tr>
                         {/* <th >ID</th> */}
                         <th>Name</th>
-                        <th>Value Type</th>
+                        <th>Value</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -428,10 +440,11 @@ const EVENTS_QUERY = {
                             <td>
                                 <label>{trackedEntityAttribute.name}</label>
                             </td>
+                            
                             <td>
                                 {trackedEntityAttribute.valueType === 'TEXT' ? (
                                     trackedEntityAttribute.optionSet && trackedEntityAttribute.optionSet.options ? (
-                                        <select name={trackedEntityAttribute.id} onChange={handleInputChange}>
+                                        <select name={trackedEntityAttribute.id} onChange={handleInputChangeSelect}>
                                             {trackedEntityAttribute.optionSet.options.map(option => (
                                                 <option key={option.id} value={option.code}>
                                                     {option.name}
@@ -486,15 +499,30 @@ const EVENTS_QUERY = {
  
 <thead>
 <tr>
-  {dataProgramDE?.data?.qPDE?.programStageDataElements.map(({ dataElement }) => (
-    <th key={dataElement.id}>
-      {dataElement.displayName === 'jtrain_course_eventid' ? 'Training Event' : dataElement.displayName}
-    </th>
-  ))}
+{transposedEvents.length > 0 && dataProgramDE?.data?.qPDE?.programStageDataElements.map(({ dataElement }) => {
+    if (dataElement.displayName.startsWith('jtrain')) {
+        if (dataElement.displayName === 'jtrain_course_eventid') {
+            return (
+                <th key={dataElement.id}>
+                    Training Event
+                </th>
+            );
+        } else {
+            return null; // This will not render the column
+        }
+    } else {
+        return (
+            <th key={dataElement.id}>
+                {dataElement.displayName}
+            </th>
+        );
+    }
+})}
 </tr>
 </thead>
 <tbody>
-  {transposedEvents.map((eventObj, index) => (
+{transposedEvents.length > 0 ? (
+  transposedEvents.map((eventObj, index) => (
     <tr key={eventObj.event}>
       {dataProgramDE?.data?.qPDE?.programStageDataElements.map(({ dataElement }, cellIndex) => (
         <td key={dataElement.id} style={{ textAlign: 'center' }}>
@@ -502,7 +530,10 @@ const EVENTS_QUERY = {
         </td>
       ))}
     </tr>
-  ))}
+  ))
+) : (
+  <p>No Courses attended</p>
+)}
 </tbody>
     </table>
   </div>

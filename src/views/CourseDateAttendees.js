@@ -1,6 +1,15 @@
 import React from 'react';
 import { useDataQuery, useDataMutation } from '@dhis2/app-runtime';
 import { StaffSearchAttendees } from './StaffSearchAttendees';
+import { CourseAttendee } from './CourseAttendee';
+
+
+const relationshipQuery = {
+    relationships: {
+      resource: 'relationships',
+      id: ({ id }) => id,
+    },
+  };
 
 export const CourseDateAttendees = ({ eventID }) => {
     if (!eventID || eventID.length === 0) {
@@ -17,17 +26,25 @@ export const CourseDateAttendees = ({ eventID }) => {
         },
     });
 
-    const mutation = {
-        resource: 'relationships',
-        type: 'delete',
-        id: "naGx9s8kuZP",
-    }
+    const { dataRel, loadingRel, errorRel } = useDataQuery(relationshipQuery);
 
-    const [mutate] = useDataMutation(mutation, {
-        onComplete: () => {
-            window.location.reload();
-        },
-    });
+    console.log('dataAttendees', data)
+    const useDeleteRelationship = (id) => {
+        const mutation = {
+            resource: 'relationships',
+            type: 'delete',
+            id: id,
+        }
+    
+        const [mutate] = useDataMutation(mutation, {
+            onComplete: () => {
+                window.location.reload();
+            },
+        });
+    
+        return mutate;
+    }
+    
 
     if (loading) return <span>Loading...</span>;
     if (error) return <span>Error: {error.message}</span>;
@@ -38,30 +55,27 @@ export const CourseDateAttendees = ({ eventID }) => {
             <p>Event ID: {eventID}</p>
 
             <table>
-                <thead>
-                    <tr>
-                        <th>Relationship ID</th>
-                        <th>Tracked Entity Instance ID</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {eventID && eventID.length > 0 && data && data.event && data.event.relationships && data.event.relationships.map((relationship) => (
-    <tr key={relationship.relationship}>
-        <td>{relationship.relationship}</td>
-        <td>{relationship.to.trackedEntityInstance.trackedEntityInstance}</td>
-        <td>
-            {/* <button onClick={() => mutate({ id: relationship.relationship })}>
-                Delete
-            </button> */}
-            <button onClick={() => mutate({ id: "naGx9s8kuZP" })}>
-                Delete
-            </button>
-            sdsvs
-        </td>
-    </tr>
-))}
-                </tbody>
-            </table>
+    <thead>
+        <tr>
+            <th>Relationship ID</th>
+            <th>Tracked Entity Instance ID</th>
+        </tr>
+    </thead>
+    <tbody>
+    {eventID && eventID.length > 0 && dataRel && dataRel.event && dataRel.event.relationships && dataRel.event.relationships.map((relationship) => {
+        console.log('dataRel',dataRel)
+  const relationshipData = dataRel.relationships[relationship.relationship];
+  return relationshipData ? (
+    <CourseAttendee 
+      key={relationship.relationship}
+      relationshipId={relationship.relationship}
+      eventID={eventID}
+      trackedEntityInstanceId={relationship.to.trackedEntityInstance.trackedEntityInstance}
+    />
+  ) : null;
+})}
+    </tbody>
+</table>
 
             <StaffSearchAttendees eventID={eventID}/>
         </div>
