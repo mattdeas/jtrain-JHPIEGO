@@ -14,10 +14,10 @@ export const CourseAttendee = ({ relationshipId, trackedEntityInstanceId, eventI
     const mutationDelRelationship = {
         resource: 'relationships',
         type: 'delete',
-        id: relationshipId,
+        id: relationshipId
         
-        event: eventID,
-        trackedEntityInstance: trackedEntityInstanceId,
+        //event: eventID,
+        //trackedEntityInstance: trackedEntityInstanceId,
     }
 
     const mutationRelationships = {
@@ -73,7 +73,7 @@ export const CourseAttendee = ({ relationshipId, trackedEntityInstanceId, eventI
             //await mutateUpdateEventRelationship();
             //await mutationRelationships();
         } catch (error) {
-            console.error(error);
+            console.error('Error in handleDelete:', error.message);
         }
     }
 

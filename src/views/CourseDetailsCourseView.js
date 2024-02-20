@@ -10,17 +10,6 @@ import {
 } from '@dhis2/ui';
 import React, { useState } from 'react';
 
-// const eventQuery = {
-//     events: {
-//         resource: 'events',
-//         params: ({ trackedEntityInstance }) => ({
-//             program: 'P59PhQsB6tb',
-//             orgUnit: 'VgrqnQEtyOP',
-//             trackedEntityInstance,
-//             fields: 'event,eventDate,dataValues[dataElement,value]'
-//         })
-//     }
-// };
 
 const eventQuery = {
     events: {
@@ -60,7 +49,6 @@ export const CourseDetailsCourseView = ({ id }) => {
     const [selectedCourseDate, setSelectedCourseDate] = useState(''); 
 
     const dSysConstants = useDataQuery(qryConstants);
-    console.log(dSysConstants);
 
     const { loading: eventLoading, error: eventError, data: eventData } = useDataQuery(eventQuery, {
         variables: { id: id },

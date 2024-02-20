@@ -1,83 +1,93 @@
 import React from 'react';
 import { useDataQuery, useDataMutation } from '@dhis2/app-runtime';
 import { StaffSearchAttendees } from './StaffSearchAttendees';
+import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import { CourseAttendee } from './CourseAttendee';
+import { StaffShow } from './CourseDateAttendees-StaffShow';
+
+const conVariableName = 'jtrain-course-attendees';
 
 
-const relationshipQuery = {
-    relationships: {
-      resource: 'relationships',
-      id: ({ id }) => id,
+const constantsQuery = () => ({
+    constants: {
+      resource: 'constants',
+      params: {
+        filter: `name:eq:${conVariableName}`,
+        fields: ['id', 'name', 'value', 'code'],
+        paging: false,
+      },
     },
-  };
+  });
+
+
+  const qryConstants = {
+    // One query object in the whole query
+    attributes: {
+        // The `attributes` endpoint should be used
+        resource: 'constants',
+        params: {
+            // Paging is disabled
+            paging: false,
+            // Only the attribute properties that are required should be loaded
+            fields: 'id, displayName, code, value',
+        },
+    },
+}
+
+const qryTrackedEntityInstance = {
+    trackedEntityInstance: {
+        resource: 'trackedEntityInstances',
+        id: ({ id }) => id,
+        params: {
+            fields: ['attributes[attribute,value]'],
+        },
+    },
+};
+
+
 
 export const CourseDateAttendees = ({ eventID }) => {
-    if (!eventID || eventID.length === 0) {
-        return <div>Please provide an event ID.</div>;
-    }
+    const { id } = useParams();
+    console.log('id:',id);
+    console.log('eventID:',eventID);
 
-    const { loading, error, data } = useDataQuery({
-        event: {
-            resource: 'events',
-            id: `${eventID}`,
-            params: {
-                fields: ['relationships[*]'],
-            },
+
+    const eventQuery = (eventID) => ({
+      events: {
+        resource: `events/${eventID}`,
+        id: ({ eventID }) => eventID,
+        params: {
+          fields: 'event,eventDate,dataValues[dataElement,value]',
         },
+      },
     });
+  
+  const { loading: loadingEvent, error: errorEvent, data: dataEvent } = useDataQuery(eventQuery(eventID));
 
-    const { dataRel, loadingRel, errorRel } = useDataQuery(relationshipQuery);
+  console.log("Event dataValues:", dataEvent);
 
-    console.log('dataAttendees', data)
-    const useDeleteRelationship = (id) => {
-        const mutation = {
-            resource: 'relationships',
-            type: 'delete',
-            id: id,
-        }
-    
-        const [mutate] = useDataMutation(mutation, {
-            onComplete: () => {
-                window.location.reload();
-            },
-        });
-    
-        return mutate;
-    }
-    
+  if (loadingEvent) return <span>Loading...</span>;
+  if (errorEvent) return <span>Error1: {errorEvent.message}</span>;
 
-    if (loading) return <span>Loading...</span>;
-    if (error) return <span>Error: {error.message}</span>;
-    console.log("data", data)
+  console.log("Event dataValues:", dataEvent);
+  console.log("Event dataValues2:", dataEvent.events.dataValues);
+
+  // Find the object where dataElement is 'l9aHlXLsEyE'
+  const dataElementObject = dataEvent.events.dataValues.find(
+    (dataValue) => dataValue.dataElement === 'l9aHlXLsEyE'
+  );
+
+    
     return (
         <div>
-            <h3>Course Date Attendees</h3>
-            <p>Event ID: {eventID}</p>
-
+            <h3>Course Date Attendees {eventID}</h3>
             <table>
-    <thead>
-        <tr>
-            <th>Relationship ID</th>
-            <th>Tracked Entity Instance ID</th>
-        </tr>
-    </thead>
-    <tbody>
-    {eventID && eventID.length > 0 && dataRel && dataRel.event && dataRel.event.relationships && dataRel.event.relationships.map((relationship) => {
-        console.log('dataRel',dataRel)
-  const relationshipData = dataRel.relationships[relationship.relationship];
-  return relationshipData ? (
-    <CourseAttendee 
-      key={relationship.relationship}
-      relationshipId={relationship.relationship}
-      eventID={eventID}
-      trackedEntityInstanceId={relationship.to.trackedEntityInstance.trackedEntityInstance}
-    />
-  ) : null;
-})}
-    </tbody>
-</table>
+                <tbody>
+                  <StaffShow tei_id={dataElementObject.value}/>
+                </tbody>
+              </table>
 
-            <StaffSearchAttendees eventID={eventID}/>
+            <StaffSearchAttendees eventID={eventID} dataEvent={dataEvent} tei_id={dataElementObject.value} />
         </div>
     );
 }

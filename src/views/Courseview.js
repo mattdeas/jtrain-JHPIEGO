@@ -1,15 +1,8 @@
-import { useDataQuery, useDataMutation } from '@dhis2/app-runtime'
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableCellHead,
-    TableHead,
-    TableRow,
-    TableRowHead,
-} from '@dhis2/ui'
+import { useDataQuery, useDataMutation } from '@dhis2/app-runtime';
+import { CourseDetailsCourseView } from './CourseDetailsCourseView';
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import React, {useState, useEffect} from 'react'
+
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -26,42 +19,9 @@ const handleResize = debounce(() => {
 }, 200);
 
 window.addEventListener('resize', handleResize);
-/**
- * This defined the data that we want to get
- * The `app-runtime` will be explained in a another session after this one,
- * so you don't have to worry about the specifics for now
- */
 
 const today = new Date();
 const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-
-const qryTrackedEntityTypes = {
-    // One query object in the whole query
-    attributes: {
-        // The `attributes` endpoint should be used
-        resource: 'trackedEntityTypes',
-        params: {
-            // Paging is disabled
-            paging: false,
-            // Only the attribute properties that are required should be loaded
-            fields: 'id, displayName',
-        },
-    },
-}
-
-const qryPrograms = {
-    // One query object in the whole query
-    attributes: {
-        // The `attributes` endpoint should be used
-        resource: 'programs',
-        params: {
-            // Paging is disabled
-            paging: false,
-            // Only the attribute properties that are required should be loaded
-            fields: 'id, displayName',
-        },
-    },
-}
 
 const qryConstants = {
     // One query object in the whole query
@@ -77,30 +37,6 @@ const qryConstants = {
     },
 }
 
-const query4 = {
-    programs: {
-        resource: 'programs',
-        params: ({ pageSize }) => ({
-            order: 'displayName:asc',
-            pageSize,
-            page: 1
-        }),
-    },
-
-
-}
-
-
-const query = {
-    // "page" variable below can be dinamically passed via refetch (see "handlePageChange" below)
-    instances: {
-        resource: 'trackedEntityInstances',
-        params: ({ ou ,trackedEntityType }) => ({
-            ou : ou,
-            trackedEntityType : trackedEntityType,
-        }),
-    },
-}
 
 
   const qryProgramFields = {
@@ -113,22 +49,12 @@ const query = {
     },
 };
 
-
-
-//https://dhis2.af.jhpiego.org/api/trackedEntityInstances?ou=x0Zl6eKgC7B&trackedEntityType=W9FNXXgGbm7
-
-const mutation = {
-    resource: 'trackedEntityInstances',
-    type: 'create',
-    data: ({ newEntity }) => newEntity,
-};
-
 const handleUpdate = () => {
-   
 };
+
+
 
 const handleCancel = () => {
-  
 };
 
 const qryTrackedEntityInstance = {
@@ -141,54 +67,267 @@ const qryTrackedEntityInstance = {
     },
 };
 
+
+
+
+
+const eventsQuery = (id) => ({
+    events: {
+        resource: 'events',
+        params: {
+            trackedEntityInstance: id,
+            fields: ['event', 'status', 'program', 'orgUnit', 'dataValues[dataElement,value]'],
+        },
+    },
+});
+const dataElementQuery = {
+    dataElement: {
+        resource: 'dataElements',
+        id: '{id}', // replace with the actual dataElement ID
+        params: {
+            fields: ['displayName'],
+        },
+    },
+};
+
+const DataElement = ({ dataElementId, value }) => {
+    const dataElementQuery = {
+        dataElement: {
+            resource: 'dataElements',
+            id: dataElementId,
+            params: {
+                fields: ['displayName'],
+            },
+        },
+    };
+
+    const { loading, error, data } = useDataQuery(dataElementQuery);
+
+    if (loading) return <td>Loading...</td>;
+    if (error) return <td>Error: {error.message}</td>;
+
+    return (
+        <>
+            <td>{data.dataElement.displayName}</td>
+            <td>{value}</td>
+        </>
+    );
+};
+
+const mutationWorking = {
+    resource: 'programs',
+    id: ({ id }) => id,
+    type: 'update',
+    partial: true,
+    data: ({ name }) => ({
+        name,
+    }),
+}
+
+const mutation = {
+    resource: 'trackedEntityInstances',
+    id: ({ id }) => id,
+    type: 'update',
+    data: ({ orgUnit, attributes }) => ({
+        orgUnit,
+        attributes,
+    }),
+}
+
+const qryProgramDataElements = {
+    "qPDE": {
+        resource: 'programStages',
+           "id": 'r0gHZqEq6DE',
+           "params": {
+               "fields": "programStageDataElements[program[id,P59PhQsB6tb],dataElement[id,displayName,valueType],sortOrder]",
+           },
+
+    },
+}
+
+// const mutationCourseEvent = {
+//     resource: 'events',
+//     type: 'create',
+//     data: ({ trackedEntityInstance }) => ({
+//         events: [
+//             {
+//                 trackedEntityInstance: 'bQD9iDVR7E3',
+//                 program: 'P59PhQsB6tb',
+//                 programStage: 'r0gHZqEq6DE',
+//                 orgUnit: 'VgrqnQEtyOP',
+//                 dataValues: [
+//                     {
+//                         dataElement: 'I3k1jlogV15',
+//                         value: '2024-01-01',
+//                     },
+//                     {
+//                         dataElement: 'ahGuEZrtqR5',
+//                         value: '2024-01-01',
+//                     },
+//                     {
+//                         dataElement: 'WYM1k90FCf7',
+//                         value: 'Testy McTestface',
+//                     }
+//                 ],
+//                 status: 'ACTIVE',
+//                 eventDate: formattedDate,
+//             },
+//         ],
+//     }),
+// };
+
+const mutationCourseEvent = {
+    resource: 'events',
+    type: 'create',
+    data: ({ trackedEntityInstance, dataValues }) => ({
+      events: [
+        {
+          trackedEntityInstance: 'bQD9iDVR7E3',
+          program: 'P59PhQsB6tb',
+          programStage: 'r0gHZqEq6DE',
+          orgUnit: 'VgrqnQEtyOP',
+          dataValues: dataValues,
+          status: 'ACTIVE',
+          eventDate: formattedDate,
+        },
+      ],
+    }),
+  };
+
 export const Courseview = () => {
-    // This is yet another functionality provided by the `@dhis2/app-runtime`
-    // For the time being it does not matter what this does exactly
-    // * loading will be true while the data is being loaded
-    // * error will be an instance of `Error` if something fails
-    // * data will be null while the data is being loaded or if something fails
-    // * data will be an object once loading is done with the following path
-    //   data.attributes.attributes <- That's an array of objects
     const { id } = useParams();
     const dSysConstants = useDataQuery(qryConstants)
     const [trackedEntityInstance, setTrackedEntityInstance] = useState(null);
-    const handleAdd = () => {
-        // Get the form field values
-        const newEntity = {
-            attributes: data.program.programTrackedEntityAttributes.map(attr => ({
-                attribute: attr.trackedEntityAttribute.id,
-                value: formFields[attr.trackedEntityAttribute.id],
-            })),
-            program: "Ss21byybIqu", // Add the program ID here
-            orgUnit: "VgrqnQEtyOP", // Add the organizational unit ID here
-            trackedEntityType: "W9FNXXgGbm7", // Add the tracked entity type ID here
-            // ... other necessary fields for a tracked entity instance
-        };
-    
-        // Call the mutate function
-        mutate({ newEntity })
-    .then((result) => {
-       console.log('Mutation result:', result);
-       console.log('Tracked entity instance created successfully!')
-    })
-    .catch((error) => {
-        console.log('Mutation error:', error);
-        console.log('Tracked entity instance failed!')
-    });
-    };
-
+    const [formFields, setFormFields] = useState({});
+    const [mutate, { loading, error }] = useDataMutation(mutation)
     const { loading: loadingEntity, error: errorEntity, data: dataEntity } = useDataQuery(qryTrackedEntityInstance, {
         variables: {
-         //   id: "1", // Replace with the ID of the tracked entity instance you want to fetch
          id,
         },
     });
-    // Use the useDataMutation hook
-    const [mutate, { loading: loading2, error }] = useDataMutation(mutation);
+    // Initialize the state for the input values
+    const [inputValues, setInputValues] = useState({});
 
+    const [showSection, setShowSection] = useState(false);
+
+  const { loading: loading2, error2, data: dataProgramDE } = useDataQuery(qryProgramDataElements);
+
+    const handleInputChange = (id, value) => {
+        //console.log('id', id);
+        //console.log('value', value);
+        setInputValues(prevValues => ({ ...prevValues, [id]: value }));
+        console.log('inputValues', inputValues);
+      };
+
+      const handleInputChangeSelect = (event) => {
+        const { name, value } = event.target;
+        //console.log(`Option ID/Code: ${name}, Option Name: ${value}`);
+        setInputValues(prevValues => ({ ...prevValues, [name]: value }));
+    };
+    const [createEvent, { dataEvent, loadingEvent, errorEvent }] = useDataMutation(mutationCourseEvent);
+
+    const Variable = () => {
+        const dataValues = Object.entries(inputValues).map(([dataElement, value]) => ({ dataElement, value }));
+        console.log('dataValues', dataValues);
+        setShowSection(false);
+        //const { error } = await mutate({ trackedEntityInstance });
+        console.log('mutation', mutate)
+        // if (error) {
+        //     console.error('Error creating event:', error);
+        // } else {
+        //     console.log('Event created successfully');
+        // }
+    };
+
+    const handleSave = async (trackedEntityInstance) => {
+    
+        // const type = 'ZBUwOGosqI0';
+        // const { error: relationshipsError, data: relationshipsData } = await mutateRelationships({ trackedEntityInstance, eventID, type});
+        // if (relationshipsError) {
+        //     console.error('Error creating relationship:', relationshipsError);
+        // } else {
+        //     console.log('Relationship created successfully');
+        //     console.log('Relationship data:', relationshipsData);
+        // }
+    
+        const dataValues = Object.entries(inputValues).map(([dataElement, value]) => ({ dataElement, value }));
+        const { error } = await createEvent({ trackedEntityInstance, dataValues });
+        console.log('CreateEvent', createEvent)
+        if (error) {
+            console.error('Error creating event:', error);
+        } else {
+            console.log('Event created successfully');
+        }
+    };
+    
+    <button onClick={() => handleAssign(trackedEntityInstance)}>
+                                Assign
+                            </button>
+    
+    // const dataValues = [
+    //     {
+    //       dataElement: 'I3k1jlogV15',
+    //       value: '2024-01-01',
+    //     },
+    //     {
+    //       dataElement: 'ahGuEZrtqR5',
+    //       value: '2024-01-01',
+    //     },
+    //     {
+    //       dataElement: 'WYM1k90FCf7',
+    //       value: 'Testy McTestface',
+    //     },
+    //   ]; 
+
+  const handleButtonClick = () => {
+    setShowSection(true);
+  };
+
+    const [responseMessage, setResponseMessage] = useState('');
+    const { loading: loadingEvents, error: errorEvents, data: eventsData } = useDataQuery(eventsQuery(id));
+    useEffect(() => {
+    if (!loadingEvents && !errorEvents && eventsData?.events) {
+        console.log('eventsDataevents',eventsData)
+        setEvents(eventsData.events.events);
+        }   
+        }, [eventsData, loadingEvents, errorEvents]);
+
+
+    let defOrgUnit = null;
+    if (dSysConstants && dSysConstants.data && dSysConstants.data.attributes && dSysConstants.data.attributes.constants) {
+        const defOrgUnitObj = dSysConstants.data.attributes.constants.find(constant => constant.displayName === 'jtrain-DefaultStaffOrgUnit');
+        defOrgUnit = defOrgUnitObj ? defOrgUnitObj.code : null;
+    }
+    
+    const attributes = Object.entries(formFields).map(([attribute, value]) => ({ attribute, value }));
+
+    const doMutation = async () => {
+        try {
+                        // Pass the mutation object to the mutate function
+                        //const response = await mutate(MutateTEI);
+                        const response = await mutate({ id: id,
+                         orgUnit: defOrgUnit, 
+                         attributes });
+                        if (!response || (error && error.length > 0)) {
+                            setResponseMessage('Failed to upload data');
+                            console.error('Error:', error);
+                        } else {
+                            setResponseMessage('Data uploaded successfully!');
+                            console.log(response);
+                        }
+                    } catch (error) {
+                        setResponseMessage('An error occurred while uploading data');
+                        console.error('Error:', error);
+                    }
+        
+    }
+
+    const handleFormSubmit = async (event) => {
+        event.preventDefault();
+        doMutation();
+    };
 
     let staffMemberid, defaultStaffOrgUnit, defaultStaffProg;
-    console.log({ dSysConstants })
     // Check if dSysConstants and constants exist
     if (dSysConstants && dSysConstants.data && dSysConstants.data.attributes && dSysConstants.data.attributes.constants) {
         // Find the jtrain-StaffMember and jtrain-DefaultStaffOrgUnit objects
@@ -200,119 +339,181 @@ export const Courseview = () => {
         staffMemberid = staffMemberObj ? staffMemberObj.code : null;
         defaultStaffOrgUnit = defaultStaffOrgUnitObj ? defaultStaffOrgUnitObj.code : null;
         defaultStaffProg = defaultStaffProgObj ? defaultStaffProgObj.code : null;
-        console.log('Constants Loaded')// Log the values to the console
-        
     }
 
-    
-
-
-    console.log({ staffMemberid, defaultStaffOrgUnit });
     const { loading: loading1, error1, data } = useDataQuery(qryProgramFields, {
         variables: {
-          id:  "Ss21byybIqu", // Use the ID of the program you want to fetch
+          id:  "P59PhQsB6tb", // Use the ID of the program you want to fetch
         },
     });
 
-    // Define a state variable for the form fields
-    const [formFields, setFormFields] = useState({});
+    
+    const [events, setEvents] = useState([]);
 
     useEffect(() => {
-        if (data && !loading1 && !error1 && dataEntity && dataEntity.trackedEntityInstance) {
+        if (!loadingEntity && !errorEntity && dataEntity?.trackedEntityInstance?.attributes) {
             setTrackedEntityInstance(dataEntity.trackedEntityInstance.attributes);
         }
-    }, [data, loading1, error1, dataEntity]);
+    }, [dataEntity, loadingEntity, errorEntity]);
     
-    console.log("trackedEntityInstance", trackedEntityInstance);
-    const handleInputChange = (event) => {
-        // Update the state with the new value of the changed field
-        setFormFields({
-            ...formFields,
-            [event.target.name]: event.target.value,
-        });
-    };
+    
+
+    
+
+    useEffect(() => {
+        if (trackedEntityInstance) {
+            const initialFormFields = trackedEntityInstance.reduce((fields, attr) => ({
+                ...fields,
+                [attr.attribute]: attr.value,
+            }), {});
+        
+            setFormFields(initialFormFields);
+        }
+    }, [trackedEntityInstance]);
 
     const findAttributeValue = (attributeId) => {
+        // If the attribute value exists in formFields, return it
+        if (formFields[attributeId]) {
+            return formFields[attributeId];
+        }
+    
+        // Otherwise, find the attribute value in trackedEntityInstance
         if (trackedEntityInstance) {
             const attribute = trackedEntityInstance.find(attr => attr.attribute === attributeId);
             return attribute ? attribute.value : '';
-        } else {
-            return '';
         }
+    
+        return '';
     };
     
     return (
-  <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+  <div style={{ flex: '0 0 50%' }}>
+  
     <h1>Course Details</h1>
 
     {
-      // display that the data is being loaded
-      // when loading is true
       loading1 && 'Loading...'
     }
 
     {
-      // display the error message
-      // is an error occurred
       error && error.message
     }
 
     {
-      // if there is any data available
-      data?.program?.programTrackedEntityAttributes && (
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Value Type</th>
+    // if there is any data available
+    data?.program?.programTrackedEntityAttributes && (
+            
+        <form onSubmit={handleFormSubmit}>
+            <table>
+                <thead>
+                    <tr>
+                        {/* <th >ID</th> */}
+                        <th>Variable</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {data.program.programTrackedEntityAttributes.map(({ trackedEntityAttribute }) => (
+                    trackedEntityAttribute.name !== 'jtrain_staff_courses' && (
+                        <tr key={trackedEntityAttribute.id}>
+                            {/* <td style={{width: '0px'}}>{trackedEntityAttribute.id}</td> */}
+                            <td>
+                                <label>{trackedEntityAttribute.name}</label>
+                            </td>
+                            <td>
+                                {trackedEntityAttribute.valueType === 'TEXT' ? (
+                                    trackedEntityAttribute.optionSet && trackedEntityAttribute.optionSet.options ? (
+                                        <select name={trackedEntityAttribute.id} onChange={handleInputChangeSelect}>
+                                            {trackedEntityAttribute.optionSet.options.map(option => (
+                                                <option key={option.id} value={option.code}>
+                                                    {option.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    ) : (
+                                        <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)} onChange={handleInputChange}  />
+                                    )
+                                ) : trackedEntityAttribute.valueType === 'DATE' ? (
+                                    <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)}  onChange={handleInputChange}/>
+                                ) : trackedEntityAttribute.valueType === 'NUMBER' ? (
+                                    <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)} onChange={handleInputChange}/>
+                                ) : (
+                                    trackedEntityAttribute.valueType
+                                )}
+                            </td>
+                        </tr>
+                    )
+                ))}
+            </tbody>
+            </table>
+            <button type="submit">Submit</button>
+            <p>{responseMessage}</p>
+            
+            
+   
+        </form>
+
+        
+    )
+}
+  </div>
+  <div style={{ display: 'flex', flexDirection: 'column' }}>
+  <div style={{ width: '100%', height: '70%', overflow: 'auto' }}>
+    <p style={{ alignContent: 'center', paddingLeft: '25%'}} >Course Details</p>
+    {
+    eventsData?.events?.events?.length > 0 && (
+      <table>
+        <tbody>
+          {eventsData.events.events.map((event) => (
+            <tr key={event.event}>
+               <td>{event.event}</td>
+              <td><CourseDetailsCourseView id={event.event} /></td>
             </tr>
+          ))}
+        </tbody>
+      </table>
+    )
+  }</div>
+  <div>
+  {!showSection && <button onClick={handleButtonClick}>New Course Dates</button>}
+  {showSection && dataProgramDE && (
+    <>
+      <table>
+        <thead>
+          <tr>
+            <th>Variable</th>
+            <th>Value</th>
+          </tr>
         </thead>
         <tbody>
-    {data.program.programTrackedEntityAttributes.map(({ trackedEntityAttribute }) => (
-        <tr key={trackedEntityAttribute.id}>
-            <td style="width:0px">{trackedEntityAttribute.id}</td>
-            <td>
-                <label>{trackedEntityAttribute.name}</label>
-            </td>
-            <td>
-                {trackedEntityAttribute.valueType === 'TEXT' ? (
-                    trackedEntityAttribute.optionSet && trackedEntityAttribute.optionSet.options ? (
-                        <select name={trackedEntityAttribute.id}  onChange={handleInputChange}>
-                            {trackedEntityAttribute.optionSet.options.map(option => (
-                                <option key={option.id} value={option.code}>
-                                    {option.name}
-                                </option>
-                            ))}
-                        </select>
-                    ) : (
-                        <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)} onChange={handleInputChange} />
-                    )
-                ) : trackedEntityAttribute.valueType === 'DATE' ? (
-                    <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)} onChange={handleInputChange} />
-                ) : trackedEntityAttribute.valueType === 'NUMBER' ? (
-                    <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)} onChange={handleInputChange} />
-                ) : (
-                    trackedEntityAttribute.valueType
-                )}
-            </td>
-        </tr>
-    ))}
-</tbody>
-        <tr>
-        <td >
-            
-            <button >Update</button>
-            <button >Cancel</button>
-        </td>
-        </tr>
-        <tr>
-            <td><hr /></td>
-        </tr>
-        </table>
-
-      )
-    }
+        
+{dataProgramDE.qPDE.programStageDataElements.map((item, index) => {
+  return (
+    <tr key={item.dataElement.id}>
+      <td>{item.dataElement.displayName}</td>
+      <td>
+        {item.dataElement.valueType === 'DATE' ? (
+          <input type="date" value={inputValues[item.dataElement.id] || ''} onChange={e => handleInputChange(item.dataElement.id, e.target.value)} />
+        ) : item.dataElement.valueType === 'TEXT' ? (
+          <input type="text" value={inputValues[item.dataElement.id] || ''} onChange={e => handleInputChange(item.dataElement.id, e.target.value)} />
+        ) : (
+          item.dataElement.valueType
+        )}
+      </td>
+    </tr>
+  );
+})}
+        </tbody>
+      </table>
+      <button onClick={() => setShowSection(false)}>Cancel</button>
+      <button onClick={handleSave}>Save</button>
+    </>
+  )}
+</div>
+    </div>
   </div>
 )
 }
+
+

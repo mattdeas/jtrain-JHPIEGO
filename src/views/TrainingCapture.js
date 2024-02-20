@@ -66,6 +66,8 @@ export const TrainingCapture = () => {
         setSearchTerm(event.target.value);
     }
 
+    const [refreshKey, setRefreshKey] = useState(0);
+
     
 
     return (
@@ -123,6 +125,7 @@ export const TrainingCapture = () => {
                                                     endDateVar: 'ahGuEZrtqR5'
                                                 });
                                                 setSearchTableExpanded(!isSearchTableExpanded);
+                                                setRefreshKey(prevKey => prevKey + 1);
                                             }}>Select</button>
                                             </TableCell>
                                         </TableRow>
@@ -137,7 +140,7 @@ export const TrainingCapture = () => {
                 </div>
             )}
             <div style={{ verticalAlign: 'top' }}>
-                {selectedCourse && <CourseDetails course={selectedCourse} />}
+                {selectedCourse && <CourseDetails key={refreshKey} course={selectedCourse} />}
             </div>
         </div>
     )

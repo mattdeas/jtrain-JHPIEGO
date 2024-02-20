@@ -62,6 +62,7 @@ export const CourseDetailsStaffView = ({ course }) => {
     const dSysConstants = useDataQuery(qryConstants);
     console.log(dSysConstants);
 
+    
     const { loading: eventLoading, error: eventError, data: eventData } = useDataQuery(eventQuery, {
         variables: { id: course },
       });
