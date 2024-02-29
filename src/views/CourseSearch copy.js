@@ -104,8 +104,8 @@ export const CourseSearch1 = () => {
     console.log({ dSysConstants })
     // Check if dSysConstants and constants exist
     if (dSysConstants && dSysConstants.data && dSysConstants.data.attributes && dSysConstants.data.attributes.constants) {
-        // Find the jtrain-StaffMember and jtrain-DefaultStaffOrgUnit objects
-        const courseObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-StaffMember');
+        // Find the jtrain-TEI-Type-Staff and jtrain-DefaultStaffOrgUnit objects
+        const courseObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-TEI-Type-Staff');
         const defaultStaffOrgUnitObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-DefaultStaffOrgUnit');
 
         console.log(courseObj)

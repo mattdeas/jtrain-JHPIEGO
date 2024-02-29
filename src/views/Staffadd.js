@@ -1,4 +1,4 @@
-import { useDataQuery, useDataMutation } from '@dhis2/app-runtime'
+import { useDataQuery, useDataMutation , useDataEngine} from '@dhis2/app-runtime'
 import {
     Table,
     TableBody,
@@ -118,7 +118,8 @@ export const Staffadd = () => {
     const { id } = useParams();
     const dSysConstants = useDataQuery(qryConstants)
     const [trackedEntityInstance, setTrackedEntityInstance] = useState(null);
-    
+    const [message, setMessage] = useState('');
+    const engine = useDataEngine();
 
     const { loading: loadingEntity, error: errorEntity, data: dataEntity } = useDataQuery(qryTrackedEntityInstance, {
         variables: {
@@ -158,22 +159,48 @@ export const Staffadd = () => {
         };
         console.log('newEntity', newEntity);
         // Call the mutate function
-        mutate({ newEntity })
-    .then((result) => {
-       console.log('Mutation result:', result);
-    })
-    .catch((error) => {
-        console.log('Mutation error:', error);
+        // Create the new tracked entity instance
+        const createResponse = await engine.mutate({
+            resource: 'trackedEntityInstances',
+            type: 'create',
+            data: newEntity,
+        });
+
+        // Get the ID of the newly created tracked entity instance
+    const teiId = createResponse.response.importSummaries[0].reference;
+
+    // Enroll the tracked entity instance in the program
+    const enrollmentData = {
+        trackedEntityInstance: teiId,
+        program: "Ss21byybIqu", // Add the program ID here
+        orgUnit: "VgrqnQEtyOP", // Add the organizational unit ID here
+        enrollmentDate: new Date().toISOString().split('T')[0], // Use the current date as the enrollment date
+        incidentDate: new Date().toISOString().split('T')[0], // Use the current date as the incident date
+    };
+
+    await engine.mutate({
+        resource: 'enrollments',
+        type: 'create',
+        data: enrollmentData,
     });
+
+    setMessage('Saved successfully');
+    //props.onSaved();
+        //redirct to the staffview page with the id 
+
+    
     };
 
 
+    
+
+    
     let staffMemberid, defaultStaffOrgUnit, defaultStaffProg;
     console.log({ dSysConstants })
     // Check if dSysConstants and constants exist
     if (dSysConstants && dSysConstants.data && dSysConstants.data.attributes && dSysConstants.data.attributes.constants) {
-        // Find the jtrain-StaffMember and jtrain-DefaultStaffOrgUnit objects
-        const staffMemberObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-StaffMember');
+        // Find the jtrain-TEI-Type-Staff and jtrain-DefaultStaffOrgUnit objects
+        const staffMemberObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-TEI-Type-Staff');
         const defaultStaffOrgUnitObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-DefaultStaffOrgUnit');
         const defaultStaffProgObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-StaffProgram');
         
@@ -254,48 +281,52 @@ export const Staffadd = () => {
         <form onSubmit={handleFormSubmit}>
             <table>
                 <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Value Type</th>
-                    </tr>
+                    
                 </thead>
                 <tbody>
-                    {data.program.programTrackedEntityAttributes.map(({ trackedEntityAttribute }) => (
-                        <tr key={trackedEntityAttribute.id}>
-                            <td style={{width: '0px'}}>{trackedEntityAttribute.id}</td>
-                            <td>
-                                <label>{trackedEntityAttribute.name}</label>
-                            </td>
-                            <td>
-                                {trackedEntityAttribute.valueType === 'TEXT' ? (
-                                    trackedEntityAttribute.optionSet && trackedEntityAttribute.optionSet.options ? (
-                                        <select name={trackedEntityAttribute.id} onChange={handleInputChange}>
-                                            {trackedEntityAttribute.optionSet.options.map(option => (
-                                                <option key={option.id} value={option.code}>
-                                                    {option.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)} onChange={handleInputChange}  />
-                                    )
-                                ) : trackedEntityAttribute.valueType === 'DATE' ? (
-                                    <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)}  onChange={handleInputChange}/>
-                                ) : trackedEntityAttribute.valueType === 'NUMBER' ? (
-                                    <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)} onChange={handleInputChange}/>
-                                ) : (
-                                    trackedEntityAttribute.valueType
-                                )}
-                            </td>
-                        </tr>
-                    ))}
+                {data.program.programTrackedEntityAttributes.map(({ trackedEntityAttribute }) => {
+    // If the name starts with 'jtrain', return null to skip this row
+    if (trackedEntityAttribute.name.startsWith('jtrain')) {
+      return null;
+    }
+
+    return (
+      <tr key={trackedEntityAttribute.id}>
+        <td>
+          <label>{trackedEntityAttribute.name}</label>
+        </td>
+        <td>
+          {trackedEntityAttribute.valueType === 'TEXT' ? (
+            trackedEntityAttribute.optionSet && trackedEntityAttribute.optionSet.options ? (
+              <select name={trackedEntityAttribute.id} onChange={handleInputChange}>
+                {trackedEntityAttribute.optionSet.options.map(option => (
+                  <option key={option.id} value={option.code}>
+                    {option.name}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)} onChange={handleInputChange}  />
+            )
+          ) : trackedEntityAttribute.valueType === 'DATE' ? (
+            <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)}  onChange={handleInputChange}/>
+          ) : trackedEntityAttribute.valueType === 'NUMBER' ? (
+            <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)} onChange={handleInputChange}/>
+          ) : (
+            trackedEntityAttribute.valueType
+          )}
+        </td>
+        {/* <td>{trackedEntityAttribute.valueType}</td> */}
+      </tr>
+    );
+  })}
                 </tbody>
             </table>
             <button type="submit">Submit</button>
         </form>
     )
 }
+    {message && <p>{message}</p>}
   </div>
 )
 }

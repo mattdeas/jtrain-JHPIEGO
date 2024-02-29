@@ -9,8 +9,9 @@ import {
     TableRow,
     TableRowHead,
 } from '@dhis2/ui'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { CourseAdd} from './Course-Add'
 
 const query = {
     instances: {
@@ -24,8 +25,20 @@ const query = {
 
 export const CourseSearch = () => {
     const { id } = useParams(); // Get the ID from the URL
+    const [showAddCourse, setShowAddCourse] = useState(false);
+    const [message, setMessage] = useState(localStorage.getItem('message') || '');
 
-    const { loading, error, data } = useDataQuery(query, {
+    useEffect(() => {
+        localStorage.removeItem('message');
+    }, []);
+
+    const reload = () => {
+        setMessage('Course added successfully');
+        setShowAddCourse(false);
+        refetch();
+    };
+
+    const { loading, error, data, refetch } = useDataQuery(query, {
         variables: {
             ou: 'VgrqnQEtyOP',
             program: 'P59PhQsB6tb',
@@ -105,11 +118,19 @@ export const CourseSearch = () => {
                                 }
                             )}
                     </TableBody>
-                    <Link to="/staffdetail-add">
-                        <button>Add New Course</button>
-                    </Link>
+                    
                 </Table>
             )}
+            <button onClick={() => { setShowAddCourse(true); setMessage(''); }}>Add New Course</button>
+            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                
+
+            {showAddCourse ? (
+                <CourseAdd onCancel={() => setShowAddCourse(false)} onSaved={reload} />
+            ) : (
+                <p>{message}</p>
+            )}
+            </div>
         </div>
     )
 }

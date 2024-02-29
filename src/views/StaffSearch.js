@@ -98,8 +98,8 @@ export const StaffSearch = () => {
     console.log({ dSysConstants })
     // Check if dSysConstants and constants exist
     if (dSysConstants && dSysConstants.data && dSysConstants.data.attributes && dSysConstants.data.attributes.constants) {
-        // Find the jtrain-StaffMember and jtrain-DefaultStaffOrgUnit objects
-        const staffMemberObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-StaffMember');
+        // Find the jtrain-TEI-Type-Staff and jtrain-DefaultStaffOrgUnit objects
+        const staffMemberObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-TEI-Type-Staff');
         const defaultStaffOrgUnitObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-DefaultStaffOrgUnit');
 
         console.log(staffMemberObj)
@@ -186,7 +186,7 @@ export const StaffSearch = () => {
       <TableBody>
       {data.instances.trackedEntityInstances
     .filter(item => item.attributes.some(attr => attr.displayName === 'Family Name' && attr.value.toLowerCase().includes(searchTerm.toLowerCase())))
-    .slice(0, 10)
+    .slice(0, 100)
     .map(
         ({ trackedEntityInstance, attributes }) => {
             // Create an object from the attributes array
@@ -210,7 +210,7 @@ export const StaffSearch = () => {
         }
     )}
                         </TableBody>
-                        <Link to="/staff_add">
+                        <Link to="/staffadd">
     <button>Add New Staff</button>
 </Link>
       

@@ -93,11 +93,14 @@ export const CourseDetailsStaffView = ({ course }) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    {data.programStages.programStageDataElements
-                      .sort((a, b) => a.sortOrder - b.sortOrder)
-                      .map(({ dataElement }) => (
-                        <TableCell key={dataElement.id}>{dataElement.displayName}</TableCell>
-                      ))}
+                  {data.programStages.programStageDataElements
+                  .sort((a, b) => a.sortOrder - b.sortOrder)
+                  .map(({ dataElement }) => {
+                    if (dataElement.displayName.startsWith('jtrain')) {
+                      return null;
+                    }
+                    return <TableCell key={dataElement.id}>{dataElement.displayName}</TableCell>;
+                  })}
                   </TableRow>
                   
                 </TableHead>
@@ -110,11 +113,16 @@ export const CourseDetailsStaffView = ({ course }) => {
                     ))}
                 </TableBody> */}
                 <TableBody>
-  {eventData?.events && (
+                {eventData?.events && (
     <TableRow>
       {data.programStages.programStageDataElements
         .sort((a, b) => a.sortOrder - b.sortOrder)
         .map(({ dataElement }) => {
+          // If dataElement.displayName starts with 'jtrain', ignore it
+          if (dataElement.displayName.startsWith('jtrain')) {
+            return null;
+          }
+
           // Create a mapping of dataElement to value
           const dataElementToValue = eventData.events.dataValues.reduce((map, { dataElement, value }) => {
             map[dataElement] = value;

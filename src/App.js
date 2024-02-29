@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import { TabBar, Tab } from '@dhis2-ui/tab';
-import { Home, Course,  CourseSearch, StaffSearch, Staffadd, TrainingCapture, Staffview, Settings,
-    CourseDetailsStaffView, CourseDetailsCourseView, CourseAttendee, CourseDateAttendees} from './views';
+import { Home, CourseAdd,  CourseSearch, StaffSearch, Staffadd, TrainingCapture, Staffview, Settings,
+    CourseDetailsStaffView, CourseDateAttendeesStaffCustomFields, CourseDetailsCourseView, CourseAttendee, CourseDateAttendees} from './views';
+
 
 import styles from './App.module.css';
 import logo from './image/jtrainlogo.png';
@@ -63,14 +64,14 @@ const MainContent = () => {
         <div>
             <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/course" element={<Course />} />
                 <Route path="/coursesearch" element={<CourseSearch />} />
+                <Route path="/courseAdd" element={<CourseAdd />} />
                 <Route path="/staffsearch" element={<StaffSearch />} />
                 <Route path="/staffview/:id" element={<Staffview />} /> 
                 <Route path="/trainingcapture" element={<TrainingCapture />} />
                 <Route path="/staffadd" element={<Staffadd />} />
                 <Route path="/courseview/:id" element={<Courseview />} />
-                <Route path="/testcomponent/:id" element={<CourseDateAttendees />} />
+                <Route path="/testcomponent/:id" element={<CourseDateAttendeesStaffCustomFields />} />
                 <Route path="/settings" element={<Settings />} />
             </Routes>
         </div>

@@ -1,4 +1,4 @@
-import { useDataQuery, useDataMutation } from '@dhis2/app-runtime';
+import { useDataQuery, useDataMutation, useDataEngine } from '@dhis2/app-runtime';
 import { CourseDetailsCourseView } from './CourseDetailsCourseView';
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import React, {useState, useEffect} from 'react'
@@ -176,109 +176,172 @@ const qryProgramDataElements = {
 //     }),
 // };
 
-const mutationCourseEvent = {
+// const mutationCourseEvent = {
+//     resource: 'events',
+//     type: 'create',
+//     data: ({ trackedEntityInstance, dataValues }) => ({
+//       events: [
+//         {
+//           trackedEntityInstance: 'bQD9iDVR7E3',
+//           program: 'P59PhQsB6tb',
+//           programStage: 'r0gHZqEq6DE',
+//           orgUnit: 'VgrqnQEtyOP',
+//           dataValues: dataValues,
+//           status: 'ACTIVE',
+//           eventDate: formattedDate,
+//         },
+//       ],
+//     }),
+//   };
+
+
+const mutationCourseEvent = (program, programStage, orgUnit, trackedEntityInstance, idataValues) => ({
     resource: 'events',
     type: 'create',
-    data: ({ trackedEntityInstance, dataValues }) => ({
+    data: () => ({
       events: [
         {
-          trackedEntityInstance: 'bQD9iDVR7E3',
-          program: 'P59PhQsB6tb',
-          programStage: 'r0gHZqEq6DE',
-          orgUnit: 'VgrqnQEtyOP',
-          dataValues: dataValues,
+          trackedEntityInstance: trackedEntityInstance,
+          program: program,
+          programStage: programStage,
+          orgUnit: orgUnit,
+          dataValues: idataValues,
           status: 'ACTIVE',
           eventDate: formattedDate,
         },
       ],
     }),
-  };
+  });
+
 
 export const Courseview = () => {
     const { id } = useParams();
+    const [refreshKey, setRefreshKey] = useState(0);
     const dSysConstants = useDataQuery(qryConstants)
     const [trackedEntityInstance, setTrackedEntityInstance] = useState(null);
     const [formFields, setFormFields] = useState({});
+    const [formFieldsCourse, setFormFieldsCourse] = useState({});
     const [mutate, { loading, error }] = useDataMutation(mutation)
     const { loading: loadingEntity, error: errorEntity, data: dataEntity } = useDataQuery(qryTrackedEntityInstance, {
         variables: {
          id,
         },
     });
-    // Initialize the state for the input values
-    const [inputValues, setInputValues] = useState({});
 
     const [showSection, setShowSection] = useState(false);
 
-  const { loading: loading2, error2, data: dataProgramDE } = useDataQuery(qryProgramDataElements);
+    const deleteMutation = {
+        resource: 'trackedEntityInstances',
+        id: id,
+        type: 'delete',
+    };
 
-    const handleInputChange = (id, value) => {
-        //console.log('id', id);
-        //console.log('value', value);
-        setInputValues(prevValues => ({ ...prevValues, [id]: value }));
-        console.log('inputValues', inputValues);
-      };
+    
+
+  const { loading: loading2, error2, data: dataProgramDE } = useDataQuery(qryProgramDataElements);
+  
+  const engine = useDataEngine();
+
+  const handleDelete = async () => {
+      if (window.confirm('Are you sure you want to delete this course?')) {
+          try {
+              await engine.mutate(deleteMutation);
+              alert('Course deleted successfully');
+          } catch (error) {
+              alert('Failed to delete course');
+          }
+      }
+  };
+
+
+  const handleInputChange = (event) => {
+    console.log(event)
+
+    const { name, value } = event.target;
+    setFormFields(prevFields => ({
+        ...prevFields,
+        [name]: value,
+    }));
+    console.log('formfields', formFields)
+};
+const handleInputChangeCourse = (name, value) => {
+    console.log(name, value)
+
+    // const { name, value } = event.target;
+    setFormFieldsCourse(prevFields => ({
+        ...prevFields,
+        [name]: value,
+    }));
+
+}
+
 
       const handleInputChangeSelect = (event) => {
         const { name, value } = event.target;
         //console.log(`Option ID/Code: ${name}, Option Name: ${value}`);
-        setInputValues(prevValues => ({ ...prevValues, [name]: value }));
+        setFormFields(prevValues => ({ ...prevValues, [name]: value }));
     };
+    
     const [createEvent, { dataEvent, loadingEvent, errorEvent }] = useDataMutation(mutationCourseEvent);
 
-    const Variable = () => {
-        const dataValues = Object.entries(inputValues).map(([dataElement, value]) => ({ dataElement, value }));
-        console.log('dataValues', dataValues);
-        setShowSection(false);
-        //const { error } = await mutate({ trackedEntityInstance });
-        console.log('mutation', mutate)
-        // if (error) {
-        //     console.error('Error creating event:', error);
-        // } else {
-        //     console.log('Event created successfully');
-        // }
-    };
+    // const handleSave = async (trackedEntityInstance) => {
+    
+    //     // const type = 'ZBUwOGosqI0';
+    //     // const { error: relationshipsError, data: relationshipsData } = await mutateRelationships({ trackedEntityInstance, eventID, type});
+    //     // if (relationshipsError) {
+    //     //     console.error('Error creating relationship:', relationshipsError);
+    //     // } else {
+    //     //     console.log('Relationship created successfully');
+    //     //     console.log('Relationship data:', relationshipsData);
+    //     // }
+    
+    //     const dataValues = Object.entries(formFieldsCourse).map(([dataElement, value]) => ({ dataElement, value }));
+    //     //trackedEntityInstance: 'bQD9iDVR7E3',
+    //     //           program: 'P59PhQsB6tb',
+    //     //           programStage: 'r0gHZqEq6DE',
+    //     //           orgUnit: 'VgrqnQEtyOP',
+    //     //           dataValues: dataValues,
+    //     //           status: 'ACTIVE',
+    //     //           eventDate: formattedDate,
 
-    const handleSave = async (trackedEntityInstance) => {
+    //     const myMutation = mutationCourseEvent('P59PhQsB6tb', 'r0gHZqEq6DE', 'VgrqnQEtyOP', trackedEntityInstance, dataValues);
+    //     const { error } = await createEvent({ trackedEntityInstance, dataValues });
+    //     console.log('CreateEvent', createEvent)
+    //     if (error) {
+    //         console.error('Error creating event:', error);
+    //     } else {
+    //         console.log('Event created successfully');
+    //     }
+    // };
+
     
-        // const type = 'ZBUwOGosqI0';
-        // const { error: relationshipsError, data: relationshipsData } = await mutateRelationships({ trackedEntityInstance, eventID, type});
-        // if (relationshipsError) {
-        //     console.error('Error creating relationship:', relationshipsError);
-        // } else {
-        //     console.log('Relationship created successfully');
-        //     console.log('Relationship data:', relationshipsData);
-        // }
-    
-        const dataValues = Object.entries(inputValues).map(([dataElement, value]) => ({ dataElement, value }));
-        const { error } = await createEvent({ trackedEntityInstance, dataValues });
-        console.log('CreateEvent', createEvent)
-        if (error) {
-            console.error('Error creating event:', error);
-        } else {
-            console.log('Event created successfully');
+
+      const handleSave = async () => {
+        const dataValues = Object.entries(formFieldsCourse).map(([dataElement, value]) => ({ dataElement, value }));
+        
+        //Default values for Course Attendees and Counts
+
+        dataValues.push({ dataElement: 'l9aHlXLsEyE', value: '' });
+        dataValues.push({ dataElement: 'Av9iXMiGRou', value: '0' });
+        const myMutation = mutationCourseEvent('P59PhQsB6tb', 'r0gHZqEq6DE', 'VgrqnQEtyOP', id, dataValues);
+        console.log(dataValues)
+        try {
+          const response = await engine.mutate(myMutation);
+          console.log('Event created successfully', response);
+          
+          // Increment refreshKey to force a re-render of CourseDetailsCourseView
+          // setRefreshKey(prevKey => prevKey + 1);
+          // Refresh the page
+         window.location.reload();
+        } catch (error) {
+          console.error('Error creating event:', error);
         }
-    };
+      };
     
     <button onClick={() => handleAssign(trackedEntityInstance)}>
                                 Assign
                             </button>
     
-    // const dataValues = [
-    //     {
-    //       dataElement: 'I3k1jlogV15',
-    //       value: '2024-01-01',
-    //     },
-    //     {
-    //       dataElement: 'ahGuEZrtqR5',
-    //       value: '2024-01-01',
-    //     },
-    //     {
-    //       dataElement: 'WYM1k90FCf7',
-    //       value: 'Testy McTestface',
-    //     },
-    //   ]; 
-
   const handleButtonClick = () => {
     setShowSection(true);
   };
@@ -330,8 +393,8 @@ export const Courseview = () => {
     let staffMemberid, defaultStaffOrgUnit, defaultStaffProg;
     // Check if dSysConstants and constants exist
     if (dSysConstants && dSysConstants.data && dSysConstants.data.attributes && dSysConstants.data.attributes.constants) {
-        // Find the jtrain-StaffMember and jtrain-DefaultStaffOrgUnit objects
-        const staffMemberObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-StaffMember');
+        // Find the jtrain-TEI-Type-Staff and jtrain-DefaultStaffOrgUnit objects
+        const staffMemberObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-TEI-Type-Staff');
         const defaultStaffOrgUnitObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-DefaultStaffOrgUnit');
         const defaultStaffProgObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-StaffProgram');
         
@@ -447,7 +510,11 @@ export const Courseview = () => {
                 ))}
             </tbody>
             </table>
-            <button type="submit">Submit</button>
+            <button type="submit">Save</button>
+            <Link to="/coursesearch">
+                <button type="button">Close</button>
+            </Link>
+            <button type="button" onClick={handleDelete}>Delete</button>
             <p>{responseMessage}</p>
             
             
@@ -467,8 +534,8 @@ export const Courseview = () => {
         <tbody>
           {eventsData.events.events.map((event) => (
             <tr key={event.event}>
-               <td>{event.event}</td>
-              <td><CourseDetailsCourseView id={event.event} /></td>
+               {/* <td>{event.event}</td> */}
+              <td><CourseDetailsCourseView id={event.event} key={refreshKey}/></td>
             </tr>
           ))}
         </tbody>
@@ -481,29 +548,32 @@ export const Courseview = () => {
     <>
       <table>
         <thead>
-          <tr>
+          {/* <tr>
             <th>Variable</th>
             <th>Value</th>
-          </tr>
+          </tr> */}
         </thead>
         <tbody>
-        
-{dataProgramDE.qPDE.programStageDataElements.map((item, index) => {
-  return (
-    <tr key={item.dataElement.id}>
-      <td>{item.dataElement.displayName}</td>
-      <td>
-        {item.dataElement.valueType === 'DATE' ? (
-          <input type="date" value={inputValues[item.dataElement.id] || ''} onChange={e => handleInputChange(item.dataElement.id, e.target.value)} />
-        ) : item.dataElement.valueType === 'TEXT' ? (
-          <input type="text" value={inputValues[item.dataElement.id] || ''} onChange={e => handleInputChange(item.dataElement.id, e.target.value)} />
-        ) : (
-          item.dataElement.valueType
-        )}
-      </td>
-    </tr>
-  );
-})}
+        {dataProgramDE.qPDE.programStageDataElements.map((item, index) => {
+            if (item.dataElement.displayName.startsWith('jtrain')) {
+                return null;
+            }
+
+            return (
+                <tr key={item.dataElement.id}>
+                <td>{item.dataElement.displayName}</td>
+                <td>
+                    {item.dataElement.valueType === 'DATE' ? (
+                        <input type="date" onChange={e => handleInputChangeCourse(item.dataElement.id, e.target.value)}  />
+                    ) : item.dataElement.valueType === 'TEXT' ? (
+                    <input type="text"  onChange={e => handleInputChangeCourse(item.dataElement.id, e.target.value)}  />
+                    ) : (
+                    item.dataElement.valueType
+                    )}
+                </td>
+                </tr>
+            );
+            })}
         </tbody>
       </table>
       <button onClick={() => setShowSection(false)}>Cancel</button>

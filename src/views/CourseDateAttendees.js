@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDataQuery, useDataMutation } from '@dhis2/app-runtime';
 import { StaffSearchAttendees } from './StaffSearchAttendees';
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
@@ -46,7 +46,8 @@ const qryTrackedEntityInstance = {
 
 
 
-export const CourseDateAttendees = ({ eventID }) => {
+export const CourseDateAttendees = ({ eventID, dElements }) => {
+    const [reload, setReload] = useState(false);
     const { id } = useParams();
     console.log('id:',id);
     console.log('eventID:',eventID);
@@ -61,21 +62,27 @@ export const CourseDateAttendees = ({ eventID }) => {
         },
       },
     });
-  
+    const handleReload = () => {
+      setReload(!reload);
+    };
   const { loading: loadingEvent, error: errorEvent, data: dataEvent } = useDataQuery(eventQuery(eventID));
-
-  console.log("Event dataValues:", dataEvent);
 
   if (loadingEvent) return <span>Loading...</span>;
   if (errorEvent) return <span>Error1: {errorEvent.message}</span>;
-
-  console.log("Event dataValues:", dataEvent);
-  console.log("Event dataValues2:", dataEvent.events.dataValues);
 
   // Find the object where dataElement is 'l9aHlXLsEyE'
   const dataElementObject = dataEvent.events.dataValues.find(
     (dataValue) => dataValue.dataElement === 'l9aHlXLsEyE'
   );
+
+  const attendeeCountObj = dataEvent.events.dataValues.find(
+    (dataValue) => dataValue.dataElement === 'Av9iXMiGRou'
+  );
+
+  const attendeeCount = parseInt(attendeeCountObj.value)
+  console.log('dataElementObject:',dataElementObject);
+
+  console.log('CDAEventID',eventID);
 
     
     return (
@@ -83,11 +90,15 @@ export const CourseDateAttendees = ({ eventID }) => {
             <h3>Course Date Attendees {eventID}</h3>
             <table>
                 <tbody>
-                  <StaffShow tei_id={dataElementObject.value}/>
+                {dataElementObject ? (
+                <StaffShow tei_id={dataElementObject.value} eventID={eventID}/>
+              ) : (
+                <tr><td>No attendees</td></tr>
+              )}
                 </tbody>
               </table>
 
-            <StaffSearchAttendees eventID={eventID} dataEvent={dataEvent} tei_id={dataElementObject.value} />
+              <StaffSearchAttendees eventID={eventID} dataEvent={dataEvent} tei_id={dataElementObject && dataElementObject.value ? dataElementObject.value : ""} tei_count={attendeeCount} dElements={dElements} onAssign={handleReload} />
         </div>
     );
 }

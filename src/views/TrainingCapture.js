@@ -52,6 +52,7 @@ const qryConstants = {
 export const TrainingCapture = () => {
     const { id } = useParams(); // Get the ID from the URL
     const [isSearchTableExpanded, setSearchTableExpanded] = useState(true);
+    const [courseSelectionLabel, setCourseSelectionLabel] = useState('');
 
     const { loading, error, data } = useDataQuery(query, {
         variables: {
@@ -68,7 +69,14 @@ export const TrainingCapture = () => {
 
     const [refreshKey, setRefreshKey] = useState(0);
 
-    
+    const updateHeadings = (xString) => {
+        // Concatenate xString to courseSelectionLabel
+        setCourseSelectionLabel(prevLabel => `${prevLabel} - ${xString}`);
+        setSearchTableExpanded(false);
+    };
+    const updateHeadingsParent = () => {
+        setCourseSelectionLabel(' : '); 
+    }
 
     return (
         <div style={{ position: 'float', top: '20%', width: '95%' }}>
@@ -78,12 +86,20 @@ export const TrainingCapture = () => {
             {error && error.message}
             {data?.instances?.trackedEntityInstances && (
                 
-                <div onClick={() => setSearchTableExpanded(!isSearchTableExpanded)}>
+                <div>
                 
-                <p style={{ backgroundColor: isSearchTableExpanded ? 'lightblue' : 'lightgrey', width: '100%', height: '50px' }}>
-        <strong>Course Type Selection</strong>
-        <span style={{ float: 'left', border: '1px solid black' }}>
-            {isSearchTableExpanded ? '-' : '+'}
+                <p onClick={() => setSearchTableExpanded(!isSearchTableExpanded)} style={{ backgroundColor: isSearchTableExpanded ? 'lightblue' : 'lightgrey', width: '100%', height: '40px' }}>
+        
+        <span style={{ float: 'left', border: 'none' }}>
+        <div style={{ display: 'flex', alignItems: 'center', paddingTop: '5px' }}>
+    <div style={{ width: '20px', textAlign: 'center' }}>
+        <strong>{isSearchTableExpanded ? '-' : '+'}</strong>
+    </div>
+    <strong>
+        Course Selection
+        {isSearchTableExpanded ? '' : courseSelectionLabel}
+    </strong>
+</div>
         </span>
     </p>          
                 {isSearchTableExpanded && data?.instances?.trackedEntityInstances && (
@@ -124,7 +140,8 @@ export const TrainingCapture = () => {
                                                     startDateVar: 'I3k1jlogV15',
                                                     endDateVar: 'ahGuEZrtqR5'
                                                 });
-                                                setSearchTableExpanded(!isSearchTableExpanded);
+                                                //setSearchTableExpanded(!isSearchTableExpanded);
+                                                setCourseSelectionLabel(' : ' + attributesObj['Course Name'] + " - ");
                                                 setRefreshKey(prevKey => prevKey + 1);
                                             }}>Select</button>
                                             </TableCell>
@@ -140,7 +157,7 @@ export const TrainingCapture = () => {
                 </div>
             )}
             <div style={{ verticalAlign: 'top' }}>
-                {selectedCourse && <CourseDetails key={refreshKey} course={selectedCourse} />}
+                {selectedCourse && <CourseDetails key={refreshKey} course={selectedCourse} updateHeadings={updateHeadings} />}
             </div>
         </div>
     )

@@ -80,11 +80,21 @@ export const CourseDetailsCourseView = ({ id }) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    {data.programStages.programStageDataElements
-                      .sort((a, b) => a.sortOrder - b.sortOrder)
-                      .map(({ dataElement }) => (
-                        <TableCell key={dataElement.id}>{dataElement.displayName}</TableCell>
-                      ))}
+                  {data.programStages.programStageDataElements
+  .sort((a, b) => a.sortOrder - b.sortOrder)
+  .map(({ dataElement }) => {
+    // Skip rendering if displayName is 'jtrain_course_attendees'
+    if (dataElement.displayName === 'jtrain_course_attendees') {
+      return null;
+    }
+
+    // Change displayName if it's 'jtrain_course_attendees_count'
+    const displayName = dataElement.displayName === 'jtrain_course_attendees_count'
+      ? '# Attendees'
+      : dataElement.displayName;
+
+    return <TableCell key={dataElement.id}>{displayName}</TableCell>;
+  })}
                   </TableRow>
                   
                 </TableHead>
@@ -92,17 +102,22 @@ export const CourseDetailsCourseView = ({ id }) => {
                 <TableBody>
   {eventData?.events && (
     <TableRow>
-      {data.programStages.programStageDataElements
-        .sort((a, b) => a.sortOrder - b.sortOrder)
-        .map(({ dataElement }) => {
-          // Create a mapping of dataElement to value
-          const dataElementToValue = eventData.events.dataValues.reduce((map, { dataElement, value }) => {
-            map[dataElement] = value;
-            return map;
-          }, {});
+    {data.programStages.programStageDataElements
+  .sort((a, b) => a.sortOrder - b.sortOrder)
+  .map(({ dataElement }) => {
+    // Skip rendering if displayName starts with 'jtrain' but is not 'jtrain_course_attendees_count'
+    if (dataElement.displayName.startsWith('jtrain') && dataElement.displayName !== 'jtrain_course_attendees_count') {
+      return null;
+    }
 
-          return <TableCell key={dataElement.id}>{dataElementToValue[dataElement.id]}</TableCell>;
-        })}
+    // Create a mapping of dataElement to value
+    const dataElementToValue = eventData.events.dataValues.reduce((map, { dataElement, value }) => {
+      map[dataElement] = value;
+      return map;
+    }, {});
+
+    return <TableCell key={dataElement.id}>{dataElementToValue[dataElement.id]}</TableCell>;
+  })}
     </TableRow>
   )}
 </TableBody>

@@ -1,4 +1,4 @@
-import { useDataQuery,useDataMutation } from '@dhis2/app-runtime'
+import { useDataQuery,useDataMutation, useDataEngine } from '@dhis2/app-runtime'
 import {
     Table,
     TableBody,
@@ -79,16 +79,18 @@ const query = {
 //     }),
 // };
 let tei_ids = [];
-export const StaffSearchAttendees = ({eventID, dataEvent, tei_id}) => {
-    
+export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dElements, onAssign}) => {
+
+    console.log('dElement',dElements)
     const dSysConstants = useDataQuery(qryConstants)
     let staffMemberid, defaultStaffOrgUnit;
     console.log('dataEvent',dataEvent)
+    const dataEngine = useDataEngine();
     console.log({ dSysConstants })
     // Check if dSysConstants and constants exist
     if (dSysConstants && dSysConstants.data && dSysConstants.data.attributes && dSysConstants.data.attributes.constants) {
-        // Find the jtrain-StaffMember and jtrain-DefaultStaffOrgUnit objects
-        const staffMemberObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-StaffMember');
+        // Find the jtrain-TEI-Type-Staff and jtrain-DefaultStaffOrgUnit objects
+        const staffMemberObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-TEI-Type-Staff');
         const defaultStaffOrgUnitObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-DefaultStaffOrgUnit');
 
         console.log(staffMemberObj)
@@ -96,8 +98,6 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id}) => {
         // Extract the values
         staffMemberid = staffMemberObj ? staffMemberObj.code : null;
         defaultStaffOrgUnit = defaultStaffOrgUnitObj ? defaultStaffOrgUnitObj.code : null;
-
-        console.log('Constants Loaded')// Log the values to the console
         
     }
 
@@ -143,6 +143,14 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id}) => {
                             dataElement: 'tsU3YD7kfYU',
                             value: eventID,
                         },
+                        {
+                            dataElement: 'qc3CCyM8VTc',
+                            value: 0,
+                        },
+                        {
+                            dataElement: 'HtoYZNR0ch6',
+                            value: 0,
+                        },
                     ],
                     status: 'ACTIVE',
                     eventDate: formattedDate,
@@ -152,89 +160,91 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id}) => {
     };
 
 
-      //THIS IS WORKING
-      const mutationCourseEventUpdatework2 = {
-        resource: 'events',
-        id: 'y4QZIFjVmey', // replace with actual event ID
-        type: 'update',
-        
-        data: {
-            program: 'P59PhQsB6tb', //Course Program
-            programStage: 'r0gHZqEq6DE',
-            orgUnit: 'VgrqnQEtyOP',
-            eventDate: formattedDate,
-            dataValues: [
-                {
-                    dataElement: 'l9aHlXLsEyE', // replace with actual data element ID
-                    value: 'abcdeafh', // replace with actual tracked entity instance ID
-                },
-                {
-                    dataElement: 'Av9iXMiGRou', // replace with actual data element ID
-                    value: 1,
-                },
-            ],
-        },
-    };
-
-
-    
-    
-
-    const mutationCourseEventUpdate ={
-        resource: 'events',
-        id: eventID,
-        type: 'update',
-        data: {
-            eventId: eventID,
-            program: dataEvent.events.program,
-            programStage: dataEvent.events.programStage,
-            orgUnit: dataEvent.events.orgUnit,
-            eventDate: dataEvent.events.eventDate,
-            dataValues: [
-                {
-                    dataElement: dataElement1,
-                    value: dataElement1Value,
-                },
-                {
-                    dataElement: dataElement2,
-                    value: dataElement2Value,
-                },
-            ],
-        },
-    };
-
-    const newCourseEventUpdate = () => ({
-        resource: 'events',
-        id: eventID,
-        type: 'update',
-        data: {
-            event: eventID,
-            program: dataEvent.events.program,
-            programStage: dataEvent.events.programStage,
-            orgUnit: dataEvent.events.orgUnit,
-            eventDate: dataEvent.events.eventDate,
-            dataValues: [
-                {
-                    dataElement: dataElement1,
-                    value: dataElement1Value,
-                },
-                {
-                    dataElement: dataElement2,
-                    value: dataElement2Value,
-                },
-            ],
-        },
-    });
-
 
     const [mutate, { loading: mutationLoading, error: mutationError }] = useDataMutation(mutation);
-    const [mutateNewCourseEventUpdate, { loading: mutationNewCourseEventLoading, error: mutationNewCourseEventError }] = useDataMutation(mutationCourseEventUpdate);
+
     //const [mutateRelationships, { loading: mutationRelationshipsLoading, error: mutationRelationshipsError }] = useDataMutation(mutationRelationships);
 
+    const UpdateEvent = (program, programStage, orgUnit, event, dataValues, trackedEntityInstance) => ({
+        resource: 'events',
+        type: 'update',
+        trackedEntityInstance,
+        id: eventID,
+        data: {
+            event,
+            program,
+            programStage,
+            orgUnit,
+            dataValues,
+        },
+      });
+
+    const CreateEvent = (program, programStage, orgUnit, dataValues, trackedEntityInstance) => ({
+        resource: 'events',
+        type: 'create',
+        trackedEntityInstance,
+        eventDate: formattedDate,
+        data: {
+          
+          program,
+          programStage,
+          orgUnit,
+          eventDate: formattedDate,
+          status: 'COMPLETED',
+          dataValues,
+          trackedEntityInstance,
+        },
+      });
+
+    //   const mutationCourseEvent = (program, programStage, orgUnit, idataValues, trackedEntityInstance, ) => ({
+    //     resource: 'events',
+    //     type: 'create',
+    //     data: () => ({
+    //       events: [
+    //         {
+    //           trackedEntityInstance: trackedEntityInstance,
+    //           program: program,
+    //           programStage: programStage,
+    //           orgUnit: orgUnit,
+    //           dataValues: idataValues,
+    //           status: 'ACTIVE',
+    //           eventDate: formattedDate,
+    //         },
+    //       ],
+    //     }),
+    //   });
+      const engine = useDataEngine();
 
 
+
+      const fetchEvent = async (eventID) => {
+        const query = {
+          events: {
+            resource: 'events',
+            id: eventID,
+            params: {
+              fields: ['event', 'dataValues[dataElement,value]'],
+            },
+          },
+        };
+      
+        const { events } = await engine.query(query);
+        console.log('EventDataElements', events);
+      
+        const dataValues = [];
+        events.dataValues.forEach(item => {
+          dataValues.push({ dataElement: item.dataElement, value: item.value });
+        });
+      
+        return dataValues;
+      };
+
+      
     const handleAssign = async (trackedEntityInstance) => {
-        
+        const dataValues = await fetchEvent(eventID);
+
+        console.log('trackedEntityInstance', trackedEntityInstance)
+
     //Cancelled until bug is cleared 
     // const type = 'ZBUwOGosqI0';
     // const { error: relationshipsError, data: relationshipsData } = await mutateRelationships({ trackedEntityInstance, eventID, type});
@@ -246,62 +256,56 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id}) => {
     // }
 
         // Create New Event for Staff Attendee
-        const { error } = await mutate({ trackedEntityInstance });
-        console.log('mutation', mutate)
-        if (error) {
-            console.error('Error creating event:', error);
-        } else {
-            console.log('Event created successfully');
+        // const { error } = await mutate({ trackedEntityInstance });
+        // console.log('mutation', mutate)
+        // if (error) {
+        //     console.error('Error creating event:', error);
+        // } else {
+        //     console.log('Event created successfully');
+        // }
+        
+        const dataInputs = [];
+        dataValues.forEach(item => {
+            let value;
+            switch (item.dataElement) {
+                case 'l9aHlXLsEyE':
+                    value = (tei_id || '') + trackedEntityInstance + ';';
+                    break;
+                case 'Av9iXMiGRou':
+                    value = tei_count + 1;
+                    break;
+                default:
+                    value = item.value;
+                    break;
+            }
+            dataInputs.push({ dataElement: item.dataElement, value: value });
+        });
+
+        const HasAttendees = dataInputs.some(item => item.dataElement === 'l9aHlXLsEyE');
+        if (!HasAttendees) {
+            dataInputs.push({ dataElement: 'l9aHlXLsEyE', value: (tei_id || '') + trackedEntityInstance + ';' });
         }
 
-        // Update Course Event Information for Attendees workaround
 
-        const courseAttendeesObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-course-attendees');
-        const courseAttendeesCode = courseAttendeesObj ? courseAttendeesObj.code : null;
 
-        const courseAttendeesCountObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-course-attendees-count');
-        const courseAttendeesCountCode = courseAttendeesCountObj ? courseAttendeesCountObj.code : null;
 
-        // Find the data values for the elements with the IDs in courseAttendeesCode and courseAttendeesCountCode
-        const courseAttendeesDataValueObj = dataEvent.events.dataValues.find(item => item.dataElement === courseAttendeesCode);
-        const courseAttendeesCountDataValueObj = dataEvent.events.dataValues.find(item => item.dataElement === courseAttendeesCountCode);
+   const myMutation = UpdateEvent('P59PhQsB6tb', 'r0gHZqEq6DE', 'VgrqnQEtyOP', eventID, dataInputs);
+   console.log('myMutation', myMutation)
+   const response = await engine.mutate(myMutation);
+   console.log('response', response)
 
-        // Extract the value property from the found objects, or set to '' or 0 if the objects are undefined
-        let courseAttendeesDataValue = courseAttendeesDataValueObj !== undefined ? courseAttendeesDataValueObj.value : '';
-        let courseAttendeesCountDataValue = courseAttendeesCountDataValueObj ? courseAttendeesCountDataValueObj.value : 0;
-
-        courseAttendeesDataValue = courseAttendeesDataValue + '<' + trackedEntityInstance + '>';
-        courseAttendeesCountDataValue = parseInt(courseAttendeesCountDataValue) + 1;
-
-        // Update the mutation object
-//         console.log('eventID:', eventID);
-// console.log('dataEvent.events.program:', dataEvent.events.program);
-// console.log('dataEvent.events.programStage:', dataEvent.events.programStage);
-// console.log('dataEvent.events.orgUnit:', dataEvent.events.orgUnit);
-// console.log('dataEvent.events.eventDate:', dataEvent.events.eventDate);
-console.log('courseAttendeesCode:', courseAttendeesCode);
-console.log('courseAttendeesDataValue:', courseAttendeesDataValue);
-console.log('courseAttendeesCountCode:', courseAttendeesCountCode);
-console.log('courseAttendeesCountDataValue:', courseAttendeesCountDataValue);
-
-    setDataElement1(courseAttendeesCode)
-    setDataElement1Value(courseAttendeesDataValue)
-    setDataElement2(courseAttendeesCountCode)
-    setDataElement2Value(courseAttendeesCountDataValue)
-    
-    console.log('mutationCourseEventUpdate',mutationCourseEventUpdate);
-    const { errorCEU } = await mutateNewCourseEventUpdate(mutationCourseEventUpdate);
-        if (errorCEU) {
-            console.error('Error creating event:', errorCEU);
-        } else {
-            console.log('Event created successfully');
-        }
-    console.log('mutationCourseEventUpdate',mutationCourseEventUpdate)
-    
-    // Define your mutation object here
-    
-    
+     const dataStaffDefault = [];
+     dataStaffDefault.push({ dataElement: 'tsU3YD7kfYU', value: eventID });
+     dataStaffDefault.push({ dataElement: 'qc3CCyM8VTc', value: 0 });
+     dataStaffDefault.push({ dataElement: 'HtoYZNR0ch6', value: 0 });
+     console.log('StaffUpdateTEI', trackedEntityInstance)
+     const myStaffUpdate = CreateEvent('Ss21byybIqu', 'Y6scAJvghc0', 'VgrqnQEtyOP', dataStaffDefault, trackedEntityInstance);
+     const response2 = await engine.mutate(myStaffUpdate);
+     console.log('response2', response2)
+     onAssign();
     }
+
+    
     return (
         <div> 
             <h3>Search Staff to Assign </h3>

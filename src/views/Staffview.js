@@ -1,4 +1,4 @@
-import { useDataQuery, useDataMutation } from '@dhis2/app-runtime'
+import { useDataQuery, useDataMutation, useDataEngine } from '@dhis2/app-runtime'
 import { CourseDetailsStaffView } from './CourseDetailsStaffView';
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import React, {useState, useEffect} from 'react'
@@ -68,13 +68,10 @@ const qryTrackedEntityInstance = {
         id: ({ id }) => id,
         params: {
             fields: ['attributes[attribute,value]'],
+            program: 'Ss21byybIqu'
         },
     },
 };
-
-
-
-
 
 const eventsQuery = (id) => ({
     events: {
@@ -203,13 +200,31 @@ export const Staffview = () => {
     const [trackedEntityInstance, setTrackedEntityInstance] = useState(null);
     const [formFields, setFormFields] = useState({});
     const [mutate, { loading, error }] = useDataMutation(mutation(id))
-    console.log(id);
     const { loading: loadingEntity, error: errorEntity, data: dataEntity } = useDataQuery(qryTrackedEntityInstance, {
         variables: {
          id,
         },
     });
 
+
+    const deleteMutation = {
+        resource: 'trackedEntityInstances',
+        id: id,
+        type: 'delete',
+    };
+
+    const engine = useDataEngine();
+
+  const handleDelete = async () => {
+      if (window.confirm('Are you sure you want to delete this Staff Member?')) {
+          try {
+              await engine.mutate(deleteMutation);
+              alert('Staff deleted successfully');
+          } catch (error) {
+              alert('Failed to delete course');
+          }
+      }
+  };
 
 
      const qryProgramDataElements = {
@@ -306,8 +321,8 @@ const EVENTS_QUERY = {
     let staffMemberid, defaultStaffOrgUnit, defaultStaffProg;
     // Check if dSysConstants and constants exist
     if (dSysConstants && dSysConstants.data && dSysConstants.data.attributes && dSysConstants.data.attributes.constants) {
-        // Find the jtrain-StaffMember and jtrain-DefaultStaffOrgUnit objects
-        const staffMemberObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-StaffMember');
+        // Find the jtrain-TEI-Type-Staff and jtrain-DefaultStaffOrgUnit objects
+        const staffMemberObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-TEI-Type-Staff');
         const defaultStaffOrgUnitObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-DefaultStaffOrgUnit');
         const defaultStaffProgObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-StaffProgram');
         
@@ -419,18 +434,11 @@ if (dataProgramDE && dataProgramDE.data && dataProgramDE.data.qPDE && dataProgra
             
         <form onSubmit={handleFormSubmit}>
             <table>
-                <thead>
-                    <tr>
-                        {/* <th >ID</th> */}
-                        <th>Name</th>
-                        <th>Value</th>
-                    </tr>
-                </thead>
+
                 <tbody>
                     {data.program.programTrackedEntityAttributes.map(({ trackedEntityAttribute }) => (
                     trackedEntityAttribute.name !== 'jtrain_staff_courses' && (
                         <tr key={trackedEntityAttribute.id}>
-                            {/* <td style={{width: '0px'}}>{trackedEntityAttribute.id}</td> */}
                             <td>
                                 <label>{trackedEntityAttribute.name}</label>
                             </td>
@@ -461,7 +469,11 @@ if (dataProgramDE && dataProgramDE.data && dataProgramDE.data.qPDE && dataProgra
                 ))}
             </tbody>
             </table>
-            <button type="submit">Submit</button>
+            <button type="submit">Save</button>
+            <Link to="/coursesearch">
+                <button type="button">Close</button>
+            </Link>
+            <button type="button" onClick={handleDelete}>Delete</button>
             <p>{responseMessage}</p>
             
             
@@ -507,8 +519,8 @@ if (dataProgramDE && dataProgramDE.data && dataProgramDE.data.qPDE && dataProgra
     } else {
         return (
             <th key={dataElement.id}>
-                {dataElement.displayName}
-            </th>
+    {!dataElement.displayName.startsWith('jtrain') && dataElement.displayName}
+</th>
         );
     }
 })}
@@ -520,7 +532,7 @@ if (dataProgramDE && dataProgramDE.data && dataProgramDE.data.qPDE && dataProgra
     <tr key={eventObj.event}>
       {dataProgramDE?.data?.qPDE?.programStageDataElements.map(({ dataElement }, cellIndex) => (
         <td key={dataElement.id} style={{ textAlign: 'center' }}>
-          {cellIndex === 0 ? <CourseDetailsStaffView course={eventObj[dataElement.displayName]} /> : eventObj[dataElement.displayName]}
+            {!dataElement.displayName.startsWith('jTrain') && (cellIndex === 0 ? <CourseDetailsStaffView course={eventObj[dataElement.displayName]} /> : eventObj[dataElement.displayName])}
         </td>
       ))}
     </tr>
