@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useDataQuery, useDataMutation } from '@dhis2/app-runtime';
 import { StaffSearchAttendees } from './StaffSearchAttendees';
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
-import { CourseAttendee } from './CourseAttendee';
 import { StaffShow } from './CourseDateAttendees-StaffShow';
 
 const conVariableName = 'jtrain-course-attendees';

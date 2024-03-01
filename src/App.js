@@ -1,3 +1,4 @@
+import { useDataQuery, useDataEngine } from "@dhis2/app-runtime";
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import { TabBar, Tab } from '@dhis2-ui/tab';
@@ -9,6 +10,7 @@ import styles from './App.module.css';
 import logo from './image/jtrainlogo.png';
 import { ResizeObserver } from '@juggle/resize-observer';
 import { Courseview } from './views/Courseview';
+import MyComponent from "./views/TestTree";
 
 const ro = new ResizeObserver((entries, observer) => {
 // Changing the body size inside of the observer
@@ -42,10 +44,31 @@ const handleResize = debounce(() => {
 
 window.addEventListener('resize', handleResize);
 
+const constantsQuery = {
+    constants: {
+        resource: "constants",
+        params: {
+            paging: false,
+            fields: ['id', 'name', 'code']
+        }
+    }
+};
+
+
 //yarn start --proxy https://dhis2.af.jhpiego.org --proxyPort 8082
 const MainContent = () => {
     const [selectedTab, setSelectedTab] = useState('');
     const location = useLocation();
+
+    //sessionStorage.clear();
+    const { loading, error, data } = useDataQuery(constantsQuery);
+    console.log('data', data)
+    useEffect(() => {
+        if (!loading && !error && data) {
+            sessionStorage.setItem('constants', JSON.stringify(data.constants.constants));
+        }
+    }, [loading, error, data]);
+    
 
     useEffect(() => {
         const currentPath = location.pathname;
@@ -73,6 +96,7 @@ const MainContent = () => {
                 <Route path="/courseview/:id" element={<Courseview />} />
                 <Route path="/testcomponent/:id" element={<CourseDateAttendeesStaffCustomFields />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/testtree" element={<MyComponent/>} />
             </Routes>
         </div>
     );

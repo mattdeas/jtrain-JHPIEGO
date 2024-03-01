@@ -115,40 +115,6 @@ const qryTrackedEntityInstance = {
     },
 };
 
-const mutationTest = {
-    resource: 'trackedEntityInstances',
-    type: 'create',
-    data: {
-        trackedEntityInstances: [
-            {
-                orgUnit: 'VgrqnQEtyOP',
-                trackedEntityInstance: '1',
-                trackedEntityType: 'W9FNXXgGbm7',
-                attributes: [
-                    { attribute: 'jv1fu2pDYKE', value: '01' },
-                    { attribute: 'zh91RcBXyEf', value: '2004-01-01' },
-                    { attribute: 'esA6f27JSQM', value: '55' },
-                    { attribute: 'ggdR2bH42l3', value: '1' },
-                    { attribute: 'Zb9icCay6Ka', value: '0' },
-                ],
-            },
-        ],
-    },
-};
-
-
-const mutationIndicatorOld = {
-    resource: 'indicators',
-    id: 'vwgKIIhIbk8',
-    type: 'update',
-    partial: true,
-    data: ({ name }) => ({
-        name,
-    }),
-}
-
-
-
 const mutationIndicator = {
     resource: 'trackedEntityInstances',
     id: ({ trackedEntityInstance }) => trackedEntityInstance,
@@ -160,32 +126,6 @@ const mutationIndicator = {
         attributes,
     }),
 };
-
-
-// const testMutate = {
-//         "resource": "programs",
-//         "type": "update",
-//         id: "KHOQp4q1r2B",
-//         "data": {
-//             "name": "A program - Updated1",
-//             "shortName": "A program - Updated",
-//             "programType": "WITH_REGISTRATION"
-//         }
-// }
-
-
-const testMutate = {
-            "resource": "trackedEntityInstances",
-            "type": "update",
-            id: "1",
-            "data": {
-                orgUnit: 'VgrqnQEtyOP',
-                attributes: [
-                    { attribute: 'esA6f27JSQM', value: '11111' }
-                ]
-            }
-    }
-
 
 const eventsQuery = (id) => ({
     events: {

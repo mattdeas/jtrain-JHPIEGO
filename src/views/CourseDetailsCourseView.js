@@ -9,6 +9,7 @@ import {
     TableRowHead,
 } from '@dhis2/ui';
 import React, { useState } from 'react';
+import { getConstantValueByName } from '../utils';  
 
 
 const eventQuery = {
@@ -22,24 +23,13 @@ const eventQuery = {
   };
   
 
-const qryConstants = {
-    // One query object in the whole query
-    attributes: {
-        // The `attributes` endpoint should be used
-        resource: 'constants',
-        params: {
-            // Paging is disabled
-            paging: false,
-            // Only the attribute properties that are required should be loaded
-            fields: 'id, displayName, code, value',
-        },
-    },
-}
 
 export const CourseDetailsCourseView = ({ id }) => {
+
+  const defCourseProgStageId = getConstantValueByName('jtrain-courseprogramstage')
     const { loading, error, data } = useDataQuery({
         programStages: {
-          resource: 'programStages/r0gHZqEq6DE',
+          resource: `programStages/${defCourseProgStageId}`,
           params: {
             fields: 'programStageDataElements[sortOrder,dataElement[id,displayName]]',
           },
@@ -48,25 +38,13 @@ export const CourseDetailsCourseView = ({ id }) => {
     console.log('dataStages', data);
     const [selectedCourseDate, setSelectedCourseDate] = useState(''); 
 
-    const dSysConstants = useDataQuery(qryConstants);
+    
 
     const { loading: eventLoading, error: eventError, data: eventData } = useDataQuery(eventQuery, {
         variables: { id: id },
       });
       if (eventLoading) return 'Loading event data...';
         if (eventError) return `Error: ${eventError.message}`;
-    
-
-      console.log('eventData',eventData)
-    if (dSysConstants.loading) return 'Loading...';
-    if (dSysConstants.error) return dSysConstants.error.message;
-    if (!dSysConstants.data.attributes || !dSysConstants.data.attributes.constants) return 'No constants data';
-
-    // Create a mapping of code to displayName from dSysConstants
-    const codeToDisplayName = dSysConstants.data.attributes.constants.reduce((map, constant) => {
-        map[constant.code] = constant.displayName;
-        return map;
-    }, {});
     
     return (
         <div>
@@ -81,20 +59,21 @@ export const CourseDetailsCourseView = ({ id }) => {
                 <TableHead>
                   <TableRow>
                   {data.programStages.programStageDataElements
-  .sort((a, b) => a.sortOrder - b.sortOrder)
-  .map(({ dataElement }) => {
-    // Skip rendering if displayName is 'jtrain_course_attendees'
-    if (dataElement.displayName === 'jtrain_course_attendees') {
-      return null;
-    }
+                    .sort((a, b) => a.sortOrder - b.sortOrder)
+                    .map(({ dataElement }) => {
+                      // Skip rendering if displayName is 'jtrain_course_attendees'
+                      if (dataElement.displayName === 'jtrain_course_attendees') {
+                        return null;
+                  }
 
-    // Change displayName if it's 'jtrain_course_attendees_count'
-    const displayName = dataElement.displayName === 'jtrain_course_attendees_count'
-      ? '# Attendees'
-      : dataElement.displayName;
+              // Change displayName if it's 'jtrain_course_attendees_count'
+              const displayName = dataElement.displayName === 'jtrain_course_attendees_count'
+                ? '# Attendees'
+                : dataElement.displayName;
 
     return <TableCell key={dataElement.id}>{displayName}</TableCell>;
   })}
+  
                   </TableRow>
                   
                 </TableHead>

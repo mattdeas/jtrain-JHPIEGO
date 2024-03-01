@@ -10,13 +10,20 @@ import {
 } from '@dhis2/ui';
 import React, { useState } from 'react';
 import { CourseDateAttendees } from './CourseDateAttendees'
+import { getConstantValueByName } from '../utils';
+
+const defCourseProgramId = getConstantValueByName('jtrain-courseprogram')
+const defCourseOrgUnitId = getConstantValueByName('jtrain-defaultcourseorgunit')
+const defCourseProgramStageId = getConstantValueByName('jtrain-courseprogramstage')
+
+jtrain-courseprogramstage
 
 const eventQuery = {
     events: {
         resource: 'events',
         params: ({ trackedEntityInstance }) => ({
-            program: 'P59PhQsB6tb',
-            orgUnit: 'VgrqnQEtyOP',
+            program: defCourseProgramId,
+            orgUnit: defCourseOrgUnitId,
             trackedEntityInstance,
             fields: 'event,eventDate,dataValues[dataElement,value]'
         })
@@ -38,7 +45,7 @@ const qryConstants = {
 }
 const qryProgramDataElements = {
         programStages: {
-          resource: 'programStages/r0gHZqEq6DE',
+          resource: `programStages/${defCourseProgramStageId}`,
           params: {
             fields: 'programStageDataElements[sortOrder,dataElement[id,displayName]]',
           },
@@ -67,10 +74,7 @@ export const CourseDetails = ({ course, updateHeadings }) => {
 
     const [refreshKey, setRefreshKey] = useState(0);
 
-    console.log('data', data)
-
     const dSysConstants = useDataQuery(qryConstants);
-    console.log(dSysConstants);
 
     // Check if data is loaded
     if (dProgramDE.loading) return 'Loading...';

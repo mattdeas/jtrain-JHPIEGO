@@ -1,4 +1,4 @@
-import { useDataQuery } from '@dhis2/app-runtime'
+import { useDataQuery, useDataEngine } from '@dhis2/app-runtime'
 import {
     Table,
     TableBody,
@@ -8,46 +8,9 @@ import {
     TableRow,
     TableRowHead,
 } from '@dhis2/ui'
-import React, { useState } from 'react'
-import { Link, BrowserRouter, Switch, Route } from 'react-router-dom'
-
-
-const itemsPerPage = 10;
-//const [currentPage, setCurrentPage] = useState(1);
-
-
-/**
- * This defined the data that we want to get
- * The `app-runtime` will be explained in a another session after this one,
- * so you don't have to worry about the specifics for now
- */
-const qryCourseTypes = {
-    // One query object in the whole query
-    attributes: {
-        // The `attributes` endpoint should be used
-        resource: 'trackedEntityTypes',
-        params: {
-            // Paging is disabled
-            paging: false,
-            // Only the attribute properties that are required should be loaded
-            fields: 'id, displayName',
-        },
-    },
-}
-
-const qryPrograms = {
-    // One query object in the whole query
-    attributes: {
-        // The `attributes` endpoint should be used
-        resource: 'programs',
-        params: {
-            // Paging is disabled
-            paging: false,
-            // Only the attribute properties that are required should be loaded
-            fields: 'id, displayName',
-        },
-    },
-}
+import React, { useState, useEffect } from 'react'
+import { Link, useParams } from 'react-router-dom'
+import { CourseAdd} from './Course-Add'
 
 const qryConstants = {
     // One query object in the whole query
@@ -63,151 +26,221 @@ const qryConstants = {
     },
 }
 
-const query4 = {
-    programs: {
-        resource: 'programs',
-        params: ({ pageSize }) => ({
-            order: 'displayName:asc',
-            pageSize,
-            page: 1
-        }),
-    },
+export const CourseSearch = () => {
+    const [showAddCourse, setShowAddCourse] = useState(false);
+    const [message, setMessage] = useState(localStorage.getItem('message') || '');
+
+    const engine = useDataEngine();
 
 
-}
+    const { loading: loadingConstants, error: errorConstants, data: dataConstants } = useDataQuery(qryConstants);
+
+    const [dThematicAreaOptions, setDThematicAreaOptions] = useState(null);
+    const [dCourseorgunit, setdefaultcourseorgunit] = useState(null);
+    const [dCourseProgram, setdefaultcourseprogram] = useState(null);
+    const [loadingOptionSets, setLoadingOptionSets] = useState(false);
+    const [errorOptionSets, setErrorOptionSets] = useState(null);
+    const [dataOptionSets, setDataOptionSets] = useState(null);
+    
+    useEffect(() => {
+        const fetchConstantsAndOptionSets = async () => {
+            try {
+                const dThematicAreaOptions = findConstantCodeByName('jtrain-thematicarea-optionset', constantsResponse);
+                setDThematicAreaOptions(dThematicAreaOptions);
+                const dCourseorgunit = findConstantCodeByName('jtrain-defaultcourseorgunit', constantsResponse);
+                setdefaultcourseorgunit(dCourseorgunit);
+                const dCourseProgram = findConstantCodeByName('jtrain-courseprogram', constantsResponse);
+                setdefaultcourseprogram(dCourseProgram);
+    
+                const optionSetsResponse = await engine.query({
+                    optionSets: {
+                        resource: `optionSets/${dThematicAreaOptions}`,
+                        params: {
+                            fields: 'options[name,code]',
+                        },
+                    },
+                });
+                setDataOptionSets(optionSetsResponse);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+    
+        fetchConstantsAndOptionSets();
+    }, []);
+
+    console.log('dThematicAreaOptions: ' + dThematicAreaOptions);
+    console.log('dCourseorgunit: ' + dCourseorgunit);
+    console.log('dCourseProgram:' + dCourseProgram);
+
+    const findConstantCodeByName = (name) => {
+        if (!dataConstants.data) return 'dataConstants is not populated';
+        if (dataConstants.loading) return 'Loading...';
+        if (dataConstants.error) return 'Error';
+    
+        const constant = dataConstants.data.attributes.constants.find(constant => constant.displayName === name);
+        if (constant) {
+            const code = constant.code.substring(constant.displayName.length + 1); // +1 to exclude the separator
+            console.log('Name' + name + ' - Code: ' + code)
+            return code;
+        } else {
+            return 'Not found';
+        }
+    };
 
 
-const query = {
-    // "page" variable below can be dinamically passed via refetch (see "handlePageChange" below)
-    instances: {
-        resource: 'trackedEntityInstances',
-        params: ({ ou ,trackedEntityType }) => ({
-            ou : ou,
-            trackedEntityType : trackedEntityType,
-        }),
-    },
-}
+    // useEffect(() => {
+    //     if (dataConstants) {
+    //         const idThematicAreaOptions = findConstantCodeByName('jtrain-thematicarea-optionset');
+    //         setDThematicAreaOptions(idThematicAreaOptions);
+    //         const idefaultcourseorgunit = findConstantCodeByName('jtrain-defaultcourseorgunit');
+    //         setdefaultcourseorgunit(idefaultcourseorgunit);
+    //         const icourseprogram = findConstantCodeByName('jtrain-courseprogram');
+    //         setdefaultcourseprogram(icourseprogram);
+    //     }
+    // }, [dataConstants]);
 
-//https://dhis2.af.jhpiego.org/api/trackedEntityInstances?ou=x0Zl6eKgC7B&trackedEntityType=W9FNXXgGbm7
+    // useEffect(() => {
+    //     if (dThematicAreaOptions) {
+    //         setLoadingOptionSets(true);
+    //         setErrorOptionSets(null);
+    //         setDataOptionSets(null);
 
-export const CourseSearch1 = () => {
-    // This is yet another functionality provided by the `@dhis2/app-runtime`
-    // For the time being it does not matter what this does exactly
-    // * loading will be true while the data is being loaded
-    // * error will be an instance of `Error` if something fails
-    // * data will be null while the data is being loaded or if something fails
-    // * data will be an object once loading is done with the following path
-    //   data.attributes.attributes <- That's an array of objects
-    const dSysConstants = useDataQuery(qryConstants)
+    //         const qryOptionSets = {
+    //             attributes: {
+    //                 resource: `optionSets/${dThematicAreaOptions}`,
+    //                 params: {
+    //                     fields: 'options[name,code]',
+    //                 },
+    //             },
+    //         }
 
-    let staffMemberid, defaultStaffOrgUnit;
-    console.log({ dSysConstants })
-    // Check if dSysConstants and constants exist
-    if (dSysConstants && dSysConstants.data && dSysConstants.data.attributes && dSysConstants.data.attributes.constants) {
-        // Find the jtrain-TEI-Type-Staff and jtrain-DefaultStaffOrgUnit objects
-        const courseObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-TEI-Type-Staff');
-        const defaultStaffOrgUnitObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-DefaultStaffOrgUnit');
+    //         useDataQuery(qryOptionSets)
+    //             .then(data => {
+    //                 setLoadingOptionSets(false);
+    //                 setDataOptionSets(data);
+    //             })
+    //             .catch(error => {
+    //                 setLoadingOptionSets(false);
+    //                 setErrorOptionSets(error);
+    //             });
+    //     }
+    // }, [dThematicAreaOptions]);
 
-        console.log(courseObj)
-        console.log(defaultStaffOrgUnitObj)
-        // Extract the values
-        staffMemberid = courseObj ? courseObj.code : null;
-        defaultStaffOrgUnit = defaultStaffOrgUnitObj ? defaultStaffOrgUnitObj.code : null;
+    useEffect(() => {
+        localStorage.removeItem('message');
+    }, []);
 
-        console.log('Constants Loaded')// Log the values to the console
-        
-    }
-    //console.log({ dSysConstants });
+    const reload = () => {
+        setMessage('Course added successfully');
+        setShowAddCourse(false);
+        refetch();
+    };
+ 
+    
+    if (loadingConstants) return <p>Loading...</p>;
+    if (errorConstants) return <p>Error : </p>;
 
-    //const { loading, error, data } = useDataQuery(qryTrackedEntityTypes)
-    //console.log({ loading, error, data });
-    console.log({ staffMemberid, defaultStaffOrgUnit });
-    const { loading, error, data } = useDataQuery(query, {
-        variables: {
-            ou: 'VgrqnQEtyOP',
-            trackedEntityType: 'W9FNXXgGbm7',
-        },
-    })
-    console.log({ loading, error, data });
-    console.log('data output', data);
-    //console.log('data instances', data.instances);
-    //console.log('data TE instances', data.instances.trackedEntityInstances);
-    //console.log('data TE instances Att', data.instances.trackedEntityInstances.attributes);
+    
 
-    // State variable for search term
+    // //const dThematicAreaOptions = findConstantCodeByName('jtrain-thematicarea-optionset');
+
+    // const qryOptionSets = {
+    //     attributes: {
+    //         resource: `optionSets/${dThematicAreaOptions}`,
+    //         params: {
+    //             fields: 'options[name,code]',
+    //         },
+    //     },
+    // }
+
+    // const { loading, error, data, refetch } = useDataQuery(query, {
+    //     variables: {
+    //         ou: dCourseorgunit,
+    //         program: dCourseProgram,
+    //     },
+    // })
+
+
     const [searchTerm, setSearchTerm] = useState('');
 
-    // Function to handle search term input change
     const handleSearchTermChange = (event) => {
         setSearchTerm(event.target.value);
     }
 
-    //https://dhis2.af.jhpiego.org/api/trackedEntityInstances/query.json?ou=x0Zl6eKgC7B&ouMode=SELECTED&&order=created:desc&program=P59PhQsB6tb&pageSize=50&page=1&totalPages=false
 
     return (
         <div>
             <h1>Search Courses </h1>
 
-            <input type="text" value={searchTerm} onChange={handleSearchTermChange} />
+            <select placeholder="Thematic Area">
+                <option value="">Select Thematic Area</option>
+                <option value="">QI</option>
+                <option value="">CI</option>
+            </select>
 
-            {
-                // display that the data is being loaded
-                // when loading is true
-                loading && 'Loading...'
-            }
+            <input type="text" value={searchTerm} onChange={handleSearchTermChange} placeholder="Course Name" />
 
-            {
-                // display the error message
-                // is an error occurred
-                error && error.message
+            <label >
+                Start Date:
+                <input type="date" />
+            </label>
+
+            <label>
+                End Date:
+                <input type="date" />
+            </label>
+
+            <button>Search</button>
+            {/* {loading && 'Loading...'}
+            {error && error.message}
+            {data?.instances?.trackedEntityInstances && (
+                <Table>
+                    <TableHead>
+                        <TableRowHead>
+                            <TableCellHead>Thematic Area</TableCellHead>
+                            <TableCellHead>Course Name</TableCellHead>
+                            <TableCellHead>Course Dates</TableCellHead>
+                            <TableCellHead>Open</TableCellHead>
+                        </TableRowHead>
+                    </TableHead>
+                    <TableBody>
+                        {data.instances.trackedEntityInstances
+                            .filter(item => item.attributes.some(attr => attr.displayName === 'Course Name' && attr.value.toLowerCase().includes(searchTerm.toLowerCase())))
+                            .slice(0, 10)
+                            .map(
+                                ({ trackedEntityInstance, attributes }) => {
+                                    const attributesObj = attributes.reduce((obj, item) => {
+                                        obj[item.displayName] = item.value;
+                                        return obj;
+                                    }, {});
+
+                                    return (
+                                        <TableRow key={trackedEntityInstance}>
+                                            <TableCell>{attributesObj['Course Thematic Area']}</TableCell>
+                                            <TableCell>{attributesObj['Course Name']}</TableCell>
+                                            <TableCell>{attributesObj['']}</TableCell>
+                                            <TableCell>
+                                                <Link to={`/courseview/${trackedEntityInstance}`}>View Details</Link>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                }
+                            )}
+                    </TableBody>
+                    
+                </Table>
+            )} */}
+            <button onClick={() => { setShowAddCourse(true); setMessage(''); }}>Add New Course</button>
+            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
                 
-            }
 
-            {
-                // if there is any data available
-                data?.instances?.trackedEntityInstances && (
-                    <Table>
-      <TableHead>
-        <TableRowHead>
-          <TableCellHead>Thematic Area</TableCellHead>
-          <TableCellHead>Course Name</TableCellHead>
-          <TableCellHead>Course Dates</TableCellHead>
-          <TableCellHead>Open</TableCellHead>
-        </TableRowHead>
-      </TableHead>
-      <TableBody>
-      {data.instances.trackedEntityInstances
-    .filter(item => item.attributes.some(attr => attr.displayName === 'Family Name' && attr.value.toLowerCase().includes(searchTerm.toLowerCase())))
-    .slice(0, 10)
-    .map(
-        ({ trackedEntityInstance, attributes }) => {
-            // Create an object from the attributes array
-            const attributesObj = attributes.reduce((obj, item) => {
-                obj[item.displayName] = item.value;
-                return obj;
-            }, {});
-
-            return (
-                <TableRow key={trackedEntityInstance}>
-                    <TableCell>{attributesObj['Family Name']}</TableCell>
-                    <TableCell>{attributesObj['First Name']}</TableCell>
-                    <TableCell>{attributesObj['Gender']}</TableCell>
-                    <TableCell >
-                    <Link to={`/staffview/${trackedEntityInstance}`}>View Details</Link>
-                    </TableCell>
-                </TableRow>
-            );
-        }
-    )}
-                        </TableBody>
-                        <Link to="/staffdetail-add">
-    <button>Add New Course</button>
-</Link>
-      
-    </Table>
-                )
-            }
+            {/* {showAddCourse ? (
+                <CourseAdd onCancel={() => setShowAddCourse(false)} onSaved={reload} />
+            ) : (
+                <p>{message}</p>
+            )} */}
+            </div>
         </div>
     )
 }
-            

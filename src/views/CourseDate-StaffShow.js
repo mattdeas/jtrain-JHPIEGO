@@ -32,16 +32,7 @@ const handleResize = debounce(() => {
 window.addEventListener('resize', handleResize);
 
 
-const query = {  
-    instances: {
-        resource: 'trackedEntityInstances',
-        params: ({ ou ,trackedEntityType, tei_id }) => ({
-            ou : ou,
-            trackedEntityType : trackedEntityType,
-            trackedEntityInstance: tei_id,
-        }),
-    },
-}
+
 
 
 const qryStaffCourseDetails = {  
@@ -81,7 +72,7 @@ const eventQuery = (eventID) => ({
   };
 
 
-export const StaffShow = ({tei_id, eventID}) => {
+export const CourseDateStaffShow = ({tei_id, eventID}) => {
     const [eventIds, setEventIds] = useState([]);
     const [currentEventId, setCurrentEventId] = useState(null);
     const [eventData, setEventData] = useState([]);
@@ -91,21 +82,33 @@ export const StaffShow = ({tei_id, eventID}) => {
     console.log('tei_id:', tei_id);
     console.log('eventID:', eventID);
 
-    const { loading, error, data } = useDataQuery(query, {
-        variables: {
-            ou: 'VgrqnQEtyOP',
-            trackedEntityType: 'W9FNXXgGbm7',
-            tei_id: tei_id,
-        },
-    });
+    const defStaffTEI = getConstantValueByName('jtrain-TEI-Type-Staff')
+    const defStaffOrg = getConstantValueByName('jtrain-DefaultStaffOrgUnit')
+
+    const defStaffProgram = getConstantValueByName('jtrain-staffprogram')
+    const defStaffCourseDE = getConstantValueByName('jtrain-course-eventid')
+    const defCourseAttendeesDE = getConstantValueByName('jtrain-course-attendees')
+    const defCourseAttendeesCountDE = getConstantValueByName('jtrain-course-attendees-count')
     
+  
 
-
+    const query = {  
+            instances: {
+                resource: 'trackedEntityInstances',
+                params: () => ({
+                    ou : defStaffOrg,
+                    trackedEntityType : defStaffTEI,
+                    trackedEntityInstance: tei_id,
+            }),
+        },
+    }
+    const { loading, error, data } = useDataQuery(query);
+    
     const { loading: loadingSCD, error: errorSCD, data: dataSCD } = useDataQuery(qryStaffCourseDetails, {
         variables: {
-            ou: 'VgrqnQEtyOP',
-            program: 'Ss21byybIqu',
-            filterEventDE: 'tsU3YD7kfYU',
+            ou: defStaffOrg,
+            program: defStaffProgram,
+            filterEventDE: defStaffCourseDE,
             EventDE: eventID,
         },
     });
@@ -126,9 +129,9 @@ export const StaffShow = ({tei_id, eventID}) => {
         
         // Modify the dataValues
         dataValues.forEach(item => {
-          if (item.dataElement === 'Av9iXMiGRou') {
+          if (item.dataElement === defCourseAttendeesDE) {
             item.value -= 1;
-          } else if (item.dataElement === 'l9aHlXLsEyE') {
+          } else if (item.dataElement === defCourseAttendeesCountDE) {
             item.value = item.value.replace(new RegExp(trackedEntityInstance + ';', 'g'), '');
           }
         });
@@ -210,9 +213,12 @@ const { loading: loadingEvent, error: errorEvent, data: dataEvent } = useDataQue
                     matchingEventValue = matchingEvent.event; // Store the event value in the variable
                 } else {
                     console.log('No matching event found');
+                    console.log('matchingEventValue', matchingEventValue);
                 }
             }
 
+            if(matchingEventValue != null)
+            {
             return (
                 <TableRow key={trackedEntityInstance}>
                     <TableCell>{trackedEntityInstance}</TableCell>
@@ -235,6 +241,7 @@ const { loading: loadingEvent, error: errorEvent, data: dataEvent } = useDataQue
                     </TableCell>
                 </TableRow>
             );
+            }
         }
     )}
                         </TableBody>
