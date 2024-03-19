@@ -9,19 +9,9 @@ import {
     TableRowHead,
 } from '@dhis2/ui';
 import React, { useState } from 'react';
-import { getConstantValueByName } from '../utils';
+import { utilGetConstantValueByName } from '../utils/utils';
 
-// const eventQuery = {
-//     events: {
-//         resource: 'events',
-//         params: ({ trackedEntityInstance }) => ({
-//             program: 'P59PhQsB6tb',
-//             orgUnit: 'VgrqnQEtyOP',
-//             trackedEntityInstance,
-//             fields: 'event,eventDate,dataValues[dataElement,value]'
-//         })
-//     }
-// };
+
 
 const eventQuery = {
     events: {
@@ -34,25 +24,13 @@ const eventQuery = {
   };
   
 
-const qryConstants = {
-    // One query object in the whole query
-    attributes: {
-        // The `attributes` endpoint should be used
-        resource: 'constants',
-        params: {
-            // Paging is disabled
-            paging: false,
-            // Only the attribute properties that are required should be loaded
-            fields: 'id, displayName, code, value',
-        },
-    },
-}
+
 
 
 
 export const CourseDetailsStaffView = ({ course }) => {
 
-    const defCourseProgramId = getConstantValueByName('jtrain-courseprogramstage')
+    const defCourseProgramId = utilGetConstantValueByName('jtrain-courseprogramstage')
     const { loading, error, data } = useDataQuery({
         programStages: {
           resource: `programStages/${defCourseProgramId}`,
@@ -61,11 +39,7 @@ export const CourseDetailsStaffView = ({ course }) => {
           },
         },
       });
-    console.log('dataStages', data);
-    const [selectedCourseDate, setSelectedCourseDate] = useState(''); 
 
-    const dSysConstants = useDataQuery(qryConstants);
-    console.log(dSysConstants);
 
     
     const { loading: eventLoading, error: eventError, data: eventData } = useDataQuery(eventQuery, {
@@ -76,16 +50,7 @@ export const CourseDetailsStaffView = ({ course }) => {
     
 
       console.log(eventData)
-    if (dSysConstants.loading) return 'Loading...';
-    if (dSysConstants.error) return dSysConstants.error.message;
-    if (!dSysConstants.data.attributes || !dSysConstants.data.attributes.constants) return 'No constants data';
 
-    // Create a mapping of code to displayName from dSysConstants
-    const codeToDisplayName = dSysConstants.data.attributes.constants.reduce((map, constant) => {
-        map[constant.code] = constant.displayName;
-        return map;
-    }, {});
-    
     return (
         <div>
           <table style={{ width: '100%' }}>

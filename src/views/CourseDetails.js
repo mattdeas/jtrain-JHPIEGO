@@ -10,40 +10,18 @@ import {
 } from '@dhis2/ui';
 import React, { useState } from 'react';
 import { CourseDateAttendees } from './CourseDateAttendees'
-import { getConstantValueByName } from '../utils';
+import { utilGetConstantValueByName } from '../utils/utils';
+import { IconView16, IconView24 } from '@dhis2/ui';
 
-const defCourseProgramId = getConstantValueByName('jtrain-courseprogram')
-const defCourseOrgUnitId = getConstantValueByName('jtrain-defaultcourseorgunit')
-const defCourseProgramStageId = getConstantValueByName('jtrain-courseprogramstage')
 
-jtrain-courseprogramstage
+export const CourseDetails = ({ course, updateHeadings }) => {
 
-const eventQuery = {
-    events: {
-        resource: 'events',
-        params: ({ trackedEntityInstance }) => ({
-            program: defCourseProgramId,
-            orgUnit: defCourseOrgUnitId,
-            trackedEntityInstance,
-            fields: 'event,eventDate,dataValues[dataElement,value]'
-        })
-    }
-};
+    const defCourseProgramId = utilGetConstantValueByName('jtrain-courseprogram')
+    const defCourseOrgUnitId = utilGetConstantValueByName('jtrain-defaultcourseorgunit')
+    const defCourseProgramStageId = utilGetConstantValueByName('jtrain-courseprogramstage')
 
-const qryConstants = {
-    // One query object in the whole query
-    attributes: {
-        // The `attributes` endpoint should be used
-        resource: 'constants',
-        params: {
-            // Paging is disabled
-            paging: false,
-            // Only the attribute properties that are required should be loaded
-            fields: 'id, displayName, code, value',
-        },
-    },
-}
-const qryProgramDataElements = {
+
+    const qryProgramDataElements = {
         programStages: {
           resource: `programStages/${defCourseProgramStageId}`,
           params: {
@@ -52,8 +30,19 @@ const qryProgramDataElements = {
         },
       };
 
-export const CourseDetails = ({ course, updateHeadings }) => {
-    const { loading, error, data } = useDataQuery(eventQuery, {
+      const eventQuery = {
+        events: {
+            resource: 'events',
+            params: ({ trackedEntityInstance }) => ({
+                program: defCourseProgramId,
+                orgUnit: defCourseOrgUnitId,
+                trackedEntityInstance,
+                fields: 'event,eventDate,dataValues[dataElement,value]'
+            })
+        }
+    };
+
+    const { loading, error, data, refetch } = useDataQuery(eventQuery, {
         variables: {
             trackedEntityInstance: course.trackedEntityInstance
         }
@@ -74,8 +63,6 @@ export const CourseDetails = ({ course, updateHeadings }) => {
 
     const [refreshKey, setRefreshKey] = useState(0);
 
-    const dSysConstants = useDataQuery(qryConstants);
-
     // Check if data is loaded
     if (dProgramDE.loading) return 'Loading...';
     if (loading) return 'Loading...';
@@ -91,32 +78,6 @@ export const CourseDetails = ({ course, updateHeadings }) => {
     });
 
     const dataElements = [...new Set(data.events.events.flatMap(({ dataValues }) => dataValues.map(({ dataElement }) => dataElement)))];
-
-
-    // Check if dSysConstants data is loaded
-    if (dSysConstants.loading) return 'Loading...';
-    if (dSysConstants.error) return dSysConstants.error.message;
-    if (!dSysConstants.data.attributes || !dSysConstants.data.attributes.constants) return 'No constants data';
-
-    // Create a mapping of code to displayName from dSysConstants
-    const codeToDisplayName = dSysConstants.data.attributes.constants.reduce((map, constant) => {
-        map[constant.code] = constant.displayName;
-        return map;
-    }, {});
-
-    
-    console.log('dataElements', dataElements)
-    console.log(dProgramDE.data.programStages.programStageDataElements)
-    // Check if dProgramDE is still loading
-    
-    // const onButtonClick = () => {
-    //     // Define the variables you want to pass back
-    //     const newLabel = 'Your new label text';
-    //     const newIsSearchTableExpanded = false;
-    
-    //     // Call updateHeadings with the variables as arguments
-    //     
-    // };
 
     const onButtonClick = (variablesToPassBack) => {
         
@@ -187,7 +148,7 @@ export const CourseDetails = ({ course, updateHeadings }) => {
                                                     setRefreshKey(prevKey => prevKey + 1); // Increment the refresh key
                                                     setShowTable(false);
                                                     onButtonClick(variablesToPassBack);
-                                                }}>Select</button>
+                                                }}><IconView24 /></button>
                                                 </TableCell>
                                             </TableRow>
                                         ))}

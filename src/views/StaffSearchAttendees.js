@@ -7,10 +7,12 @@ import {
     TableHead,
     TableRow,
     TableRowHead,
+    IconAddCircle24,
+    IconView24,
 } from '@dhis2/ui'
 import React, { useState, useEffect } from 'react'
 import { Link, BrowserRouter, Switch, Route } from 'react-router-dom'
-
+import { utilGetConstantValueByName } from '../utils/utils';
 
 function debounce(func, wait) {
     let timeout;
@@ -30,24 +32,6 @@ const handleResize = debounce(() => {
 window.addEventListener('resize', handleResize);
 
 const itemsPerPage = 10;
-//const [currentPage, setCurrentPage] = useState(1);
-
-const qryConstants = {
-    // One query object in the whole query
-    attributes: {
-        // The `attributes` endpoint should be used
-        resource: 'constants',
-        params: {
-            // Paging is disabled
-            paging: false,
-            // Only the attribute properties that are required should be loaded
-            fields: 'id, displayName, code, value',
-        },
-    },
-}
-
-
-
 
 const query = {
     // "page" variable below can be dinamically passed via refetch (see "handlePageChange" below)
@@ -78,36 +62,40 @@ const query = {
         
 //     }),
 // };
-let tei_ids = [];
-export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dElements, onAssign}) => {
-
-    console.log('dElement',dElements)
-    const dSysConstants = useDataQuery(qryConstants)
-    let staffMemberid, defaultStaffOrgUnit;
-    console.log('dataEvent',dataEvent)
-    const dataEngine = useDataEngine();
-    console.log({ dSysConstants })
-    // Check if dSysConstants and constants exist
-    if (dSysConstants && dSysConstants.data && dSysConstants.data.attributes && dSysConstants.data.attributes.constants) {
-        // Find the jtrain-TEI-Type-Staff and jtrain-DefaultStaffOrgUnit objects
-        const staffMemberObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-TEI-Type-Staff');
-        const defaultStaffOrgUnitObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-DefaultStaffOrgUnit');
-
-        console.log(staffMemberObj)
-        console.log(defaultStaffOrgUnitObj)
-        // Extract the values
-        staffMemberid = staffMemberObj ? staffMemberObj.code : null;
-        defaultStaffOrgUnit = defaultStaffOrgUnitObj ? defaultStaffOrgUnitObj.code : null;
-        
-    }
+export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dElements, onAssign, refreshCount}) => {
 
 
-    const { loading, error, data } = useDataQuery(query, {
+    
+    const defStaffProgramId = utilGetConstantValueByName('jtrain-staffprogram');
+    const defStaffProgramCourseId = utilGetConstantValueByName('jtrain-staffprogram-course');
+    const defStaffOrgUnitId = utilGetConstantValueByName('jtrain-DefaultStaffOrgUnit');
+    const defStaffTEIType = utilGetConstantValueByName('jtrain-TEI-Type-Staff');
+    const defCourseEventId = utilGetConstantValueByName('jtrain-course-eventid');
+    const defCourseAttendeesDE = utilGetConstantValueByName('jtrain-course-attendees');
+    const defCourseAttendeesCountDE = utilGetConstantValueByName('jtrain-course-attendees-count');
+    const defCoursePreScore = utilGetConstantValueByName('jtrain-course-pretest-score');
+    const defCoursePostScore = utilGetConstantValueByName('jtrain-course-posttest-score');
+    const defCourseProgramId = utilGetConstantValueByName('jtrain-courseprogram');
+    const defCourseProgramStageId = utilGetConstantValueByName('jtrain-courseprogramstage');
+
+    const { loading, error, data, refetch } = useDataQuery(query, {
         variables: {
-            ou: 'VgrqnQEtyOP',
-            trackedEntityType: 'W9FNXXgGbm7',
+            ou: defStaffOrgUnitId,
+            trackedEntityType: defStaffTEIType,
         },
     })
+
+    
+    useEffect(() => {
+        refetch();
+        // This code will run whenever refreshCount changes
+
+        // Fetch data or perform other side effects here
+
+    }, [refreshCount]); // Pass refreshCount as a dependency to useEffect
+
+
+
 
     // State variable for search term
     const [searchTerm, setSearchTerm] = useState('');
@@ -116,13 +104,6 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
     const handleSearchTermChange = (event) => {
         setSearchTerm(event.target.value);
     }
-
-
-    const [dataElement1, setDataElement1] = useState('');
-    const [dataElement1Value, setDataElement1Value] = useState('');
-    const [dataElement2, setDataElement2] = useState('');
-    const [dataElement2Value, setDataElement2Value] = useState(0);
-
 
     const today = new Date();
         const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
@@ -134,21 +115,21 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
             events: [
                 {
                     trackedEntityInstance,
-                    program: 'Ss21byybIqu',
-                    programStage: 'Y6scAJvghc0',
-                    enrollment: 'qIuyPn7AVu2',
-                    orgUnit: 'VgrqnQEtyOP',
+                    program: defStaffProgramId,
+                    programStage: defStaffProgramCourseId,
+                    //enrollment: 'qIuyPn7AVu2',
+                    orgUnit: defStaffOrgUnitId,
                     dataValues: [
                         {
-                            dataElement: 'tsU3YD7kfYU',
+                            dataElement: defCourseEventId,
                             value: eventID,
                         },
                         {
-                            dataElement: 'qc3CCyM8VTc',
+                            dataElement: defCoursePreScore,
                             value: 0,
                         },
                         {
-                            dataElement: 'HtoYZNR0ch6',
+                            dataElement: defCoursePostScore,
                             value: 0,
                         },
                     ],
@@ -196,26 +177,7 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
         },
       });
 
-    //   const mutationCourseEvent = (program, programStage, orgUnit, idataValues, trackedEntityInstance, ) => ({
-    //     resource: 'events',
-    //     type: 'create',
-    //     data: () => ({
-    //       events: [
-    //         {
-    //           trackedEntityInstance: trackedEntityInstance,
-    //           program: program,
-    //           programStage: programStage,
-    //           orgUnit: orgUnit,
-    //           dataValues: idataValues,
-    //           status: 'ACTIVE',
-    //           eventDate: formattedDate,
-    //         },
-    //       ],
-    //     }),
-    //   });
       const engine = useDataEngine();
-
-
 
       const fetchEvent = async (eventID) => {
         const query = {
@@ -229,7 +191,6 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
         };
       
         const { events } = await engine.query(query);
-        console.log('EventDataElements', events);
       
         const dataValues = [];
         events.dataValues.forEach(item => {
@@ -245,33 +206,14 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
 
         console.log('trackedEntityInstance', trackedEntityInstance)
 
-    //Cancelled until bug is cleared 
-    // const type = 'ZBUwOGosqI0';
-    // const { error: relationshipsError, data: relationshipsData } = await mutateRelationships({ trackedEntityInstance, eventID, type});
-    // if (relationshipsError) {
-    //     console.error('Error creating relationship:', relationshipsError);
-    // } else {
-    //     console.log('Relationship created successfully');
-    //     console.log('Relationship data:', relationshipsData);
-    // }
-
-        // Create New Event for Staff Attendee
-        // const { error } = await mutate({ trackedEntityInstance });
-        // console.log('mutation', mutate)
-        // if (error) {
-        //     console.error('Error creating event:', error);
-        // } else {
-        //     console.log('Event created successfully');
-        // }
-        
         const dataInputs = [];
         dataValues.forEach(item => {
             let value;
             switch (item.dataElement) {
-                case 'l9aHlXLsEyE':
+                case defCourseAttendeesDE:
                     value = (tei_id || '') + trackedEntityInstance + ';';
                     break;
-                case 'Av9iXMiGRou':
+                case defCourseAttendeesCountDE:
                     value = tei_count + 1;
                     break;
                 default:
@@ -281,28 +223,38 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
             dataInputs.push({ dataElement: item.dataElement, value: value });
         });
 
-        const HasAttendees = dataInputs.some(item => item.dataElement === 'l9aHlXLsEyE');
+        const HasAttendees = dataInputs.some(item => item.dataElement === defCourseAttendeesDE);
         if (!HasAttendees) {
-            dataInputs.push({ dataElement: 'l9aHlXLsEyE', value: (tei_id || '') + trackedEntityInstance + ';' });
+            dataInputs.push({ dataElement: defCourseAttendeesDE, value: (tei_id || '') + trackedEntityInstance + ';' });
         }
 
 
 
 
-   const myMutation = UpdateEvent('P59PhQsB6tb', 'r0gHZqEq6DE', 'VgrqnQEtyOP', eventID, dataInputs);
+   const myMutation = UpdateEvent(defCourseProgramId, defCourseProgramStageId, defStaffOrgUnitId, eventID, dataInputs);
    console.log('myMutation', myMutation)
    const response = await engine.mutate(myMutation);
    console.log('response', response)
 
      const dataStaffDefault = [];
-     dataStaffDefault.push({ dataElement: 'tsU3YD7kfYU', value: eventID });
-     dataStaffDefault.push({ dataElement: 'qc3CCyM8VTc', value: 0 });
-     dataStaffDefault.push({ dataElement: 'HtoYZNR0ch6', value: 0 });
+     dataStaffDefault.push({ dataElement: defCourseEventId, value: eventID });
+     dataStaffDefault.push({ dataElement: defCoursePreScore, value: 0 });
+     dataStaffDefault.push({ dataElement: defCoursePostScore, value: 0 });
      console.log('StaffUpdateTEI', trackedEntityInstance)
-     const myStaffUpdate = CreateEvent('Ss21byybIqu', 'Y6scAJvghc0', 'VgrqnQEtyOP', dataStaffDefault, trackedEntityInstance);
-     const response2 = await engine.mutate(myStaffUpdate);
-     console.log('response2', response2)
-     onAssign();
+     const myStaffUpdate = CreateEvent(defStaffProgramId, defStaffProgramCourseId, defStaffOrgUnitId, dataStaffDefault, trackedEntityInstance);
+     try {
+            const response2 = await engine.mutate(myStaffUpdate);
+            console.log('Mutation completed', response2);
+            
+            // Add a delay before calling onAssign and refetch
+            setTimeout(() => {
+                onAssign();
+                refetch();
+            }, 1000); // Delay of 1 second
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+        
     }
 
     
@@ -363,17 +315,13 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
                     <TableCell>{attributesObj['Date of Birth']}</TableCell>
                     <TableCell>{attributesObj['Age']}</TableCell>
                     <TableCell >
+                    <a href={`/staffview/${trackedEntityInstance}`} target="_blank" rel="noopener noreferrer"><IconView24 /></a>
                     
-                    <Link to={`/staffview/${trackedEntityInstance}`}>View</Link>
                     </TableCell>
-                    <TableCell>{trackedEntityInstance}</TableCell>
-                    <TableCell>
-                        {/* <button onClick={() => mutate({ trackedEntityInstance, courseId: eventID, score: 99, type: 'ZBUwOGosqI0' })}>
-                            Assign
-                        </button> */}
-                        <button onClick={() => handleAssign(trackedEntityInstance)}>
-                            Assign
-                        </button>
+                    {/* <TableCell>{trackedEntityInstance}</TableCell> */}
+                       
+                    <TableCell align="left">
+                        <div onClick={() => handleAssign(trackedEntityInstance)}><IconAddCircle24 /></div>
                     </TableCell>
                 </TableRow>
             );

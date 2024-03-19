@@ -1,55 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDataQuery, useDataMutation } from '@dhis2/app-runtime';
 import { StaffSearchAttendees } from './StaffSearchAttendees';
-import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import { StaffShow } from './CourseDateAttendees-StaffShow';
-
-const conVariableName = 'jtrain-course-attendees';
-
-
-const constantsQuery = () => ({
-    constants: {
-      resource: 'constants',
-      params: {
-        filter: `name:eq:${conVariableName}`,
-        fields: ['id', 'name', 'value', 'code'],
-        paging: false,
-      },
-    },
-  });
-
-
-  const qryConstants = {
-    // One query object in the whole query
-    attributes: {
-        // The `attributes` endpoint should be used
-        resource: 'constants',
-        params: {
-            // Paging is disabled
-            paging: false,
-            // Only the attribute properties that are required should be loaded
-            fields: 'id, displayName, code, value',
-        },
-    },
-}
-
-const qryTrackedEntityInstance = {
-    trackedEntityInstance: {
-        resource: 'trackedEntityInstances',
-        id: ({ id }) => id,
-        params: {
-            fields: ['attributes[attribute,value]'],
-        },
-    },
-};
-
-
+import { utilGetConstantValueByName } from '../utils/utils';
+import { CircularLoader } from '@dhis2/ui';
 
 export const CourseDateAttendees = ({ eventID, dElements }) => {
+  
     const [reload, setReload] = useState(false);
-    const { id } = useParams();
-    console.log('id:',id);
-    console.log('eventID:',eventID);
+    const [refreshCount,setRefreshCount] = useState(0)
+
+    const [loading, setLoading] = useState(false); // Add a new state variable for loading
+
+   
+
 
 
     const eventQuery = (eventID) => ({
@@ -61,43 +25,54 @@ export const CourseDateAttendees = ({ eventID, dElements }) => {
         },
       },
     });
+
+
     const handleReload = () => {
+      setLoading(true); // Start loading
+      console.log('REFRESHES-START')
+      setReload(!reload);
+      setRefreshCount(prevKey => prevKey + 1); 
+      refetchEvent().finally(() => {
+          // When refetchEvent is done, stop loading
+          setLoading(false);
+      });
+      setReload(!reload);
+      setRefreshCount(prevKey => prevKey + 1); 
       setReload(!reload);
     };
-  const { loading: loadingEvent, error: errorEvent, data: dataEvent } = useDataQuery(eventQuery(eventID));
+
+
+  const { loading: loadingEvent, error: errorEvent, data: dataEvent, refetch: refetchEvent } = useDataQuery(eventQuery(eventID), [reload]);
 
   if (loadingEvent) return <span>Loading...</span>;
   if (errorEvent) return <span>Error1: {errorEvent.message}</span>;
 
-  // Find the object where dataElement is 'l9aHlXLsEyE'
   const dataElementObject = dataEvent.events.dataValues.find(
-    (dataValue) => dataValue.dataElement === 'l9aHlXLsEyE'
+    (dataValue) => dataValue.dataElement === utilGetConstantValueByName('jtrain-course-attendees')
   );
 
   const attendeeCountObj = dataEvent.events.dataValues.find(
-    (dataValue) => dataValue.dataElement === 'Av9iXMiGRou'
+    (dataValue) => dataValue.dataElement === utilGetConstantValueByName('jtrain-course-attendees-count')
   );
 
   const attendeeCount = parseInt(attendeeCountObj.value)
-  console.log('dataElementObject:',dataElementObject);
-
-  console.log('CDAEventID',eventID);
-
-    
     return (
-        <div>
-            <h3>Course Date Attendees {eventID}</h3>
-            <table>
-                <tbody>
-                {dataElementObject ? (
-                <StaffShow tei_id={dataElementObject.value} eventID={eventID}/>
-              ) : (
-                <tr><td>No attendees</td></tr>
-              )}
-                </tbody>
-              </table>
+      <div>
+      <h3>Course Date Attendees {eventID}</h3>
+      <p>{refreshCount}</p>
+      {loading ? <CircularLoader /> : ( // Show the loader if loading is true
+          <table>
+              <tbody>
+              {dataElementObject ? (
+              <StaffShow tei_id={dataElementObject.value} eventID={eventID} reload={reload}  refreshCount={refreshCount} onDelete={handleReload} key={refreshCount} />
+            ) : (
+              <tr><td>No attendees</td></tr>
+            )}
+              </tbody>
+            </table>
+      )}
 
-              <StaffSearchAttendees eventID={eventID} dataEvent={dataEvent} tei_id={dataElementObject && dataElementObject.value ? dataElementObject.value : ""} tei_count={attendeeCount} dElements={dElements} onAssign={handleReload} />
-        </div>
+      <StaffSearchAttendees eventID={eventID} dataEvent={dataEvent} tei_id={dataElementObject && dataElementObject.value ? dataElementObject.value : ""} tei_count={attendeeCount} dElements={dElements} onAssign={handleReload} refreshCount={refreshCount} reload={reload} key={refreshCount}/>
+  </div>
     );
 }

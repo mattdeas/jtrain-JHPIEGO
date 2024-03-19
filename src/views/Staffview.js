@@ -2,9 +2,10 @@ import { useDataQuery, useDataMutation, useDataEngine } from '@dhis2/app-runtime
 import { CourseDetailsStaffView } from './CourseDetailsStaffView';
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import React, {useState, useEffect} from 'react'
-// import delicon from './image/delete_icon.png'; 
-// import magnify from './image/magnifying.png';
-// import logo from './image/jtrainlogo.png';
+import { utilGetConstantValueByName } from '../utils/utils';
+import { OrganisationUnitTree } from '@dhis2/ui';
+import { CourseDateAttendeesStaffCustomFields } from './CourseDateAttendees-Staff-CustomFields';
+import { IconSave16, IconCross16, IconDelete16 } from '@dhis2/ui';
 
 
 function debounce(func, wait) {
@@ -28,22 +29,6 @@ const today = new Date();
 const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
 
-
-
-const qryConstants = {
-    // One query object in the whole query
-    attributes: {
-        // The `attributes` endpoint should be used
-        resource: 'constants',
-        params: {
-            // Paging is disabled
-            paging: false,
-            // Only the attribute properties that are required should be loaded
-            fields: 'id, displayName, code, value',
-        },
-    },
-}
-
   const qryProgramFields = {
     program: {
       resource: 'programs',
@@ -54,24 +39,7 @@ const qryConstants = {
     },
 };
 
-const handleUpdate = () => {
-};
 
-
-
-const handleCancel = () => {
-};
-
-const qryTrackedEntityInstance = {
-    trackedEntityInstance: {
-        resource: 'trackedEntityInstances',
-        id: ({ id }) => id,
-        params: {
-            fields: ['attributes[attribute,value]'],
-            program: 'Ss21byybIqu'
-        },
-    },
-};
 
 const eventsQuery = (id) => ({
     events: {
@@ -92,95 +60,6 @@ const dataElementQuery = {
     },
 };
 
-const DataElement = ({ dataElementId, value }) => {
-    const dataElementQuery = {
-        dataElement: {
-            resource: 'dataElements',
-            id: dataElementId,
-            params: {
-                fields: ['displayName'],
-            },
-        },
-    };
-
-    const { loading, error, data } = useDataQuery(dataElementQuery);
-
-    if (loading) return <td>Loading...</td>;
-    if (error) return <td>Error: {error.message}</td>;
-
-    return (
-        <>
-            <td>{data.dataElement.displayName}</td>
-            <td>{value}</td>
-        </>
-    );
-};
-
-const createMutation = (id, attributes) => ({
-    resource: 'trackedEntityInstances',
-    type: 'update',
-    id: id,
-    data: {
-        orgUnit: 'VgrqnQEtyOP',
-        attributes: Object.entries(attributes).map(([attribute, value]) => ({ attribute, value }))
-    },
-});
-
-const mutationWorking = {
-    resource: 'programs',
-    id: ({ id }) => id,
-    type: 'update',
-    partial: true,
-    data: ({ name }) => ({
-        name,
-    }),
-}
-
-
-const handleAssign = async (trackedEntityInstance) => {
-        
-    
-    const type = 'ZBUwOGosqI0';
-    // const { error: relationshipsError, data: relationshipsData } = await mutateRelationships({ trackedEntityInstance, eventID, type});
-    // if (relationshipsError) {
-    //     console.error('Error creating relationship:', relationshipsError);
-    // } else {
-    //     console.log('Relationship created successfully');
-    //     console.log('Relationship data:', relationshipsData);
-    // }
-
-    const { error } = await mutate({ trackedEntityInstance });
-    console.log('mutation', mutate)
-    if (error) {
-        console.error('Error creating event:', error);
-    } else {
-        console.log('Event created successfully');
-    }
-};
-
-const newEvent = {
-    resource: 'events',
-    type: 'create',
-    data: ({ trackedEntityInstance }) => ({
-        events: [
-            {
-                trackedEntityInstance,
-                program: 'Ss21byybIqu',
-                programStage: 'Y6scAJvghc0',
-                enrollment: 'qIuyPn7AVu2',
-                orgUnit: 'VgrqnQEtyOP',
-                dataValues: [
-                    {
-                        dataElement: 'tsU3YD7kfYU',
-                        value: eventID,
-                    },
-                ],
-                status: 'ACTIVE',
-                eventDate: formattedDate,
-            },
-        ],
-    }),
-};
 
 const mutation = (id) => ({
     resource: 'trackedEntityInstances',
@@ -196,10 +75,45 @@ const mutation = (id) => ({
 
 export const Staffview = () => {
     const { id } = useParams();
-    const dSysConstants = useDataQuery(qryConstants)
     const [trackedEntityInstance, setTrackedEntityInstance] = useState(null);
     const [formFields, setFormFields] = useState({});
     const [mutate, { loading, error }] = useDataMutation(mutation(id))
+
+
+    if(sessionStorage.getItem('constants') == null)
+    {
+        const engine = useDataEngine();
+    
+        useEffect(() => {
+            const fetchData = async () => {
+                const { loading, error, data } = await engine.query(utilConstantsQueryStructure);
+                console.log('data', data);
+                if (!loading && !error && data) {
+                    sessionStorage.setItem('constants', JSON.stringify(data.constants.constants));
+                }
+            };
+        
+            fetchData();
+        }, [engine]);
+    }
+
+    const defStaffOrgUnitId = utilGetConstantValueByName('jtrain-DefaultStaffOrgUnit')
+    const defStaffProgId = utilGetConstantValueByName('jtrain-staffprogram')
+    const defStaffProgCourseId = utilGetConstantValueByName('jtrain-staffprogram-course')
+    const defLocationTEA = utilGetConstantValueByName('jtrain-location')
+
+    const qryTrackedEntityInstance = {
+        trackedEntityInstance: {
+            resource: 'trackedEntityInstances',
+            id: ({ id }) => id,
+            params: {
+                fields: ['attributes[attribute,value]'],
+                program: defStaffProgId
+            },
+        },
+    };
+
+
     const { loading: loadingEntity, error: errorEntity, data: dataEntity } = useDataQuery(qryTrackedEntityInstance, {
         variables: {
          id,
@@ -219,7 +133,7 @@ export const Staffview = () => {
       if (window.confirm('Are you sure you want to delete this Staff Member?')) {
           try {
               await engine.mutate(deleteMutation);
-              alert('Staff deleted successfully');
+              
           } catch (error) {
               alert('Failed to delete course');
           }
@@ -230,31 +144,18 @@ export const Staffview = () => {
      const qryProgramDataElements = {
          "qPDE": {
              resource: 'programStages',
-                "id": 'Y6scAJvghc0',
+                "id": defStaffProgCourseId,
                 "params": {
-                    "fields": "programStageDataElements[program[id,Ss21byybIqu],dataElement[id,displayName],sortOrder]",
+                    "fields": `programStageDataElements[program[id,${defStaffProgId}],dataElement[id,displayName],sortOrder]`,
                 },
 
          },
     }
 
-    // Define the query outside the component
-const EVENTS_QUERY = {
-    events: {
-        resource: 'events',
-        params: {
-            fields: ['event', 'dataValues[dataElement,value]'],
-            event: ({ eventIds }) => eventIds.join(';'),
-        },
-    },
-};
 
     const dataProgramDE  = useDataQuery(qryProgramDataElements);
 
-    console.log('dataProgramDE', dataProgramDE)
-
     const { loading: loadingDataElement, error: errorDataElement, data: dataElementData } = useDataQuery(dataElementQuery);
-    console.log('dsysContstants',dSysConstants)
     const [responseMessage, setResponseMessage] = useState('');
     const { loading: loadingEvents, error: errorEvents, data: eventsData } = useDataQuery(eventsQuery(id));
     useEffect(() => {
@@ -264,23 +165,13 @@ const EVENTS_QUERY = {
         }, [eventsData, loadingEvents, errorEvents]);
 
     
-    console.log('eventsData', eventsData)
-    let defOrgUnit = null;
-    if (dSysConstants && dSysConstants.data && dSysConstants.data.attributes && dSysConstants.data.attributes.constants) {
-        const defOrgUnitObj = dSysConstants.data.attributes.constants.find(constant => constant.displayName === 'jtrain-DefaultStaffOrgUnit');
-        defOrgUnit = defOrgUnitObj ? defOrgUnitObj.code : null;
-    }
     
     
     const attributes = Object.entries(formFields).map(([attribute, value]) => ({ attribute, value }));
 
     const doMutation = async () => {
         try {
-                        // Pass the mutation object to the mutate function
-                        //const response = await mutate(MutateTEI);
-                        //const response = await mutate({ id: id,
-                        // orgUnit: defOrgUnit, attributes });
-                        const response = await mutate({ orgUnit: defOrgUnit, attributes });
+                        const response = await mutate({ orgUnit: defStaffOrgUnitId, attributes });
                         if (!response || (error && error.length > 0)) {
                             setResponseMessage('Failed to upload data');
                             console.error('Error:', error);
@@ -316,54 +207,34 @@ const EVENTS_QUERY = {
         //console.log(`Option ID/Code: ${name}, Option Name: ${value}`);
         setFormFields(prevFields => ({ ...prevFields, [name]: value }));
     };
-    
 
-    let staffMemberid, defaultStaffOrgUnit, defaultStaffProg;
-    // Check if dSysConstants and constants exist
-    if (dSysConstants && dSysConstants.data && dSysConstants.data.attributes && dSysConstants.data.attributes.constants) {
-        // Find the jtrain-TEI-Type-Staff and jtrain-DefaultStaffOrgUnit objects
-        const staffMemberObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-TEI-Type-Staff');
-        const defaultStaffOrgUnitObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-DefaultStaffOrgUnit');
-        const defaultStaffProgObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-StaffProgram');
-        
-        // Extract the values
-        staffMemberid = staffMemberObj ? staffMemberObj.code : null;
-        defaultStaffOrgUnit = defaultStaffOrgUnitObj ? defaultStaffOrgUnitObj.code : null;
-        defaultStaffProg = defaultStaffProgObj ? defaultStaffProgObj.code : null;
+    const [selected, setSelected] = useState([]);
+
+    
+    const onTreeChange = ({ selected }) => {
+        setSelected(selected);
+        console.log('selected:' , selected)
+
+        setFormFields(prevFields => ({
+            ...prevFields,
+            [defLocationTEA]: selected[0], // assuming selected is an array and you want to store the first value
+        }));
     }
+
 
     const { loading: loading1, error1, data } = useDataQuery(qryProgramFields, {
         variables: {
-          id:  "Ss21byybIqu", // Use the ID of the program you want to fetch
+          id:  defStaffProgId, // Use the ID of the program you want to fetch
         },
     });
 
     
     const [events, setEvents] = useState([]);
 
-    // const transposedEvents = events.map(event => {
-    //     console.log('event', event)
-    //     const eventObj = { event: event.event };
-    //     event.dataValues.forEach(dataValue => {
-    //         if (dataProgramDE && dataProgramDE.data && dataProgramDE.data.qPDE) {
-    //             console.log('dataProgramDE', dataProgramDE)
-    //             const matchingElement = dataProgramDE.data.qPDE.programStageDataElements.find(element => element.dataElement.id === dataValue.dataElement);
-    //             //console.log('element.dataElement.id', element.dataElement.id)
-    //             console.log('dataValue.dataElement',dataValue.dataElement)
-    //             if (matchingElement) {
-    //                 eventObj[matchingElement.dataElement.displayName] = dataValue.value;
-    //                 eventObj.sortOrder = matchingElement.sortOrder;
-    //             }
-    //         }
-    //     });
-    //     console.log('eventObj', eventObj)
-    //     return eventObj;
-    // });
-
     
     let transposedEvents = [];
 
-if (dataProgramDE && dataProgramDE.data && dataProgramDE.data.qPDE && dataProgramDE.data.qPDE.programStageDataElements) {
+    if (dataProgramDE && dataProgramDE.data && dataProgramDE.data.qPDE && dataProgramDE.data.qPDE.programStageDataElements) {
     transposedEvents = events.map(event => {
         const eventObj = { event: event.event };
         event.dataValues.forEach(dataValue => {
@@ -374,10 +245,7 @@ if (dataProgramDE && dataProgramDE.data && dataProgramDE.data.qPDE && dataProgra
         });
         return eventObj;
     });
-} else {
-    // Fetch the necessary data here
-    // This will depend on how you're fetching data in your application
-}
+    } else {}
 
     
  
@@ -400,8 +268,22 @@ if (dataProgramDE && dataProgramDE.data && dataProgramDE.data.qPDE && dataProgra
         }
     }, [trackedEntityInstance]);
 
+    
+
+    
+
     const findAttributeValue = (attributeId) => {
+        
+        //Location return as array
+        if(attributeId === defLocationTEA) {
+            if(formFields[attributeId] !== undefined && formFields[attributeId] !== null && formFields[attributeId] !== '') {
+                return [formFields[attributeId]];
+            }
+            else
+            return [];
+        }
         // If the attribute value exists in formFields, return it
+
         if (formFields[attributeId]) {
             return formFields[attributeId];
         }
@@ -442,11 +324,20 @@ if (dataProgramDE && dataProgramDE.data && dataProgramDE.data.qPDE && dataProgra
                             <td>
                                 <label>{trackedEntityAttribute.name}</label>
                             </td>
-                            
                             <td>
-                                {trackedEntityAttribute.valueType === 'TEXT' ? (
-                                    trackedEntityAttribute.optionSet && trackedEntityAttribute.optionSet.options ? (
-                                        <select name={trackedEntityAttribute.id} onChange={handleInputChangeSelect}>
+                            {trackedEntityAttribute.valueType === 'TEXT' ? (
+                                    trackedEntityAttribute.id === defLocationTEA ? (
+                                        <div>
+                                            <OrganisationUnitTree
+                                                initiallyExpanded={[defStaffOrgUnitId]}
+                                                roots={defStaffOrgUnitId} // replace with your root organisation unit ID
+                                                selected={findAttributeValue(trackedEntityAttribute.id)}
+                                                onChange={onTreeChange}
+                                                singleSelection
+                                            />
+                                        </div>
+                                    ) : trackedEntityAttribute.optionSet && trackedEntityAttribute.optionSet.options ? (
+                                        <select name={trackedEntityAttribute.id} onChange={handleInputChangeSelect} value={findAttributeValue(trackedEntityAttribute.id)}>
                                             {trackedEntityAttribute.optionSet.options.map(option => (
                                                 <option key={option.id} value={option.code}>
                                                     {option.name}
@@ -454,26 +345,31 @@ if (dataProgramDE && dataProgramDE.data && dataProgramDE.data.qPDE && dataProgra
                                             ))}
                                         </select>
                                     ) : (
+
                                         <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)} onChange={handleInputChange}  />
                                     )
                                 ) : trackedEntityAttribute.valueType === 'DATE' ? (
                                     <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)}  onChange={handleInputChange}/>
                                 ) : trackedEntityAttribute.valueType === 'NUMBER' ? (
                                     <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)} onChange={handleInputChange}/>
+                                ) : trackedEntityAttribute.valueType === 'ORGANISATION_UNIT' ? (
+                                    'Data Type Not supported.'
+                                    
                                 ) : (
-                                    trackedEntityAttribute.valueType
+                                    'Data Type Not supported.'
                                 )}
+                                
                             </td>
                         </tr>
                     )
                 ))}
             </tbody>
             </table>
-            <button type="submit">Save</button>
-            <Link to="/coursesearch">
-                <button type="button">Close</button>
+            <button type="submit"><IconSave16 /> Save</button>
+            <Link to="/staffsearch">
+                <button type="button"><IconCross16 />Close</button>
             </Link>
-            <button type="button" onClick={handleDelete}>Delete</button>
+            <button type="button" onClick={handleDelete}><IconDelete16 /> Delete</button>
             <p>{responseMessage}</p>
             
             
@@ -498,14 +394,14 @@ if (dataProgramDE && dataProgramDE.data && dataProgramDE.data.qPDE && dataProgra
             display: 'inline-block',
             fontSize: '16px',
             borderRadius: '12px'
-            }}>Go to Training Capture</button>
+            }}>Go to Training Capture111111</button>
         </Link>
         </div>
     <table>
  
 <thead>
 <tr>
-{transposedEvents.length > 0 && dataProgramDE?.data?.qPDE?.programStageDataElements.map(({ dataElement }) => {
+{/* {transposedEvents.length > 0 && dataProgramDE?.data?.qPDE?.programStageDataElements.map(({ dataElement }) => {
     if (dataElement.displayName.startsWith('jtrain')) {
         if (dataElement.displayName === 'jtrain_course_eventid') {
             return (
@@ -523,18 +419,34 @@ if (dataProgramDE && dataProgramDE.data && dataProgramDE.data.qPDE && dataProgra
 </th>
         );
     }
-})}
+})} */}
 </tr>
 </thead>
 <tbody>
 {transposedEvents.length > 0 ? (
   transposedEvents.map((eventObj, index) => (
     <tr key={eventObj.event}>
-      {dataProgramDE?.data?.qPDE?.programStageDataElements.map(({ dataElement }, cellIndex) => (
-        <td key={dataElement.id} style={{ textAlign: 'center' }}>
-            {!dataElement.displayName.startsWith('jTrain') && (cellIndex === 0 ? <CourseDetailsStaffView course={eventObj[dataElement.displayName]} /> : eventObj[dataElement.displayName])}
-        </td>
+
+        <td>
+        {dataProgramDE?.data?.qPDE?.programStageDataElements.map(({ dataElement }, cellIndex) => (
+        <div>
+            <div key={dataElement.id} style={{ textAlign: 'center' }}>
+                {!dataElement.displayName.startsWith('jTrain') && (cellIndex === 0 ? <CourseDetailsStaffView course={eventObj[dataElement.displayName]} /> : '' )}
+            </div>
+        </div>
+        
       ))}
+            {dataProgramDE?.data?.qPDE?.programStageDataElements.map(({ dataElement }, cellIndex) => (
+            <div>
+                <div key={dataElement.id} style={{ textAlign: 'center' }}>
+                    {!dataElement.displayName.startsWith('jTrain') && (cellIndex === 0 ?   <CourseDateAttendeesStaffCustomFields eventID={eventObj.event} /> : '')}
+                </div>
+            </div>
+            
+        ))}
+           
+        </td>
+      
     </tr>
   ))
 ) : (

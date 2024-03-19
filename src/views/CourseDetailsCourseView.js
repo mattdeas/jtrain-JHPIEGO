@@ -9,7 +9,7 @@ import {
     TableRowHead,
 } from '@dhis2/ui';
 import React, { useState } from 'react';
-import { getConstantValueByName } from '../utils';  
+import { utilGetConstantValueByName } from '../utils/utils';  
 
 
 const eventQuery = {
@@ -26,7 +26,7 @@ const eventQuery = {
 
 export const CourseDetailsCourseView = ({ id }) => {
 
-  const defCourseProgStageId = getConstantValueByName('jtrain-courseprogramstage')
+  const defCourseProgStageId = utilGetConstantValueByName('jtrain-courseprogramstage')
     const { loading, error, data } = useDataQuery({
         programStages: {
           resource: `programStages/${defCourseProgStageId}`,

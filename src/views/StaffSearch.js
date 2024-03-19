@@ -1,4 +1,4 @@
-import { useDataQuery } from '@dhis2/app-runtime'
+import { useDataQuery, useDataEngine } from '@dhis2/app-runtime'
 import {
     Table,
     TableBody,
@@ -8,10 +8,11 @@ import {
     TableRow,
     TableRowHead,
 } from '@dhis2/ui'
-import React, { useState } from 'react'
+import React, { useState, useEffect} from 'react'
 import { Link, BrowserRouter, Switch, Route } from 'react-router-dom'
 import { ResizeObserver } from '@juggle/resize-observer';
-import { getConstantValueByName } from '../utils';
+import { utilGetConstantValueByName } from '../utils/utils';
+import { IconView16 } from '@dhis2/ui'
 
 
 
@@ -32,45 +33,6 @@ const handleResize = debounce(() => {
 
 window.addEventListener('resize', handleResize);
 
-const itemsPerPage = 10;
-//const [currentPage, setCurrentPage] = useState(1);
-
-
-/**
- * This defined the data that we want to get
- * The `app-runtime` will be explained in a another session after this one,
- * so you don't have to worry about the specifics for now
- */
-const qryTrackedEntityTypes = {
-    // One query object in the whole query
-    attributes: {
-        // The `attributes` endpoint should be used
-        resource: 'trackedEntityTypes',
-        params: {
-            // Paging is disabled
-            paging: false,
-            // Only the attribute properties that are required should be loaded
-            fields: 'id, displayName',
-        },
-    },
-}
-
-const qryConstants = {
-    // One query object in the whole query
-    attributes: {
-        // The `attributes` endpoint should be used
-        resource: 'constants',
-        params: {
-            // Paging is disabled
-            paging: false,
-            // Only the attribute properties that are required should be loaded
-            fields: 'id, displayName, code, value',
-        },
-    },
-}
-
-
-
 
 const query = {
     // "page" variable below can be dinamically passed via refetch (see "handlePageChange" below)
@@ -86,49 +48,16 @@ const query = {
 //https://dhis2.af.jhpiego.org/api/trackedEntityInstances?ou=x0Zl6eKgC7B&trackedEntityType=W9FNXXgGbm7
 
 export const StaffSearch = () => {
-    // This is yet another functionality provided by the `@dhis2/app-runtime`
-    // For the time being it does not matter what this does exactly
-    // * loading will be true while the data is being loaded
-    // * error will be an instance of `Error` if something fails
-    // * data will be null while the data is being loaded or if something fails
-    // * data will be an object once loading is done with the following path
-    //   data.attributes.attributes <- That's an array of objects
-    const dSysConstants = useDataQuery(qryConstants)
 
-    let staffMemberid, defaultStaffOrgUnit;
-    console.log({ dSysConstants })
-    // Check if dSysConstants and constants exist
-    if (dSysConstants && dSysConstants.data && dSysConstants.data.attributes && dSysConstants.data.attributes.constants) {
-        // Find the jtrain-TEI-Type-Staff and jtrain-DefaultStaffOrgUnit objects
-        const staffMemberObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-TEI-Type-Staff');
-        const defaultStaffOrgUnitObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-DefaultStaffOrgUnit');
+    const defStaffOrgUnitId = utilGetConstantValueByName('jtrain-DefaultStaffOrgUnit')
+    const defStaffType = utilGetConstantValueByName('jtrain-TEI-Type-Staff')
 
-        console.log(staffMemberObj)
-        console.log(defaultStaffOrgUnitObj)
-        // Extract the values
-        staffMemberid = staffMemberObj ? staffMemberObj.code : null;
-        defaultStaffOrgUnit = defaultStaffOrgUnitObj ? defaultStaffOrgUnitObj.code : null;
-
-        console.log('Constants Loaded')// Log the values to the console
-        
-    }
-    //console.log({ dSysConstants });
-
-    //const { loading, error, data } = useDataQuery(qryTrackedEntityTypes)
-    //console.log({ loading, error, data });
-    console.log({ staffMemberid, defaultStaffOrgUnit });
     const { loading, error, data } = useDataQuery(query, {
         variables: {
-            ou: 'VgrqnQEtyOP',
-            trackedEntityType: 'W9FNXXgGbm7',
+            ou: defStaffOrgUnitId,
+            trackedEntityType: defStaffType,
         },
     })
-    console.log({ loading, error, data });
-    console.log('data output', data);
-    //console.log('data instances', data.instances);
-    //console.log('data TE instances', data.instances.trackedEntityInstances);
-    //console.log('data TE instances Att', data.instances.trackedEntityInstances.attributes);
-
     // State variable for search term
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -181,7 +110,7 @@ export const StaffSearch = () => {
           <TableCellHead>Gender</TableCellHead>
           <TableCellHead>Date of Birth</TableCellHead>
           <TableCellHead>Age</TableCellHead>
-          <TableCellHead>Open</TableCellHead>
+          <TableCellHead>View</TableCellHead>
         </TableRowHead>
       </TableHead>
       <TableBody>
@@ -204,7 +133,7 @@ export const StaffSearch = () => {
                     <TableCell>{attributesObj['Date of Birth']}</TableCell>
                     <TableCell>{attributesObj['Age']}</TableCell>
                     <TableCell >
-                    <Link to={`/staffview/${trackedEntityInstance}`}>View Details</Link>
+                    <Link to={`/staffview/${trackedEntityInstance}`}><IconView16/></Link>
                     </TableCell>
                 </TableRow>
             );

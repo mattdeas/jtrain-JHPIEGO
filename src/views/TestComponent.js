@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDataMutation } from '@dhis2/app-runtime';
+import { CalendarInput } from '@dhis2/ui'
 
 const UploadDataToDHIS2 = () => {
   const jsonToUpload = {
@@ -52,9 +53,11 @@ const UploadDataToDHIS2 = () => {
 
   return (
     <div>
-      {loading && <p>Loading...</p>}
-      {error && <p>Error: {error.message}</p>}
-      {data && <p>Data uploaded successfully</p>}
+      
+      <CalendarInput date="2021-10-13"     dir="ltr"
+    locale="en-CA"
+    timeZone="Africa/Khartoum"
+    weekDayFormat="short" />
     </div>
   );
 };

@@ -2,7 +2,7 @@ import { useDataQuery, useDataEngine } from "@dhis2/app-runtime";
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import { TabBar, Tab } from '@dhis2-ui/tab';
-import { Home, CourseAdd,  CourseSearch, StaffSearch, Staffadd, TrainingCapture, Staffview, Settings,
+import { Home,  CourseSearch, StaffSearch, Staffadd, TrainingCapture, Staffview, Settings,
     CourseDetailsStaffView, CourseDateAttendeesStaffCustomFields, CourseDetailsCourseView, CourseAttendee, CourseDateAttendees} from './views';
 
 
@@ -21,6 +21,7 @@ document.body.style.width = '50%';
 // Listen for errors
 //window.addEventListener('error', e => console.log(e.message));
 window.addEventListener('error', e => {});
+
 
 // Observe the body
 ro.observe(document.body);
@@ -44,31 +45,14 @@ const handleResize = debounce(() => {
 
 window.addEventListener('resize', handleResize);
 
-const constantsQuery = {
-    constants: {
-        resource: "constants",
-        params: {
-            paging: false,
-            fields: ['id', 'name', 'code']
-        }
-    }
-};
+
 
 
 //yarn start --proxy https://dhis2.af.jhpiego.org --proxyPort 8082
 const MainContent = () => {
+    
     const [selectedTab, setSelectedTab] = useState('');
     const location = useLocation();
-
-    //sessionStorage.clear();
-    const { loading, error, data } = useDataQuery(constantsQuery);
-    console.log('data', data)
-    useEffect(() => {
-        if (!loading && !error && data) {
-            sessionStorage.setItem('constants', JSON.stringify(data.constants.constants));
-        }
-    }, [loading, error, data]);
-    
 
     useEffect(() => {
         const currentPath = location.pathname;
@@ -88,7 +72,6 @@ const MainContent = () => {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/coursesearch" element={<CourseSearch />} />
-                <Route path="/courseAdd" element={<CourseAdd />} />
                 <Route path="/staffsearch" element={<StaffSearch />} />
                 <Route path="/staffview/:id" element={<Staffview />} /> 
                 <Route path="/trainingcapture" element={<TrainingCapture />} />

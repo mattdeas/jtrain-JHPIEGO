@@ -10,7 +10,6 @@ const constantsQuery = {
     },
   },
 };
-
 const deQuery = {
     dataElements: {
       resource: 'dataElements',

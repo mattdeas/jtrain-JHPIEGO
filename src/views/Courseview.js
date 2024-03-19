@@ -3,9 +3,13 @@ import { CourseDetailsCourseView } from './CourseDetailsCourseView';
 import { CourseDateStaffShow } from './CourseDate-StaffShow';
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import React, {useState, useEffect} from 'react'
-import { getConstantValueByName } from '../utils';
-import { CourseEditView} from './CourseEditView'
-
+import { utilGetConstantValueByName, utilgetCodeByName } from '../utils/utils';
+import { CourseEditEvent} from './CourseEditEvent'
+import { Calendar } from '@dhis2-ui/calendar'
+import { IconAdd16, IconDelete16, IconCross16, IconSave16, IconView16 } from '@dhis2/ui';
+import { CalendarInput } from '@dhis2/ui';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 function debounce(func, wait) {
     let timeout;
@@ -88,6 +92,7 @@ const mutation = {
 
 
 
+
 const mutationCourseEvent = (program, programStage, orgUnit, trackedEntityInstance, idataValues) => ({
     resource: 'events',
     type: 'create',
@@ -113,6 +118,8 @@ export const Courseview = () => {
     const [trackedEntityInstance, setTrackedEntityInstance] = useState(null);
     const [formFields, setFormFields] = useState({});
     const [formFieldsCourse, setFormFieldsCourse] = useState({});
+    const [dateFields, setDateFields] = useState({});
+    
     const [isViewClicked, setisViewClicked] = useState(false);
     const [mutate, { loading, error }] = useDataMutation(mutation)
     const { loading: loadingEntity, error: errorEntity, data: dataEntity } = useDataQuery(qryTrackedEntityInstance, {
@@ -131,10 +138,9 @@ export const Courseview = () => {
         },
     };
 
-    const defCourseOrgUnitId = getConstantValueByName('jtrain-defaultcourseorgunit')
-    const defCourseProgramId = getConstantValueByName('jtrain-courseprogram')
-    const defCourseProgStageId = getConstantValueByName('jtrain-courseprogramstage')
-    
+    const defCourseOrgUnitId = utilGetConstantValueByName('jtrain-defaultcourseorgunit')
+    const defCourseProgramId = utilgetCodeByName('jtrain-courseprogram')
+    const defCourseProgStageId = utilgetCodeByName('jtrain-courseprogramstage')
 
     const qryProgramDataElements = {
         "qPDE": {
@@ -155,8 +161,6 @@ export const Courseview = () => {
         type: 'delete',
     };
 
-    
-    
 
   const { loading: loading2, error2, data: dataProgramDE } = useDataQuery(qryProgramDataElements);
   
@@ -168,11 +172,43 @@ export const Courseview = () => {
               await engine.mutate(deleteMutation);
               alert('Course deleted successfully');
           } catch (error) {
-              //alert('Failed to delete course');
+              alert('Failed to delete course');
           }
       }
   };
 
+  const deleteEvent = async (eventToDelete) => {
+    try {
+        const mutation = {
+            resource: 'events',
+            id: eventToDelete, // Replace with the correct property for the event ID
+            type: 'delete',
+        };
+
+        const result = await engine.mutate(mutation);
+
+        if (result.status === 'OK') {
+            console.log('Event deleted successfully');
+            refetchEvent();
+        } else {
+            console.log('Failed to delete event');
+        }
+    } catch (error) {
+        console.error('Error deleting event:', error);
+    }
+};
+     
+
+
+  const handleDeleteEvent = (eventToDelete) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this event?");
+    if (confirmDelete) {
+        console.log('eventtodel',eventToDelete)
+        deleteEvent(eventToDelete);
+    }
+};
+
+  
 
   const handleInputChange = (event) => {
     console.log(event)
@@ -195,6 +231,25 @@ const handleInputChangeCourse = (name, value) => {
 
 }
 
+const handleInputChangeCourseDate = (name, date) => {
+    if (date) {
+        const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+        console.log(name, value)
+
+
+        setFormFieldsCourse(prevFields => ({
+            ...prevFields,
+            [name]: value,
+        }));
+
+        setDateFields(prevFields => ({
+            ...prevFields,
+            [name]: value,
+        }));
+    }
+};
+
 
       const handleInputChangeSelect = (event) => {
         const { name, value } = event.target;
@@ -208,8 +263,8 @@ const handleInputChangeCourse = (name, value) => {
         const dataValues = Object.entries(formFieldsCourse).map(([dataElement, value]) => ({ dataElement, value }));
         
         //Default values for Course Attendees and Counts
-        const defCourseAttendeesId = getConstantValueByName('jtrain-course-attendees')
-        const defCourseAttendeesCountId = getConstantValueByName('jtrain-course-attendees-count')
+        const defCourseAttendeesId = utilGetConstantValueByName('jtrain-course-attendees')
+        const defCourseAttendeesCountId = utilGetConstantValueByName('jtrain-course-attendees-count')
         dataValues.push({ dataElement: defCourseAttendeesId, value: '' });
         dataValues.push({ dataElement: defCourseAttendeesCountId, value: '0' });
 
@@ -236,7 +291,7 @@ const handleInputChangeCourse = (name, value) => {
   };
 
     const [responseMessage, setResponseMessage] = useState('');
-    const { loading: loadingEvents, error: errorEvents, data: eventsData } = useDataQuery(eventsQuery(id));
+    const { loading: loadingEvents, error: errorEvents, data: eventsData, refetch: refetchEvent } = useDataQuery(eventsQuery(id));
     useEffect(() => {
     if (!loadingEvents && !errorEvents && eventsData?.events) {
         console.log('eventsDataevents',eventsData)
@@ -331,6 +386,8 @@ const handleInputChangeCourse = (name, value) => {
         setSelectedEvent(null)
         console.log('ViewEvent',event)
     };
+
+    
     
     return (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -391,11 +448,11 @@ const handleInputChangeCourse = (name, value) => {
                 ))}
             </tbody>
             </table>
-            <button type="submit">Save</button>
+            <button type="submit"><IconSave16 /> Save</button>
             <Link to="/coursesearch">
-                <button type="button">Close</button>
+                <button type="button"><IconCross16/> Close</button>
             </Link>
-            <button type="button" onClick={handleDelete}>Delete</button>
+            <button type="button" onClick={handleDelete}><IconDelete16 /> Delete</button>
             <p>{responseMessage}</p>
             
             
@@ -406,7 +463,7 @@ const handleInputChangeCourse = (name, value) => {
     )
 }
 {selectedEvent &&  (
-    <div><CourseDateStaffShow key={selectedEvent} eventID={selectedEvent} />
+    <div><CourseDateStaffShow key={selectedEvent} tei_id={id} eventID={selectedEvent} />
 <button onClick={hideCourseDateShow}>Close</button>
 </div>
 )}
@@ -417,23 +474,27 @@ const handleInputChangeCourse = (name, value) => {
                     <div>
                         <p style={{ alignContent: 'center', paddingLeft: '25%'}} >Course Events</p>
                         {
-                        eventsData?.events?.events?.length > 0 && (
+                        eventsData?.events?.events?.length > 0 ? (
                             <table>
                             <tbody>
                                 {eventsData.events.events.map((event) => (
                                 <tr key={event.event}>
+                                    <td>{event.event}</td>
                                     <td><CourseDetailsCourseView id={event.event} key={refreshKey}/></td>
-                                    <td><button onClick={() => handleViewClick(event.event)}>View</button></td>
+                                    <td><div role="button" tabIndex="0" onClick={() => handleViewClick(event.event)}><IconView16 /></div></td>
+                                    <td><div role="button" tabIndex="0" onClick={() => handleDeleteEvent(event.event)}><IconDelete16  /></div></td>
                                 </tr>
                                 ))}
                             </tbody>
                             </table>
+                        ) : (
+                            <p>No events listed</p>
                         )
                         }
                     </div>
                     )}
                     <div style={{paddingLeft: '5px'}}>
-                        {!showSection && <button  onClick={handleButtonClick}>New Course Dates</button>}
+                        {!showSection && !isViewClicked && <button  onClick={handleButtonClick}><IconAdd16/> New Course Dates</button>}
                     </div>
                     <div>
                         {showSection && dataProgramDE && (
@@ -453,7 +514,13 @@ const handleInputChangeCourse = (name, value) => {
                                         <td>{item.dataElement.displayName}</td>
                                         <td>
                                             {item.dataElement.valueType === 'DATE' ? (
-                                                <input type="date" onChange={e => handleInputChangeCourse(item.dataElement.id, e.target.value)}  />
+                                                <DatePicker
+    selected={dateFields[item.dataElement.id] ? new Date(dateFields[item.dataElement.id]) : new Date()}
+    onChange={(date) => handleInputChangeCourseDate(item.dataElement.id, date)}
+    dateFormat="yyyy-MM-dd"
+    placeholderText='YYYY-MM-DD'
+/>
+
                                             ) : item.dataElement.valueType === 'TEXT' ? (
                                             <input type="text"  onChange={e => handleInputChangeCourse(item.dataElement.id, e.target.value)}  />
                                             ) : (
@@ -465,8 +532,8 @@ const handleInputChangeCourse = (name, value) => {
                                     })}
                                 </tbody>
                             </table>
-                            <button onClick={() => setShowSection(false)}>Cancel</button>
-                            <button onClick={handleSave}>Save</button>
+                            <button onClick={() => setShowSection(false)}><IconCross16 />Cancel</button>
+                            <button onClick={handleSave}><IconSave16 /> Save</button>
                             </>
                         )}
                     </div>

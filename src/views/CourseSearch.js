@@ -1,4 +1,5 @@
-import { useDataQuery } from '@dhis2/app-runtime'
+import { useDataQuery, useDataEngine } from '@dhis2/app-runtime'
+
 import { CalendarInput } from '@dhis2-ui/calendar'
 import {
     Table,
@@ -11,7 +12,11 @@ import {
 } from '@dhis2/ui'
 import React, { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { CourseAdd} from './Course-Add'
+import { CourseAdd} from './CourseAdd'
+import { utilgetCodeByName } from '../utils/utils'
+import { IconAdd24, IconView24 } from '@dhis2/ui'
+
+
 
 const query = {
     instances: {
@@ -23,8 +28,10 @@ const query = {
     },
 }
 
+
+
 export const CourseSearch = () => {
-    const { id } = useParams(); // Get the ID from the URL
+
     const [showAddCourse, setShowAddCourse] = useState(false);
     const [message, setMessage] = useState(localStorage.getItem('message') || '');
     const [selectedThematicArea, setSelectedThematicArea] = useState('');
@@ -39,20 +46,9 @@ export const CourseSearch = () => {
         refetch();
     };
 
-    const sysConstants =  JSON.parse(sessionStorage.getItem('constants'));
-
-    const getConstantValueByName = (name) => {
-        const sysConstants = JSON.parse(sessionStorage.getItem('constants'));
-        const constant = sysConstants.find(constant => constant.name === name);
-        if (constant) {
-            return constant.code.substring(name.length + 1);
-        }
-        return null;
-    }
-
-    const defCourseOrgUnitId = getConstantValueByName('jtrain-defaultcourseorgunit')
-    const defCourseProgramId = getConstantValueByName('jtrain-courseprogram')
-    const defThemAreaId = getConstantValueByName('jtrain-thematicarea-optionset')
+    const defCourseOrgUnitId = utilgetCodeByName('jtrain-defaultcourseorgunit')
+    const defCourseProgramId = utilgetCodeByName('jtrain-courseprogram')
+    const defThemAreaId = utilgetCodeByName('jtrain-thematicarea-optionset')
 
     const { loading, error, data, refetch } = useDataQuery(query, {
         variables: {
@@ -104,8 +100,7 @@ export const CourseSearch = () => {
                         <TableRowHead>
                             <TableCellHead>Thematic Area</TableCellHead>
                             <TableCellHead>Course Name</TableCellHead>
-                            <TableCellHead>Course Dates</TableCellHead>
-                            <TableCellHead>Open</TableCellHead>
+                            <TableCellHead>View</TableCellHead>
                         </TableRowHead>
                     </TableHead>
                     <TableBody>
@@ -126,9 +121,8 @@ export const CourseSearch = () => {
                                 <TableRow key={trackedEntityInstance}>
                                     <TableCell>{attributesObj['Course Thematic Area']}</TableCell>
                                     <TableCell>{attributesObj['Course Name']}</TableCell>
-                                    <TableCell>{attributesObj['']}</TableCell>
                                     <TableCell>
-                                        <Link to={`/courseview/${trackedEntityInstance}`}>View Details</Link>
+                                        <Link to={`/courseview/${trackedEntityInstance}`}><IconView24/> </Link>
                                     </TableCell>
                                 </TableRow>
                             );
@@ -138,7 +132,7 @@ export const CourseSearch = () => {
                     
                 </Table>
             )}
-            <button onClick={() => { setShowAddCourse(true); setMessage(''); }}>Add New Course</button>
+            <button style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => { setShowAddCourse(true); setMessage(''); }}><IconAdd24 /> New Course</button>
             <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
                 
 

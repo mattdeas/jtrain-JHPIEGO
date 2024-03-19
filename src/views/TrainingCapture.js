@@ -11,6 +11,8 @@ import {
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { CourseDetails } from './CourseDetails';
+import { utilGetConstantValueByName } from '../utils/utils';
+import { IconAddCircle24, IconSubtractCircle24, IconView16, IconView24 } from '@dhis2/ui';
 
 function debounce(func, wait) {
     let timeout;
@@ -39,25 +41,20 @@ const query = {
     },
 }
 
-const qryConstants = {
-    attributes: {
-        resource: 'constants',
-        params: {
-            paging: false,
-            fields: 'id, displayName, code, ',
-        },
-    },
-}
-
 export const TrainingCapture = () => {
     const { id } = useParams(); // Get the ID from the URL
     const [isSearchTableExpanded, setSearchTableExpanded] = useState(true);
     const [courseSelectionLabel, setCourseSelectionLabel] = useState('');
 
+    const defCourseProgramId = utilGetConstantValueByName('jtrain-courseprogram');
+    const defCourseOrgUnitId = utilGetConstantValueByName('jtrain-defaultcourseorgunit');
+    const defCourseStartDate = utilGetConstantValueByName('jtrain-CourseStartDate');
+    const defCourseEndDate = utilGetConstantValueByName('jtrain-CourseEndDate');
+    
     const { loading, error, data } = useDataQuery(query, {
         variables: {
-            ou: 'VgrqnQEtyOP',
-            program: 'P59PhQsB6tb',
+            ou: defCourseOrgUnitId,
+            program: defCourseProgramId,
         },
     })
     const [selectedCourse, setSelectedCourse] = useState(null);
@@ -93,9 +90,9 @@ export const TrainingCapture = () => {
         <span style={{ float: 'left', border: 'none' }}>
         <div style={{ display: 'flex', alignItems: 'center', paddingTop: '5px' }}>
     <div style={{ width: '20px', textAlign: 'center' }}>
-        <strong>{isSearchTableExpanded ? '-' : '+'}</strong>
+        <strong>{isSearchTableExpanded ? <IconSubtractCircle24 /> : <IconAddCircle24 />}</strong>
     </div>
-    <strong>
+    <strong style={{ paddingLeft: '10px' }}>
         Course Selection
         {isSearchTableExpanded ? '' : courseSelectionLabel}
     </strong>
@@ -112,7 +109,7 @@ export const TrainingCapture = () => {
                         <TableRowHead>
                             <TableCellHead>Thematic Area</TableCellHead>
                             <TableCellHead>Course Name</TableCellHead>
-                            <TableCellHead>Select</TableCellHead>
+                            <TableCellHead>View</TableCellHead>
                         </TableRowHead>
                     </TableHead>
                     <TableBody>
@@ -132,18 +129,18 @@ export const TrainingCapture = () => {
                                             <TableCell>{attributesObj['Course Name']}</TableCell>
                                             {/* <TableCell>{attributesObj['']}</TableCell> */}
                                             <TableCell>
-                                            <button onClick={() => {
+                                            <div onClick={() => {
                                                 setSelectedCourse({
                                                     trackedEntityInstance: trackedEntityInstance,
                                                     thematicArea: attributesObj['Course Thematic Area'],
                                                     courseName: attributesObj['Course Name'],
-                                                    startDateVar: 'I3k1jlogV15',
-                                                    endDateVar: 'ahGuEZrtqR5'
+                                                    startDateVar: defCourseStartDate,
+                                                    endDateVar: defCourseEndDate
                                                 });
                                                 //setSearchTableExpanded(!isSearchTableExpanded);
                                                 setCourseSelectionLabel(' : ' + attributesObj['Course Name'] + " - ");
                                                 setRefreshKey(prevKey => prevKey + 1);
-                                            }}>Select</button>
+                                            }}><IconView24 /></div>
                                             </TableCell>
                                         </TableRow>
                                     );

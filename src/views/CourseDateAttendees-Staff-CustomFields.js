@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDataQuery, useDataEngine } from '@dhis2/app-runtime';
-import { Table, TableHead, TableRow, TableCell, TableBody, InputField } from '@dhis2/ui';
+import { Table, TableHead, TableRow, TableCell, TableBody, InputField, IconCheckmark24, CircularLoader, IconCross24 } from '@dhis2/ui';
 
 //export const CourseDateAttendeesStaffCustomFields = ({event}) => {
     export const CourseDateAttendeesStaffCustomFields = ({eventID}) => {
     //const { id } = useParams();
+    
+    const [updateStatus, setUpdateStatus] = useState(null);
     const event = eventID;
-    console.log('CourseDateAttendeesStaffCustomFields', event)
     const engine = useDataEngine();
-    //const id = event;
-    //console.log('CourseDateAttendeesStaffCustomFieldsid', id)
-    //console.log('CourseDateAttendeesStaffCustomFieldsevent', event)
     const [programStageData, setProgramStageData] = useState(null);
     const [dataInputTypes, setDataInputTypes] = useState({});
     const [eventData, setEventData] = useState(null);
+    const [hasError, setHasError] = useState(false);
 
     const { loading: eventLoading, error: eventError, data: initialEventData } = useDataQuery({
         event: {
@@ -68,6 +67,7 @@ import { Table, TableHead, TableRow, TableCell, TableBody, InputField } from '@d
     }, [engine, programStageData]);
 
     const handleInputChange = async (dataElementId, newValue) => {
+        setUpdateStatus('loading');
         const updatedDataValues = eventData.event.dataValues.map(dv => dv.dataElement === dataElementId ? { ...dv, value: newValue, status: 'loading' } : dv);
         setEventData(prev => ({ ...prev, event: { ...prev.event, dataValues: updatedDataValues } }));
 
@@ -85,6 +85,7 @@ import { Table, TableHead, TableRow, TableCell, TableBody, InputField } from '@d
                     dataValues: prev.event.dataValues.map(dv => dv.dataElement === dataElementId ? { ...dv, status: 'success' } : dv),
                 },
             }));
+            setUpdateStatus('success')
         } catch (error) {
             setEventData(prev => ({
                 ...prev,
@@ -93,11 +94,10 @@ import { Table, TableHead, TableRow, TableCell, TableBody, InputField } from '@d
                     dataValues: prev.event.dataValues.map(dv => dv.dataElement === dataElementId ? { ...dv, status: 'error' } : dv),
                 },
             }));
+            setUpdateStatus('error')
         }
     };
-    if (eventLoading) return <span>Loading...</span>;
-    if (eventError) return <span>Error: {eventError.message}</span>;
-
+    if (eventLoading) return <div><span><CircularLoader /> Loading ...</span></div>;
     const sortedDataElements = programStageData?.programStageDataElements?.sort((a, b) => a.sortOrder - b.sortOrder);
 
     return (
@@ -138,6 +138,11 @@ import { Table, TableHead, TableRow, TableCell, TableBody, InputField } from '@d
                                 )
                             );
                         })}
+                        <TableCell>
+                            {updateStatus === 'loading' && <CircularLoader />}
+                            {updateStatus === 'success' && <IconCheckmark24 color='green' />}
+                            {updateStatus === 'error' && <IconCross24 color='red' />}
+                        </TableCell>
                     </TableRow>
                 </TableBody>
             </Table>
