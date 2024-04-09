@@ -1,6 +1,7 @@
 import React, { useEffect,useState } from 'react';
 import { useDataEngine } from '@dhis2/app-runtime';
 import { utilgetCodeByName } from '../utils/utils';
+import { ReportOverview } from './ReportOverview';
 
 
 export const Home = () => {
@@ -50,7 +51,8 @@ export const Home = () => {
     return (
         <div>
             <h1>Home</h1>
-            <p>Code for 'jtrain-TEI-Type-Staff': {code}</p>
+            {/* <p>Code for 'jtrain-TEI-Type-Staff': {code}</p> */}
+            <ReportOverview />
         </div>
     );
 }

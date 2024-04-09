@@ -18,11 +18,17 @@ const eventQuery = {
       resource: 'events',
       id: ({ id }) => id,
       params: {
-        fields: 'event,eventDate,dataValues[dataElement,value]',
+        fields: 'event,eventDate,dataValues[dataElement,value],trackedEntityInstance[*]',
       },
     },
   };
   
+  const trackedEntityInstanceQuery = {
+    trackedEntityInstance: {
+        resource: 'trackedEntityInstances',
+        id: ({ id }) => id,
+    },
+};
 
 
 
@@ -30,39 +36,50 @@ const eventQuery = {
 
 export const CourseDetailsStaffView = ({ course }) => {
 
-    const defCourseProgramId = utilGetConstantValueByName('jtrain-courseprogramstage')
-    const { loading, error, data } = useDataQuery({
-        programStages: {
-          resource: `programStages/${defCourseProgramId}`,
-          params: {
-            fields: 'programStageDataElements[sortOrder,dataElement[id,displayName]]',
-          },
+  const defCourseProgramId = utilGetConstantValueByName('jtrain-courseprogramstage')
+  const { loading, error, data } = useDataQuery({
+      programStages: {
+        resource: `programStages/${defCourseProgramId}`,
+        params: {
+          fields: 'programStageDataElements[sortOrder,dataElement[id,displayName]]',
         },
+      },
+    });
+  
+  const { loading: eventLoading, error: eventError, data: eventData } = useDataQuery(eventQuery, {
+      variables: { id: course },
+  });
+
+  let teiData;
+  if (eventData && eventData.events.trackedEntityInstance) {
+      const { loading: teiLoading, error: teiError, data } = useDataQuery(trackedEntityInstanceQuery, {
+          variables: { id: eventData.events.trackedEntityInstance },
       });
+      if (teiLoading) return 'Loading TEI data...';
+      if (teiError) return `Error: ${teiError.message}`;
+      teiData = data;
+  }
 
+  if (eventLoading) return 'Loading event data...';
+  if (eventError) return `Error: ${eventError.message}`;
 
-    
-    const { loading: eventLoading, error: eventError, data: eventData } = useDataQuery(eventQuery, {
-        variables: { id: course },
-      });
-      if (eventLoading) return 'Loading event data...';
-        if (eventError) return `Error: ${eventError.message}`;
-    
+  console.log('matt', teiData)
 
-      console.log(eventData)
-
-    return (
-        <div>
-          <table style={{ width: '100%' }}>
-            <tr>
-              <td>
-                <div style={{ width: '100%' }}>
+  return (
+      <div>
+        <table style={{ width: '100%' }}>
+          <tr>
+            <td>
+              <div style={{ width: '100%' }}>
                   {loading && 'Loading...'}
                   {error && error.message}
                   {data?.programStages && (
               <Table>
                 <TableHead>
                   <TableRow>
+                  {teiData && teiData.trackedEntityInstance.attributes.map(attribute => (
+                  <TableCell key={attribute.attribute}>{attribute.displayName}</TableCell>
+                  ))}
                   {data.programStages.programStageDataElements
                   .sort((a, b) => a.sortOrder - b.sortOrder)
                   .map(({ dataElement }) => {
@@ -85,6 +102,9 @@ export const CourseDetailsStaffView = ({ course }) => {
                 <TableBody>
                 {eventData?.events && (
     <TableRow>
+      {teiData && teiData.trackedEntityInstance.attributes.map(attribute => (
+          <TableCell key={attribute.attribute}>{attribute.value}</TableCell>
+      ))}
       {data.programStages.programStageDataElements
         .sort((a, b) => a.sortOrder - b.sortOrder)
         .map(({ dataElement }) => {

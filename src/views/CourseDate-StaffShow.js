@@ -199,8 +199,6 @@ export const CourseDateStaffShow = ({tei_id, eventID, reload, refreshCount}) => 
 //     skip: !currentEventId,
 // });
 
-    console.log('setEventIds:', eventIds);
-    console.log('dataEvent',dataEvent)
    
     return (
 

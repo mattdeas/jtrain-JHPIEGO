@@ -115,7 +115,7 @@ export const StaffSearch = () => {
       </TableHead>
       <TableBody>
       {data.instances.trackedEntityInstances
-    .filter(item => item.attributes.some(attr => attr.displayName === 'Family Name' && attr.value.toLowerCase().includes(searchTerm.toLowerCase())))
+    .filter(item => item.attributes && item.attributes.some(attr => attr.displayName === 'Family Name' && attr.value.toLowerCase().includes(searchTerm.toLowerCase())))
     .slice(0, 100)
     .map(
         ({ trackedEntityInstance, attributes }) => {

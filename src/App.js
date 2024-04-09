@@ -77,7 +77,7 @@ const MainContent = () => {
                 <Route path="/trainingcapture" element={<TrainingCapture />} />
                 <Route path="/staffadd" element={<Staffadd />} />
                 <Route path="/courseview/:id" element={<Courseview />} />
-                <Route path="/testcomponent/:id" element={<CourseDateAttendeesStaffCustomFields />} />
+                <Route path="/testcomponent/:id" element={<CourseDetailsStaffView />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/testtree" element={<MyComponent/>} />
             </Routes>

@@ -383,7 +383,7 @@ export const Staffview = () => {
   <div style={{ flex: '0 0 50%' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <h2>Courses</h2>
-        <Link to="/trainingcapture">
+        {/* <Link to="/trainingcapture">
             <button style={{
             background: 'linear-gradient(to right, darkblue, cyan)',
             border: 'none',
@@ -394,8 +394,8 @@ export const Staffview = () => {
             display: 'inline-block',
             fontSize: '16px',
             borderRadius: '12px'
-            }}>Go to Training Capture111111</button>
-        </Link>
+            }}>Go to Training Capture</button>
+        </Link> */}
         </div>
     <table>
  
