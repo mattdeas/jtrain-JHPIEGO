@@ -299,7 +299,7 @@ export const Staffview = () => {
     
     return (
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-  <div style={{ flex: '0 0 50%' }}>
+  <div style={{ flex: '0 0 25%' }}>
     <h1>Staff Details</h1>
 
     {
@@ -380,8 +380,8 @@ export const Staffview = () => {
     )
 }
   </div>
-  <div style={{ flex: '0 0 50%' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+  <div style={{ flex: '0%' }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
         <h2>Courses</h2>
         {/* <Link to="/trainingcapture">
             <button style={{

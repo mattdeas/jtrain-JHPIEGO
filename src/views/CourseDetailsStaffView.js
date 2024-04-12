@@ -23,20 +23,25 @@ const eventQuery = {
     },
   };
   
-  const trackedEntityInstanceQuery = {
-    trackedEntityInstance: {
-        resource: 'trackedEntityInstances',
-        id: ({ id }) => id,
-    },
-};
-
-
-
 
 
 export const CourseDetailsStaffView = ({ course }) => {
 
   const defCourseProgramId = utilGetConstantValueByName('jtrain-courseprogramstage')
+  const defCourseTEITypeID = utilGetConstantValueByName('jtrain-TEI-Type-Course')
+
+  const trackedEntityInstanceQuery = {
+    trackedEntityInstance: {
+        resource: 'trackedEntityInstances',
+        id: ({ id }) => id,
+        params: {
+          fields: ['attributes[attribute,value]'],
+          trackedEntityType: defCourseTEITypeID,
+      },
+    },
+  };
+
+
   const { loading, error, data } = useDataQuery({
       programStages: {
         resource: `programStages/${defCourseProgramId}`,
@@ -50,18 +55,13 @@ export const CourseDetailsStaffView = ({ course }) => {
       variables: { id: course },
   });
 
-  let teiData;
-  if (eventData && eventData.events.trackedEntityInstance) {
-      const { loading: teiLoading, error: teiError, data } = useDataQuery(trackedEntityInstanceQuery, {
-          variables: { id: eventData.events.trackedEntityInstance },
-      });
-      if (teiLoading) return 'Loading TEI data...';
-      if (teiError) return `Error: ${teiError.message}`;
-      teiData = data;
-  }
+  const { loading: teiLoading, error: teiError, data: teiData } = useDataQuery(trackedEntityInstanceQuery, {
+      skip: !eventData || !eventData.events.trackedEntityInstance,
+      variables: { id: eventData ? eventData.events.trackedEntityInstance : null },
+  });
 
-  if (eventLoading) return 'Loading event data...';
-  if (eventError) return `Error: ${eventError.message}`;
+  if (eventLoading || teiLoading) return 'Loading data...';
+  if (eventError || teiError) return `Error: ${teiError.message}`;
 
   console.log('matt', teiData)
 
@@ -77,16 +77,18 @@ export const CourseDetailsStaffView = ({ course }) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                  {teiData && teiData.trackedEntityInstance.attributes.map(attribute => (
-                  <TableCell key={attribute.attribute}>{attribute.displayName}</TableCell>
-                  ))}
+                  <TableCell style={{ fontWeight: 'bold' }} colSpan={2}>Course Details</TableCell>
+                  {/* <TableCell></TableCell> */}
+                  {/* {teiData && teiData.trackedEntityInstance.attributes.map(attribute => (
+                  <TableCell key={attribute.attribute}>{attribute.displayName}aa</TableCell>
+                  ))} */}
                   {data.programStages.programStageDataElements
                   .sort((a, b) => a.sortOrder - b.sortOrder)
                   .map(({ dataElement }) => {
                     if (dataElement.displayName.startsWith('jtrain')) {
                       return null;
                     }
-                    return <TableCell key={dataElement.id}>{dataElement.displayName}</TableCell>;
+                    return <TableCell style={{ fontWeight: 'bold' }} key={dataElement.id}>{dataElement.displayName}</TableCell>;
                   })}
                   </TableRow>
                   
