@@ -11,37 +11,12 @@ import {
 } from '@dhis2/ui'
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import React, {useState, useEffect} from 'react'
+import { utilGetConstantValueByName } from '../utils/utils';
+import { OrganisationUnitTree } from '@dhis2/ui';
 
 const today = new Date();
 //const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-const qryTrackedEntityTypes = {
-    // One query object in the whole query
-    attributes: {
-        // The `attributes` endpoint should be used
-        resource: 'trackedEntityTypes',
-        params: {
-            // Paging is disabled
-            paging: false,
-            // Only the attribute properties that are required should be loaded
-            fields: 'id, displayName',
-        },
-    },
-}
-
-const qryPrograms = {
-    // One query object in the whole query
-    attributes: {
-        // The `attributes` endpoint should be used
-        resource: 'programs',
-        params: {
-            // Paging is disabled
-            paging: false,
-            // Only the attribute properties that are required should be loaded
-            fields: 'id, displayName',
-        },
-    },
-}
 
 const qryConstants = {
     // One query object in the whole query
@@ -85,15 +60,7 @@ const mutation = {
     data: ({ newEntity }) => newEntity,
 };
 
-// const mutation = {
-//     resource: 'trackedEntityInstances',
-//     id: ({ id }) => id,
-//     type: 'update',
-//     data: ({ orgUnit, attributes }) => ({
-//         orgUnit,
-//         attributes,
-//     }),
-// }
+
 
 const handleUpdate = () => {
 };
@@ -115,12 +82,18 @@ const qryTrackedEntityInstance = {
 
 
 
+
 export const Staffadd = () => {
     const { id } = useParams();
     const dSysConstants = useDataQuery(qryConstants)
     const [trackedEntityInstance, setTrackedEntityInstance] = useState(null);
     const [message, setMessage] = useState('');
     const engine = useDataEngine();
+
+    const defStaffOrgUnitId = utilGetConstantValueByName('jtrain-DefaultStaffOrgUnit')
+    const defStaffProgId = utilGetConstantValueByName('jtrain-staffprogram')
+    const defStaffEntityType = utilGetConstantValueByName('jtrain-TEI-Type-Staff')
+    const defLocationTEA = utilGetConstantValueByName('jtrain-location-TEA')
 
     const { loading: loadingEntity, error: errorEntity, data: dataEntity } = useDataQuery(qryTrackedEntityInstance, {
         variables: {
@@ -153,9 +126,9 @@ export const Staffadd = () => {
                 attribute: attr.trackedEntityAttribute.id,
                 value: formFields[attr.trackedEntityAttribute.id],
             })),
-            program: "Ss21byybIqu", // Add the program ID here
-            orgUnit: "VgrqnQEtyOP", // Add the organizational unit ID here
-            trackedEntityType: "W9FNXXgGbm7", // Add the tracked entity type ID here
+            program: defStaffProgId, // Add the program ID here
+            orgUnit: defStaffOrgUnitId, // Add the organizational unit ID here
+            trackedEntityType: defStaffEntityType, // Add the tracked entity type ID here
             id: id,
         };
         console.log('newEntity', newEntity);
@@ -170,11 +143,15 @@ export const Staffadd = () => {
         // Get the ID of the newly created tracked entity instance
     const teiId = createResponse.response.importSummaries[0].reference;
 
+
+
+    
     // Enroll the tracked entity instance in the program
     const enrollmentData = {
         trackedEntityInstance: teiId,
-        program: "Ss21byybIqu", // Add the program ID here
-        orgUnit: "VgrqnQEtyOP", // Add the organizational unit ID here
+
+        program: defStaffProgId, // Add the program ID here
+        orgUnit: defStaffOrgUnitId, // Add the organizational unit ID here
         enrollmentDate: new Date().toISOString().split('T')[0], // Use the current date as the enrollment date
         incidentDate: new Date().toISOString().split('T')[0], // Use the current date as the incident date
     };
@@ -194,7 +171,11 @@ export const Staffadd = () => {
 
 
     
-
+    const handleInputChangeSelect = (event) => {
+      const { name, value } = event.target;
+      //console.log(`Option ID/Code: ${name}, Option Name: ${value}`);
+      setFormFields(prevFields => ({ ...prevFields, [name]: value }));
+  };
     
     let staffMemberid, defaultStaffOrgUnit, defaultStaffProg;
     console.log({ dSysConstants })
@@ -213,7 +194,7 @@ export const Staffadd = () => {
 
     const { loading: loading1, error1, data } = useDataQuery(qryProgramFields, {
         variables: {
-          id:  "Ss21byybIqu", // Use the ID of the program you want to fetch
+          id:  defStaffProgId, // Use the ID of the program you want to fetch
         },
     });
 
@@ -234,6 +215,7 @@ export const Staffadd = () => {
     //     setFormFields(initialFormFields);
     // }, [trackedEntityInstance]);
 
+    const [selected, setSelected] = useState([]);
     useEffect(() => {
         if (trackedEntityInstance) {
             const initialFormFields = trackedEntityInstance.reduce((fields, attr) => ({
@@ -259,6 +241,16 @@ export const Staffadd = () => {
     
         return '';
     };
+
+    const onTreeChange = ({ selected }) => {
+      setSelected(selected);
+      console.log('selected:' , selected)
+
+      setFormFields(prevFields => ({
+          ...prevFields,
+          [defLocationTEA]: selected[0], // assuming selected is an array and you want to store the first value
+      }));
+  }
     
     return (
   <div>
@@ -293,29 +285,44 @@ export const Staffadd = () => {
 
     return (
       <tr key={trackedEntityAttribute.id}>
-        <td>
+        <td style={{ verticalAlign: 'top' }}>
           <label>{trackedEntityAttribute.name}</label>
         </td>
         <td>
+          
           {trackedEntityAttribute.valueType === 'TEXT' ? (
-            trackedEntityAttribute.optionSet && trackedEntityAttribute.optionSet.options ? (
-              <select name={trackedEntityAttribute.id} onChange={handleInputChange}>
-                {trackedEntityAttribute.optionSet.options.map(option => (
-                  <option key={option.id} value={option.code}>
-                    {option.name}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)} onChange={handleInputChange}  />
-            )
-          ) : trackedEntityAttribute.valueType === 'DATE' ? (
-            <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)}  onChange={handleInputChange}/>
-          ) : trackedEntityAttribute.valueType === 'NUMBER' ? (
-            <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)} onChange={handleInputChange}/>
-          ) : (
-            trackedEntityAttribute.valueType
-          )}
+  trackedEntityAttribute.id === defLocationTEA ? (
+      <div>
+          <OrganisationUnitTree
+              initiallyExpanded={[defStaffOrgUnitId]}
+              roots={defStaffOrgUnitId} // replace with your root organisation unit ID
+              selected={selected}
+              onChange={onTreeChange}
+              singleSelection
+          />
+      </div>
+  ) : trackedEntityAttribute.optionSet && trackedEntityAttribute.optionSet.options ? (
+      <select name={trackedEntityAttribute.id} onChange={handleInputChangeSelect} value={findAttributeValue(trackedEntityAttribute.id)}>
+          {trackedEntityAttribute.optionSet.options.map(option => (
+              <option key={option.id} value={option.code}>
+                  {option.name}
+              </option>
+          ))}
+      </select>
+  ) : (
+
+      <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)} onChange={handleInputChange}  />
+  )
+) : trackedEntityAttribute.valueType === 'DATE' ? (
+  <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)}  onChange={handleInputChange}/>
+) : trackedEntityAttribute.valueType === 'NUMBER' ? (
+  <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)} onChange={handleInputChange}/>
+) : trackedEntityAttribute.valueType === 'ORGANISATION_UNIT' ? (
+  'Data Type Not supported.'
+  
+) : (
+  'Data Type Not supported.'
+)}
         </td>
         {/* <td>{trackedEntityAttribute.valueType}</td> */}
       </tr>
@@ -331,3 +338,5 @@ export const Staffadd = () => {
   </div>
 )
 }
+
+

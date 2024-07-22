@@ -1,4 +1,5 @@
-import { useDataQuery } from '@dhis2/app-runtime';
+import { useDataQuery, useDataEngine } from '@dhis2/app-runtime';
+
 import {
     Table,
     TableBody,
@@ -8,7 +9,7 @@ import {
     TableRow,
     TableRowHead,
 } from '@dhis2/ui';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { utilGetConstantValueByName } from '../utils/utils';
 
 
@@ -24,24 +25,42 @@ const eventQuery = {
   };
   
 
-
-export const CourseDetailsStaffView = ({ course }) => {
-
-  const defCourseProgramId = utilGetConstantValueByName('jtrain-courseprogramstage')
-  const defCourseTEITypeID = utilGetConstantValueByName('jtrain-TEI-Type-Course')
-
   const trackedEntityInstanceQuery = {
     trackedEntityInstance: {
-        resource: 'trackedEntityInstances',
-        id: ({ id }) => id,
-        params: {
-          fields: ['attributes[attribute,value]'],
-          trackedEntityType: defCourseTEITypeID,
+      resource: 'trackedEntityInstances',
+      params: {
+        fields: ['attributes[attribute,value]'],
       },
     },
   };
 
 
+
+
+  const ORG_UNITS_QUERY = {
+    orgUnits: {
+        resource: 'organisationUnits',
+        params: {
+            paging: false,
+        },
+    },
+};
+
+const teiQuery = {
+  trackedEntityInstance: {
+    resource: 'trackedEntityInstances',
+    id: ({id}) => id, // This function allows us to dynamically pass the ID later
+    params: {
+      fields: ['attributes'],
+    },
+  },
+};
+
+export const CourseDetailsStaffView = ({ course }) => {
+  console.log('course', course)
+  const defCourseProgramId = utilGetConstantValueByName('jtrain-courseprogramstage')
+  const defCourseTEITypeID = utilGetConstantValueByName('jtrain-TEI-Type-Course')
+  const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
   const { loading, error, data } = useDataQuery({
       programStages: {
         resource: `programStages/${defCourseProgramId}`,
@@ -50,21 +69,48 @@ export const CourseDetailsStaffView = ({ course }) => {
         },
       },
     });
-  
+    const [teiName, setTeiName] = useState('');
+    const dataEngine = useDataEngine();
   const { loading: eventLoading, error: eventError, data: eventData } = useDataQuery(eventQuery, {
-      variables: { id: course },
+    variables: { id: course },
   });
 
-  const { loading: teiLoading, error: teiError, data: teiData } = useDataQuery(trackedEntityInstanceQuery, {
-      skip: !eventData || !eventData.events.trackedEntityInstance,
-      variables: { id: eventData ? eventData.events.trackedEntityInstance : null },
-  });
+  
 
-  if (eventLoading || teiLoading) return 'Loading data...';
-  if (eventError || teiError) return `Error: ${teiError.message}`;
+  const trackedEntityInstanceId = eventData?.events?.trackedEntityInstance;
+ console.log('trackedEntityInstanceId', trackedEntityInstanceId)
+  const trackedEntityInstanceQuery = {
+    trackedEntityInstance: {
+      resource: `trackedEntityInstances/${trackedEntityInstanceId}`,
+      params: {
+        fields: 'attributes[attribute,value]',
+      },
+    },
+  };
 
-  console.log('matt', teiData)
+  useEffect(() => {
+    const fetchTEIName = async () => {
+      if (eventData?.events.trackedEntityInstance) {
+        try {
+          const result = await dataEngine.query(teiQuery, {
+            variables: { id: eventData.events.trackedEntityInstance },
+          });
+          const nameAttribute = result.trackedEntityInstance.attributes[0]?.value;
+          setTeiName(nameAttribute);
+        } catch (error) {
+          console.error('Error fetching tracked entity instance:', error);
+        }
+      }
+    };
 
+    fetchTEIName();
+  }, [eventData, dataEngine]);
+
+  console.log('eventdata', eventData)
+  // console.log('teiData', teiData)
+  console.log('trackedentityinstanceid ', trackedEntityInstanceId)
+
+ 
   return (
       <div>
         <table style={{ width: '100%' }}>
@@ -77,11 +123,9 @@ export const CourseDetailsStaffView = ({ course }) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                  <TableCell style={{ fontWeight: 'bold' }} colSpan={2}>Course Details</TableCell>
-                  {/* <TableCell></TableCell> */}
-                  {/* {teiData && teiData.trackedEntityInstance.attributes.map(attribute => (
-                  <TableCell key={attribute.attribute}>{attribute.displayName}aa</TableCell>
-                  ))} */}
+                  <TableCell style={{ fontWeight: 'bold' }} colSpan={1}>Course Details</TableCell>
+                  
+                  
                   {data.programStages.programStageDataElements
                   .sort((a, b) => a.sortOrder - b.sortOrder)
                   .map(({ dataElement }) => {
@@ -104,9 +148,12 @@ export const CourseDetailsStaffView = ({ course }) => {
                 <TableBody>
                 {eventData?.events && (
     <TableRow>
-      {teiData && teiData.trackedEntityInstance.attributes.map(attribute => (
+      {/* {teiData && teiData.trackedEntityInstance.attributes.map(attribute => (
           <TableCell key={attribute.attribute}>{attribute.value}</TableCell>
-      ))}
+      ))} */}
+      <TableCell>
+      {teiName}
+      </TableCell>
       {data.programStages.programStageDataElements
         .sort((a, b) => a.sortOrder - b.sortOrder)
         .map(({ dataElement }) => {
@@ -116,12 +163,28 @@ export const CourseDetailsStaffView = ({ course }) => {
           }
 
           // Create a mapping of dataElement to value
-          const dataElementToValue = eventData.events.dataValues.reduce((map, { dataElement, value }) => {
-            map[dataElement] = value;
-            return map;
-          }, {});
+          let dataElementToValue = {};
 
-          return <TableCell key={dataElement.id}>{dataElementToValue[dataElement.id]}</TableCell>;
+          if (eventData.events && eventData.events.dataValues) {
+              dataElementToValue = eventData.events.dataValues.reduce((map, { dataElement, value }) => {
+                  map[dataElement] = value;
+                  return map;
+              }, {});
+          }
+
+          if(dataElement.displayName === 'Location') {
+            const orgUnitId = dataElementToValue[dataElement.id];
+            const orgUnit = orgUnitsData.orgUnits.organisationUnits.find(orgUnit => orgUnit.id === orgUnitId);
+
+            return (
+                <TableCell key={dataElement.id}>
+                    {orgUnit ? orgUnit.displayName : orgUnitId}
+                </TableCell>
+            );
+
+          }
+          else
+            return <TableCell key={dataElement.id}>{dataElementToValue[dataElement.id]}</TableCell>;
         })}
     </TableRow>
   )}

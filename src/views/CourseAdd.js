@@ -38,6 +38,7 @@ import { IconCross16, IconSave16 } from '@dhis2/ui';
     export const CourseAdd = (props) => {
         const { id } = useParams();
         const [message, setMessage] = useState('');
+        const [formFields, setFormFields] = useState({});
         const dSysConstants = useDataQuery(qryConstants);
         const [trackedEntityInstance, setTrackedEntityInstance] = useState(null);
         const engine = useDataEngine();
@@ -46,21 +47,11 @@ import { IconCross16, IconSave16 } from '@dhis2/ui';
         const [date, setDate] = useState('');
 
         const handleInputChange = (event) => {
+            console.log('is this working')
             const { name, value } = event.target;
             setFormFields(prevFields => ({
                 ...prevFields,
                 [name]: value,
-            }));
-        };
-
-        const handleInputChangeDate = (id, value) => {
-            const selectedDate = new Date(value);
-            const formattedDate = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
-            setDate(formattedDate);
-
-            setFormFields(prevFields => ({
-                ...prevFields,
-                [id]: formattedDate,
             }));
         };
 
@@ -136,7 +127,7 @@ import { IconCross16, IconSave16 } from '@dhis2/ui';
 
                 {loading1 && 'Loading...'}
 
-                {error && error.message}
+                {error1 && error1.message}
 
                 {data?.program?.programTrackedEntityAttributes && (
                     <form onSubmit={handleFormSubmit}>
@@ -159,7 +150,7 @@ import { IconCross16, IconSave16 } from '@dhis2/ui';
                                                         ))}
                                                     </select>
                                                 ) : (
-                                                    <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)} onChange={handleInputChange} />
+                                                    <input type="text" name={trackedEntityAttribute.id} onChange={handleInputChange} />
                                                 )
                                             ) : trackedEntityAttribute.valueType === 'DATE' ? (
                                                 <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)} onChange={handleInputChange} />
@@ -173,7 +164,7 @@ import { IconCross16, IconSave16 } from '@dhis2/ui';
                                 ))}
                             </tbody>
                         </table>
-                        <button type="submit"><IconSave16 /> Savea1111a</button>
+                        <button type="submit"><IconSave16 /> Save</button>
                         <button type="button" onClick={props.onCancel}><IconCross16 /> Cancel</button>
                         {message && <p>{message}</p>}
                     </form>

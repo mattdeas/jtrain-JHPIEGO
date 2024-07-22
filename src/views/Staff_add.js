@@ -170,15 +170,7 @@ const DataElement = ({ dataElementId, value }) => {
     );
 };
 
-const createMutation = (id, attributes) => ({
-    resource: 'trackedEntityInstances',
-    type: 'update',
-    id: id,
-    data: {
-        orgUnit: 'VgrqnQEtyOP',
-        attributes: Object.entries(attributes).map(([attribute, value]) => ({ attribute, value }))
-    },
-});
+
 
 const mutation = {
     resource: 'trackedEntityInstances',
@@ -307,22 +299,11 @@ export const Staff_add = () => {
 
     
 
-    let sortedProgramStageDataElements = [];
     if (dataProgramDE && dataProgramDE.data && dataProgramDE.data.qPDE) {
         sortedProgramStageDataElements = [...dataProgramDE.data.qPDE.programStageDataElements].sort((a, b) => a.sortOrder - b.sortOrder);
     }
     
-    // Create a new array where each element is an object with properties for each data value
-    // const transposedEvents = events.map(event => {
-    //     const eventObj = { event: event.event };
-    //     event.dataValues.forEach(dataValue => {
-    //         const matchingElement = sortedProgramStageDataElements.find(element => element.dataElement.id === dataValue.dataElement);
-    //         if (matchingElement) {
-    //             eventObj[matchingElement.dataElement.displayName] = dataValue.value;
-    //         }
-    //     });
-    //     return eventObj;
-    // });
+
    
     useEffect(() => {
         if (!loadingEntity && !errorEntity && dataEntity?.trackedEntityInstance?.attributes) {

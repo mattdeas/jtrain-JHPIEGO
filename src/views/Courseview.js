@@ -31,16 +31,23 @@ window.addEventListener('resize', handleResize);
 const today = new Date();
 const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
+const defCourseOrgUnitId = utilGetConstantValueByName('jtrain-defaultcourseorgunit')
+    const defCourseProgramId = utilgetCodeByName('jtrain-courseprogram')
+    const defCourseProgStageId = utilgetCodeByName('jtrain-courseprogramstage')
+
+
+
+
 const qryTrackedEntityInstance = {
     trackedEntityInstance: {
         resource: 'trackedEntityInstances',
         id: ({ id }) => id,
         params: {
             fields: ['attributes[attribute,value]'],
+            program: defCourseProgramId
         },
     },
 };
-
 
 
 
@@ -138,9 +145,7 @@ export const Courseview = () => {
         },
     };
 
-    const defCourseOrgUnitId = utilGetConstantValueByName('jtrain-defaultcourseorgunit')
-    const defCourseProgramId = utilgetCodeByName('jtrain-courseprogram')
-    const defCourseProgStageId = utilgetCodeByName('jtrain-courseprogramstage')
+    
 
     const qryProgramDataElements = {
         "qPDE": {
@@ -418,9 +423,11 @@ const handleInputChangeCourseDate = (name, date) => {
                             {/* <td style={{width: '0px'}}>{trackedEntityAttribute.id}</td> */}
                             <td>
                                 <label>{trackedEntityAttribute.name}</label>
+                               
                             </td>
                             <td>
-                                {trackedEntityAttribute.valueType === 'TEXT' ? (
+                                {
+                                    trackedEntityAttribute.valueType === 'TEXT' ? (
                                     trackedEntityAttribute.optionSet && trackedEntityAttribute.optionSet.options ? (
                                         <select 
                                         name={trackedEntityAttribute.id} 
@@ -479,7 +486,6 @@ const handleInputChangeCourseDate = (name, date) => {
                             <tbody>
                                 {eventsData.events.events.map((event) => (
                                 <tr key={event.event}>
-                                    <td>{event.event}</td>
                                     <td><CourseDetailsCourseView id={event.event} key={refreshKey}/></td>
                                     <td><div role="button" tabIndex="0" onClick={() => handleViewClick(event.event)}><IconView16 /></div></td>
                                     <td><div role="button" tabIndex="0" onClick={() => handleDeleteEvent(event.event)}><IconDelete16  /></div></td>

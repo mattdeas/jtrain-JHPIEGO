@@ -57,6 +57,10 @@ export const TrainingCapture = () => {
             program: defCourseProgramId,
         },
     })
+    console.log('data',data)
+console.log('defCourseOrgUnitId',defCourseOrgUnitId)
+console.log('defCourseProgramId',defCourseProgramId)
+
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -93,7 +97,7 @@ export const TrainingCapture = () => {
         <strong>{isSearchTableExpanded ? <IconSubtractCircle24 /> : <IconAddCircle24 />}</strong>
     </div>
     <strong style={{ paddingLeft: '10px' }}>
-        Course Selection
+        Course Selection                     
         {isSearchTableExpanded ? '' : courseSelectionLabel}
     </strong>
 </div>
@@ -107,14 +111,12 @@ export const TrainingCapture = () => {
                     <Table>
                     <TableHead>
                         <TableRowHead>
-                            <TableCellHead>Thematic Area</TableCellHead>
                             <TableCellHead>Course Name</TableCellHead>
                             <TableCellHead>View</TableCellHead>
                         </TableRowHead>
                     </TableHead>
                     <TableBody>
                         {data.instances.trackedEntityInstances
-                            .filter(item => item.attributes.some(attr => attr.displayName === 'Course Thematic Area' && attr.value.toLowerCase().includes(searchTerm.toLowerCase())))
                             .slice(0, 10)
                             .map(
                                 ({ trackedEntityInstance, attributes }) => {
@@ -125,14 +127,12 @@ export const TrainingCapture = () => {
 
                                     return (
                                         <TableRow key={trackedEntityInstance}>
-                                            <TableCell>{attributesObj['Course Thematic Area']}</TableCell>
                                             <TableCell>{attributesObj['Course Name']}</TableCell>
                                             {/* <TableCell>{attributesObj['']}</TableCell> */}
                                             <TableCell>
                                             <div onClick={() => {
                                                 setSelectedCourse({
                                                     trackedEntityInstance: trackedEntityInstance,
-                                                    thematicArea: attributesObj['Course Thematic Area'],
                                                     courseName: attributesObj['Course Name'],
                                                     startDateVar: defCourseStartDate,
                                                     endDateVar: defCourseEndDate

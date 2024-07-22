@@ -14,13 +14,23 @@ import { utilGetConstantValueByName } from '../utils/utils';
 import { IconView16, IconView24 } from '@dhis2/ui';
 
 
+const ORG_UNITS_QUERY = {
+    orgUnits: {
+        resource: 'organisationUnits',
+        params: {
+            paging: false,
+        },
+    },
+};
+
 export const CourseDetails = ({ course, updateHeadings }) => {
 
     const defCourseProgramId = utilGetConstantValueByName('jtrain-courseprogram')
     const defCourseOrgUnitId = utilGetConstantValueByName('jtrain-defaultcourseorgunit')
     const defCourseProgramStageId = utilGetConstantValueByName('jtrain-courseprogramstage')
-
-
+    const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
+    console.log('course:', course)
+console.log('orgunitsdata',orgUnitsData)
     const qryProgramDataElements = {
         programStages: {
           resource: `programStages/${defCourseProgramStageId}`,
@@ -91,7 +101,7 @@ export const CourseDetails = ({ course, updateHeadings }) => {
     };
 
     return (
-        <div>
+        <div>CourseDetails.js
             <table style={{width: '100%'}}>
             
                 <tr>
@@ -99,7 +109,6 @@ export const CourseDetails = ({ course, updateHeadings }) => {
                     {showTable && (
                         <div style={{ width: '100%' }}>
                             <h3>Course Details</h3>
-                            <p>Thematic Area: {course.thematicArea}</p>
                             <p>Course Name: {course.courseName}</p>
     
                             {loading && 'Loading...'}
@@ -121,13 +130,23 @@ export const CourseDetails = ({ course, updateHeadings }) => {
                                             <TableRow key={event} style={event === selectedRow ? {backgroundColor: 'blue'} : {}}>
                                                 {dProgramDE.data.programStages.programStageDataElements.map(dataElementObject => {
                                                     if (dataElementObject.dataElement.displayName === 'jtrain_course_attendees') return null;
+                                                    if (dataElementObject.dataElement.displayName === 'Location') 
                                                     return (
                                                         <TableCell key={dataElementObject.dataElement.id}>
+                                                            {orgUnitsData.orgUnits.organisationUnits.find(ou => ou.id === values[dataElementObject.dataElement.id])?.displayName}
+                                                        </TableCell>
+                                                    
+                                                    );
+                                                    
+                                                    return (
+                                                        <TableCell key={dataElementObject.dataElement.id}>
+                                                            
                                                             {values[dataElementObject.dataElement.id]}
                                                         </TableCell>
                                                     );
+                                                    
                                                 })}
-                                                <TableCell>
+                                                <TableCell rowSpan={2}>
                                                 <button onClick={() => {
                                                     const selectedCourseData = {
                                                         event: event,

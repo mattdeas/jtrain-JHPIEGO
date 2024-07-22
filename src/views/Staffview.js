@@ -6,7 +6,7 @@ import { utilGetConstantValueByName } from '../utils/utils';
 import { OrganisationUnitTree } from '@dhis2/ui';
 import { CourseDateAttendeesStaffCustomFields } from './CourseDateAttendees-Staff-CustomFields';
 import { IconSave16, IconCross16, IconDelete16 } from '@dhis2/ui';
-
+import { useNavigate } from "react-router-dom";
 
 function debounce(func, wait) {
     let timeout;
@@ -39,6 +39,15 @@ const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).pad
     },
 };
 
+
+const ORG_UNITS_QUERY = {
+    orgUnits: {
+        resource: 'organisationUnits',
+        params: {
+            paging: false,
+        },
+    },
+};
 
 
 const eventsQuery = (id) => ({
@@ -78,7 +87,7 @@ export const Staffview = () => {
     const [trackedEntityInstance, setTrackedEntityInstance] = useState(null);
     const [formFields, setFormFields] = useState({});
     const [mutate, { loading, error }] = useDataMutation(mutation(id))
-
+    const [showTree, setShowTree] = useState(false);
 
     if(sessionStorage.getItem('constants') == null)
     {
@@ -96,12 +105,13 @@ export const Staffview = () => {
             fetchData();
         }, [engine]);
     }
-
+    const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
     const defStaffOrgUnitId = utilGetConstantValueByName('jtrain-DefaultStaffOrgUnit')
     const defStaffProgId = utilGetConstantValueByName('jtrain-staffprogram')
     const defStaffProgCourseId = utilGetConstantValueByName('jtrain-staffprogram-course')
-    const defLocationTEA = utilGetConstantValueByName('jtrain-location')
-
+    const defLocationTEA = utilGetConstantValueByName('jtrain-location-TEA')
+    const defShowScore = utilGetConstantValueByName('jtrain-ShowScore')
+    console.log('locationTEA', defLocationTEA)
     const qryTrackedEntityInstance = {
         trackedEntityInstance: {
             resource: 'trackedEntityInstances',
@@ -113,6 +123,7 @@ export const Staffview = () => {
         },
     };
 
+    
 
     const { loading: loadingEntity, error: errorEntity, data: dataEntity } = useDataQuery(qryTrackedEntityInstance, {
         variables: {
@@ -129,11 +140,15 @@ export const Staffview = () => {
 
     const engine = useDataEngine();
 
+    
+    const navigate = useNavigate();
+
   const handleDelete = async () => {
       if (window.confirm('Are you sure you want to delete this Staff Member?')) {
           try {
               await engine.mutate(deleteMutation);
-              
+              alert('Trainee Successfully Deleted')
+              navigate('/staffsearch');  // Redirect to the staffsearch page
           } catch (error) {
               alert('Failed to delete course');
           }
@@ -155,7 +170,7 @@ export const Staffview = () => {
 
     const dataProgramDE  = useDataQuery(qryProgramDataElements);
 
-    const { loading: loadingDataElement, error: errorDataElement, data: dataElementData } = useDataQuery(dataElementQuery);
+    //const { loading: loadingDataElement, error: errorDataElement, data: dataElementData } = useDataQuery(dataElementQuery);
     const [responseMessage, setResponseMessage] = useState('');
     const { loading: loadingEvents, error: errorEvents, data: eventsData } = useDataQuery(eventsQuery(id));
     useEffect(() => {
@@ -166,7 +181,7 @@ export const Staffview = () => {
 
     
     
-    
+    console.log('eventsData', eventsData)   
     const attributes = Object.entries(formFields).map(([attribute, value]) => ({ attribute, value }));
 
     const doMutation = async () => {
@@ -321,20 +336,38 @@ export const Staffview = () => {
                     {data.program.programTrackedEntityAttributes.map(({ trackedEntityAttribute }) => (
                     trackedEntityAttribute.name !== 'jtrain_staff_courses' && (
                         <tr key={trackedEntityAttribute.id}>
-                            <td>
+                            <td style={{ verticalAlign: 'top' }}>
                                 <label>{trackedEntityAttribute.name}</label>
                             </td>
                             <td>
                             {trackedEntityAttribute.valueType === 'TEXT' ? (
                                     trackedEntityAttribute.id === defLocationTEA ? (
                                         <div>
-                                            <OrganisationUnitTree
-                                                initiallyExpanded={[defStaffOrgUnitId]}
+                                        {
+    findAttributeValue(trackedEntityAttribute.id)
+        ? findAttributeValue(trackedEntityAttribute.id)
+            .toString()
+            .split('/')
+            .slice(2)
+            .map(id => {
+                const orgUnit = orgUnitsData.orgUnits.organisationUnits.find(orgUnit => orgUnit.id === id);
+                return orgUnit ? orgUnit.displayName : id;
+            })
+            .join(' - ')
+        : ''
+}
+            <button onClick={() => setShowTree(!showTree)}>
+                 Change Location
+            </button>
+            {showTree && 
+                                             <OrganisationUnitTree
+                                                // initiallyExpanded={[defStaffOrgUnitId]}
+                                                initiallyExpanded={findAttributeValue(trackedEntityAttribute.id)}
                                                 roots={defStaffOrgUnitId} // replace with your root organisation unit ID
                                                 selected={findAttributeValue(trackedEntityAttribute.id)}
                                                 onChange={onTreeChange}
                                                 singleSelection
-                                            />
+                                            />}
                                         </div>
                                     ) : trackedEntityAttribute.optionSet && trackedEntityAttribute.optionSet.options ? (
                                         <select name={trackedEntityAttribute.id} onChange={handleInputChangeSelect} value={findAttributeValue(trackedEntityAttribute.id)}>
@@ -401,25 +434,7 @@ export const Staffview = () => {
  
 <thead>
 <tr>
-{/* {transposedEvents.length > 0 && dataProgramDE?.data?.qPDE?.programStageDataElements.map(({ dataElement }) => {
-    if (dataElement.displayName.startsWith('jtrain')) {
-        if (dataElement.displayName === 'jtrain_course_eventid') {
-            return (
-                <th key={dataElement.id}>
-                    Training Event
-                </th>
-            );
-        } else {
-            return null; // This will not render the column
-        }
-    } else {
-        return (
-            <th key={dataElement.id}>
-    {!dataElement.displayName.startsWith('jtrain') && dataElement.displayName}
-</th>
-        );
-    }
-})} */}
+
 </tr>
 </thead>
 <tbody>
@@ -436,14 +451,14 @@ export const Staffview = () => {
         </div>
         
       ))}
-            {dataProgramDE?.data?.qPDE?.programStageDataElements.map(({ dataElement }, cellIndex) => (
-            <div>
-                <div key={dataElement.id} style={{ textAlign: 'center' }}>
-                    {!dataElement.displayName.startsWith('jTrain') && (cellIndex === 0 ?   <CourseDateAttendeesStaffCustomFields eventID={eventObj.event} /> : '')}
-                </div>
-            </div>
-            
-        ))}
+      
+      { dataProgramDE?.data?.qPDE?.programStageDataElements.map(({ dataElement }, cellIndex) => (
+    <div>
+        <div key={dataElement.id} style={{ textAlign: 'center' }}>
+            {!dataElement.displayName.startsWith('jTrain') && (cellIndex === 0 ? <CourseDateAttendeesStaffCustomFields eventID={eventObj.event} /> : '')}
+        </div>
+    </div>
+))}
            
         </td>
       

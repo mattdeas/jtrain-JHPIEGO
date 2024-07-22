@@ -82,12 +82,12 @@ export const CourseSearch = () => {
         <div>
             <h1>Search Courses </h1>
 
-            <select placeholder="Thematic Area" value={selectedThematicArea} onChange={handleThematicAreaChange}>
+            {/* <select placeholder="Thematic Area" value={selectedThematicArea} onChange={handleThematicAreaChange}>
             <option value="">Select Thematic Area</option>
             {dThematicAreas && dThematicAreas.thematicAreas.options.map((option, index) => (
                 <option key={index} value={option.code}>{option.name}</option>
             ))}
-        </select>
+        </select> */}
 
             <input type="text" value={searchTerm} onChange={handleSearchTermChange} placeholder="Course Name" />
 
@@ -98,7 +98,7 @@ export const CourseSearch = () => {
                 <Table>
                     <TableHead>
                         <TableRowHead>
-                            <TableCellHead>Thematic Area</TableCellHead>
+                            {/* <TableCellHead>Thematic Area</TableCellHead> */}
                             <TableCellHead>Course Name</TableCellHead>
                             <TableCellHead>View</TableCellHead>
                         </TableRowHead>
@@ -119,7 +119,7 @@ export const CourseSearch = () => {
 
                             return (
                                 <TableRow key={trackedEntityInstance}>
-                                    <TableCell>{attributesObj['Course Thematic Area']}</TableCell>
+                                    {/* <TableCell>{attributesObj['Course Thematic Area']}</TableCell> */}
                                     <TableCell>{attributesObj['Course Name']}</TableCell>
                                     <TableCell>
                                         <Link to={`/courseview/${trackedEntityInstance}`}><IconView24/> </Link>

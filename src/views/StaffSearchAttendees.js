@@ -73,6 +73,7 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
     const defCourseEventId = utilGetConstantValueByName('jtrain-course-eventid');
     const defCourseAttendeesDE = utilGetConstantValueByName('jtrain-course-attendees');
     const defCourseAttendeesCountDE = utilGetConstantValueByName('jtrain-course-attendees-count');
+    const defShowScore = utilGetConstantValueByName('jtrain-ShowScores');
     const defCoursePreScore = utilGetConstantValueByName('jtrain-course-pretest-score');
     const defCoursePostScore = utilGetConstantValueByName('jtrain-course-posttest-score');
     const defCourseProgramId = utilGetConstantValueByName('jtrain-courseprogram');
@@ -260,7 +261,7 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
     
     return (
         <div> 
-            <h3>Search Staff to Assign </h3>
+            <h3>Search Trainee to Enroll </h3>
 
             <input type="text" value={searchTerm} onChange={handleSearchTermChange} />
 
@@ -283,19 +284,18 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
                     <Table>
       <TableHead>
         <TableRowHead>
-          <TableCellHead>Family Name</TableCellHead>
+          <TableCellHead>Last Name</TableCellHead>
           <TableCellHead>First Name</TableCellHead>
-          <TableCellHead>Gender</TableCellHead>
-          <TableCellHead>Date of Birth</TableCellHead>
-          <TableCellHead>Age</TableCellHead>
+          <TableCellHead>Mobile #</TableCellHead>
+          <TableCellHead>Designation</TableCellHead>
           <TableCellHead>Open</TableCellHead>
-          <TableCellHead>Assign</TableCellHead>
+          <TableCellHead>Enroll</TableCellHead>
         </TableRowHead>
       </TableHead>
       <TableBody>
       {data.instances.trackedEntityInstances
         .filter(item => 
-        item.attributes.some(attr => attr.displayName === 'Family Name' && attr.value.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        item.attributes.some(attr => attr.displayName === 'Last Name' && attr.value.toLowerCase().includes(searchTerm.toLowerCase())) &&
         !(tei_id && tei_id.includes(item.trackedEntityInstance)) // Exclude the instances that are in tei_id
     )
     .slice(0, 10)
@@ -309,11 +309,11 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
 
             return (
                 <TableRow key={trackedEntityInstance}>
-                    <TableCell>{attributesObj['Family Name']}</TableCell>
+                {/* <!-- This area needs to be dynamic --> */}
+                    <TableCell>{attributesObj['Last Name']}</TableCell>
                     <TableCell>{attributesObj['First Name']}</TableCell>
-                    <TableCell>{attributesObj['Gender']}</TableCell>
-                    <TableCell>{attributesObj['Date of Birth']}</TableCell>
-                    <TableCell>{attributesObj['Age']}</TableCell>
+                    <TableCell>{attributesObj['Mobile #']}</TableCell>
+                    <TableCell>{attributesObj['Designation']}</TableCell>
                     <TableCell >
                     <a href={`/staffview/${trackedEntityInstance}`} target="_blank" rel="noopener noreferrer"><IconView24 /></a>
                     

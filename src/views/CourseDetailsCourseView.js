@@ -22,6 +22,14 @@ const eventQuery = {
     },
   };
   
+  const ORG_UNITS_QUERY = {
+    orgUnits: {
+        resource: 'organisationUnits',
+        params: {
+            paging: false,
+        },
+    },
+};
 
 
 export const CourseDetailsCourseView = ({ id }) => {
@@ -38,7 +46,7 @@ export const CourseDetailsCourseView = ({ id }) => {
     console.log('dataStages', data);
     const [selectedCourseDate, setSelectedCourseDate] = useState(''); 
 
-    
+    const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);    
 
     const { loading: eventLoading, error: eventError, data: eventData } = useDataQuery(eventQuery, {
         variables: { id: id },
@@ -95,7 +103,13 @@ export const CourseDetailsCourseView = ({ id }) => {
       return map;
     }, {});
 
-    return <TableCell key={dataElement.id}>{dataElementToValue[dataElement.id]}</TableCell>;
+    if (dataElement.displayName === 'Location') {
+      return <TableCell key={dataElement.id}>
+      {orgUnitsData.orgUnits.organisationUnits.find(orgUnit => orgUnit.id === dataElementToValue[dataElement.id]).displayName}
+      </TableCell>;
+    }
+    else
+      return <TableCell key={dataElement.id}>{dataElementToValue[dataElement.id]}</TableCell>;
   })}
     </TableRow>
   )}

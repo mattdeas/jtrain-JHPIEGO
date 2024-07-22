@@ -35,30 +35,61 @@ window.addEventListener('resize', handleResize);
 
 
 const query = {
-    // "page" variable below can be dinamically passed via refetch (see "handlePageChange" below)
     instances: {
         resource: 'trackedEntityInstances',
-        params: ({ ou ,trackedEntityType }) => ({
-            ou : ou,
-            trackedEntityType : trackedEntityType,
+        params: ({ ou, trackedEntityType, page, pageSize }) => ({
+            ou: ou,
+            trackedEntityType: trackedEntityType,
+            fields: [
+                'trackedEntityInstance',
+                'attributes[displayName,value]',
+                'orgUnits[id,displayName]',
+            ],
+            page: page,
+            pageSize: pageSize,
         }),
     },
-}
+};
 
-//https://dhis2.af.jhpiego.org/api/trackedEntityInstances?ou=x0Zl6eKgC7B&trackedEntityType=W9FNXXgGbm7
+const ORG_UNITS_QUERY = {
+    orgUnits: {
+        resource: 'organisationUnits',
+        params: {
+            paging: false,
+        },
+    },
+};
+
 
 export const StaffSearch = () => {
 
     const defStaffOrgUnitId = utilGetConstantValueByName('jtrain-DefaultStaffOrgUnit')
     const defStaffType = utilGetConstantValueByName('jtrain-TEI-Type-Staff')
+    const [page, setPage] = useState(1); // Current page
+    const [pageSize, setPageSize] = useState(10); // Items per page
 
+    const [totalItems, setTotalItems] = useState(0);
+const [totalPages, setTotalPages] = useState(0);
+
+
+    const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
     const { loading, error, data } = useDataQuery(query, {
         variables: {
             ou: defStaffOrgUnitId,
             trackedEntityType: defStaffType,
+            page: page,
+            pageSize: pageSize,
         },
-    })
+    });
+
+    console.log('data is ', data)
+    console.log('orgUnitsData is ', orgUnitsData)
     // State variable for search term
+
+
+
+
+    
     const [searchTerm, setSearchTerm] = useState('');
 
     // Function to handle search term input change
@@ -66,25 +97,39 @@ export const StaffSearch = () => {
         setSearchTerm(event.target.value);
     }
 
+    const handleSearchTermChangeFirst = (event) => {
+        setSearchTerm(event.target.value);
+    }
+
+    const engine = useDataEngine();
     
+
+    // Pagination controls
+    const paginationControls = (
+        <div>
+            <button onClick={() => setPage(page - 1)} disabled={page === 1}>Previous</button>
+            <span>Page {page}</span>
+            <button onClick={() => setPage(page + 1)}>Next</button>
+        </div>
+    );
 
     return (
         <div>
             <h1>Search Staff </h1>
 
             {/* <input type="text" value={searchTerm} onChange={handleSearchTermChange} /> */}
-            <input type="text" value={searchTerm} onChange={handleSearchTermChange} placeholder="Family Name" />
+            {/* <input type="text" value={searchTerm} onChange={handleSearchTermChange} placeholder="Last Name" />
 
-<input type="text" onChange={handleSearchTermChange} placeholder="First Name" />
+<input type="text" onChange={handleSearchTermChangeFirst} placeholder="First Name" /> */}
 
-<select >
+{/* <select >
     <option value="">Select Gender</option>
     <option value="male">Male</option>
     <option value="female">Female</option>
     <option value="other">Other</option>
-</select>
+</select> */}
 
-<input type="number" onChange={handleSearchTermChange} placeholder="Age" />
+{/* <input type="number" onChange={handleSearchTermChange} placeholder="Age" /> */}
 
             {
                 // display that the data is being loaded
@@ -105,17 +150,18 @@ export const StaffSearch = () => {
                     <Table>
       <TableHead>
         <TableRowHead>
-          <TableCellHead>Family Name</TableCellHead>
+          <TableCellHead>Last Name</TableCellHead>
           <TableCellHead>First Name</TableCellHead>
-          <TableCellHead>Gender</TableCellHead>
-          <TableCellHead>Date of Birth</TableCellHead>
-          <TableCellHead>Age</TableCellHead>
+          <TableCellHead>Designation</TableCellHead>
+          <TableCellHead>Mobile #</TableCellHead>
+          <TableCellHead>Location</TableCellHead>
+          <TableCellHead>PIN</TableCellHead>
           <TableCellHead>View</TableCellHead>
         </TableRowHead>
       </TableHead>
       <TableBody>
       {data.instances.trackedEntityInstances
-    .filter(item => item.attributes && item.attributes.some(attr => attr.displayName === 'Family Name' && attr.value.toLowerCase().includes(searchTerm.toLowerCase())))
+    .filter(item => item.attributes && item.attributes.some(attr => attr.displayName === 'Last Name' && attr.value.toLowerCase().includes(searchTerm.toLowerCase())))
     .slice(0, 100)
     .map(
         ({ trackedEntityInstance, attributes }) => {
@@ -127,13 +173,25 @@ export const StaffSearch = () => {
 
             return (
                 <TableRow key={trackedEntityInstance}>
-                    <TableCell>{attributesObj['Family Name']}</TableCell>
+                    <TableCell>{attributesObj['Last Name']}</TableCell>
                     <TableCell>{attributesObj['First Name']}</TableCell>
-                    <TableCell>{attributesObj['Gender']}</TableCell>
-                    <TableCell>{attributesObj['Date of Birth']}</TableCell>
-                    <TableCell>{attributesObj['Age']}</TableCell>
+                    <TableCell>{attributesObj['Designation']}</TableCell>
+                    <TableCell>{attributesObj['Mobile #']}</TableCell>
+                    <TableCell>
+                        {attributesObj['Location'] 
+                            ? attributesObj['Location']
+                                .split('/')
+                                .slice(2)
+                                .map(id => {
+                                    const orgUnit = orgUnitsData.orgUnits.organisationUnits.find(orgUnit => orgUnit.id === id);
+                                    return orgUnit ? orgUnit.displayName : id;
+                                })
+                                .join(' - ')
+                            : ''}
+                    </TableCell>
+                    <TableCell>{attributesObj['PIN']}</TableCell>
                     <TableCell >
-                    <Link to={`/staffview/${trackedEntityInstance}`}><IconView16/></Link>
+                        <Link to={`/staffview/${trackedEntityInstance}`}><IconView16/></Link>
                     </TableCell>
                 </TableRow>
             );

@@ -36,7 +36,14 @@ const handleResize = debounce(() => {
 window.addEventListener('resize', handleResize);
 
 
-
+const ORG_UNITS_QUERY = {
+    orgUnits: {
+        resource: 'organisationUnits',
+        params: {
+            paging: false,
+        },
+    },
+};
 
 
 const qryStaffCourseDetails = {  
@@ -128,6 +135,8 @@ export const CourseDateStaffShow = ({tei_id, eventID, reload, refreshCount}) => 
         },
       });
 
+      
+    const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
 
     const handleDelete = async (trackedEntityInstance) => {
         // Delete the event
@@ -199,6 +208,7 @@ export const CourseDateStaffShow = ({tei_id, eventID, reload, refreshCount}) => 
 //     skip: !currentEventId,
 // });
 
+
    
     return (
 
@@ -223,16 +233,15 @@ export const CourseDateStaffShow = ({tei_id, eventID, reload, refreshCount}) => 
                     
                     <Table>
       <TableHead>
-        <TableRowHead>
-            <TableCellHead>Course Details: <CourseDetailsCourseView id={eventID} /> </TableCellHead>
-        </TableRowHead>
+      <TableRowHead>
+        <TableCellHead colSpan={7}>Course Details: <CourseDetailsCourseView id={eventID} /> </TableCellHead>
+       </TableRowHead>
         <TableRowHead>
         
-          <TableCellHead>Family Name1111</TableCellHead>
+          <TableCellHead>Last Name</TableCellHead>
           <TableCellHead>First Name</TableCellHead>
-          <TableCellHead>Gender</TableCellHead>
-          <TableCellHead>Date of Birth</TableCellHead>
-          <TableCellHead>Age</TableCellHead>
+          <TableCellHead>Designation</TableCellHead>
+          <TableCellHead>Location</TableCellHead>
           <TableCellHead>Open</TableCellHead>
         </TableRowHead>
       </TableHead>
@@ -260,13 +269,25 @@ export const CourseDateStaffShow = ({tei_id, eventID, reload, refreshCount}) => 
             if(matchingEventValue != null)
             {
             return (
+
                 <TableRow key={trackedEntityInstance}>
-                    <TableCell>{trackedEntityInstance}</TableCell>
-                    <TableCell>{attributesObj['Family Name']}</TableCell>
+                    <TableCell>{attributesObj['Last Name']}</TableCell>
                     <TableCell>{attributesObj['First Name']}</TableCell>
-                    <TableCell>{attributesObj['Gender']}</TableCell>
-                    <TableCell>{attributesObj['Date of Birth']}</TableCell>
-                    <TableCell>{attributesObj['Age']}</TableCell>
+                    <TableCell>{attributesObj['Designation']}</TableCell>
+                    <TableCell>{
+                        (attributesObj['Location'])                    
+
+            .toString()
+            .split('/')
+            .slice(2)
+            .map(id => {
+                const orgUnit = orgUnitsData.orgUnits.organisationUnits.find(orgUnit => orgUnit.id === id);
+                return orgUnit ? orgUnit.displayName : id;
+            })
+            .join(' - ')
+
+                        
+                        }</TableCell>
                     <TableCell >
                         <Link to={`/staffview/${trackedEntityInstance}`}><IconView24 alt="View Staff Details"/></Link>
                     </TableCell>

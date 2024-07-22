@@ -21,6 +21,15 @@ const handleResize = debounce(() => {}, 200);
 
 window.addEventListener('resize', handleResize);
 
+const ORG_UNITS_QUERY = {
+    orgUnits: {
+        resource: 'organisationUnits',
+        params: {
+            paging: false,
+        },
+    },
+};
+
 const query = {
     instances: {
         resource: 'trackedEntityInstances',
@@ -91,6 +100,8 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onDelete }) =
             refreshKey,
         },
     });
+    const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
+
 
     useEffect(() => {
         setRefreshKey(prevKey => prevKey + 1);
@@ -258,14 +269,14 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onDelete }) =
                     <Table>
       <TableHead>
         <TableRowHead>
-          <TableCellHead>Family Name</TableCellHead>
+          <TableCellHead>Last Name</TableCellHead>
           <TableCellHead>First Name</TableCellHead>
-          <TableCellHead>Gender</TableCellHead>
-          <TableCellHead>Date of Birth</TableCellHead>
-          <TableCellHead>Age</TableCellHead>
+          <TableCellHead>Mobile #</TableCellHead>
+          <TableCellHead>Designation</TableCellHead>
+          <TableCellHead>Location</TableCellHead>
           <TableCellHead>View</TableCellHead>
           <TableCellHead colSpan='3' style={{ textAlign: 'center' }} >Course Information</TableCellHead>
-          {/* <TableCellHead>ParentRefresh {refreshCount} - {refreshKey}</TableCellHead> */}
+          
         </TableRowHead>
       </TableHead>
       <TableBody>
@@ -296,11 +307,23 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onDelete }) =
             return (
                 <TableRow key={trackedEntityInstance}>
                     {/* <TableCell>{trackedEntityInstance}</TableCell> */}
-                    <TableCell>{attributesObj['Family Name']}</TableCell>
+                    {/* <TableCell>{trackedEntityInstance}</TableCell> */}
+                    <TableCell>{attributesObj['Last Name']}</TableCell>
                     <TableCell>{attributesObj['First Name']}</TableCell>
-                    <TableCell>{attributesObj['Gender']}</TableCell>
-                    <TableCell>{attributesObj['Date of Birth']}</TableCell>
-                    <TableCell>{attributesObj['Age']}</TableCell>
+                    <TableCell>{attributesObj['Mobile #']}</TableCell>
+                    <TableCell>{attributesObj['Designation']}</TableCell>
+                    <TableCell>
+                    {attributesObj['Location'].toString()
+                    .split('/')
+                    .slice(2)
+                    .map(id => {
+                        const orgUnit = orgUnitsData.orgUnits.organisationUnits.find(orgUnit => orgUnit.id === id);
+                        return orgUnit ? orgUnit.displayName : id;
+                    })
+                    .join(' - ')
+                    
+                            }
+                    </TableCell>
                     <TableCell >
                         <Link to={`/staffview/${trackedEntityInstance}`}><IconView24 /> </Link>
                     </TableCell>
