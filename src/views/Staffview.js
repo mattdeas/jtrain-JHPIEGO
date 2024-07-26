@@ -59,15 +59,7 @@ const eventsQuery = (id) => ({
         },
     },
 });
-const dataElementQuery = {
-    dataElement: {
-        resource: 'dataElements',
-        id: '{id}', // replace with the actual dataElement ID
-        params: {
-            fields: ['displayName'],
-        },
-    },
-};
+
 
 
 const mutation = (id) => ({

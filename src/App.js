@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import { TabBar, Tab } from '@dhis2-ui/tab';
 import { Home,  CourseSearch, StaffSearch, Staffadd, TrainingCapture, Staffview, Settings,
-    CourseDetailsStaffView, CourseDateAttendeesStaffCustomFields, CourseDetailsCourseView, CourseAttendee, CourseDateAttendees} from './views';
+    CourseDetailsStaffView, BulkStaffAdd, CourseDateAttendeesStaffCustomFields, CourseDetailsCourseView, CourseAttendee, CourseDateAttendees} from './views';
 
 
 import styles from './App.module.css';
@@ -80,6 +80,7 @@ const MainContent = () => {
                 <Route path="/testcomponent/:id" element={<CourseDetailsStaffView />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/testtree" element={<MyComponent/>} />
+                <Route path="/bulkstaffadd" element={<BulkStaffAdd />} />
             </Routes>
         </div>
     );

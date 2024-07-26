@@ -1,5 +1,49 @@
+const constantsQuery = {
+    constants: {
+        resource: "constants",
+        params: {
+            fields: ['id', 'name', 'code']
+        }
+    }
+};
+
+import { useState, useEffect } from 'react';
+import { useDataEngine } from '@dhis2/app-runtime';
+
+export const useFetchAndStoreConstants = () => {
+    const engine = useDataEngine();
+    const [constants, setConstants] = useState(null);
+
+    useEffect(() => {
+        const fetchConstants = async () => {
+            const sessionStorageConstants = sessionStorage.getItem('constants');
+            if (!sessionStorageConstants) {
+                try {
+                    // Assuming constantsQuery is available in the scope
+                    const { constants } = await engine.query(constantsQuery);
+                    sessionStorage.setItem('constants', JSON.stringify(constants));
+                    setConstants(constants);
+                } catch (error) {
+                    console.error('Error fetching constants:', error);
+                    // Handle error appropriately
+                }
+            } else {
+                setConstants(JSON.parse(sessionStorageConstants));
+            }
+        };
+
+        fetchConstants();
+    }, [engine]);
+
+    return constants;
+};
+
 export const utilGetConstantValueByName = (name) => {
     const sessionStorageConstants = sessionStorage.getItem('constants');
+    if(sessionStorageConstants == null)
+    {
+        sessionStorageConstants = getConsta
+    }
     const constants = JSON.parse(sessionStorageConstants);
     if (Array.isArray(constants)) {
         const item = constants.find(d => d.name === name);
@@ -8,8 +52,10 @@ export const utilGetConstantValueByName = (name) => {
             return codeWithoutName;
         }
     }
+
     return null;
 };
+
 
 export const utilgetCodeByName = (name) => {
     const sessionStorageConstants = sessionStorage.getItem('constants');

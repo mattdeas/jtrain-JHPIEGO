@@ -62,14 +62,6 @@ const mutation = {
 
 
 
-const handleUpdate = () => {
-};
-
-
-
-const handleCancel = () => {
-};
-
 const qryTrackedEntityInstance = {
     trackedEntityInstance: {
         resource: 'trackedEntityInstances',
@@ -109,8 +101,6 @@ export const Staffadd = () => {
         console.log(event)
 
         const { name, value } = event.target;
-        console.log('name', name)
-        console.log('value', value)
         setFormFields(prevFields => ({
             ...prevFields,
             [name]: value,

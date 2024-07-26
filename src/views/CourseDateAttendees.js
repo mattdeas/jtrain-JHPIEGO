@@ -58,7 +58,7 @@ export const CourseDateAttendees = ({ eventID, dElements }) => {
   const attendeeCount = parseInt(attendeeCountObj.value)
     return (
       <div>
-      <h3>Course Date Attendees </h3>
+      <h3>Course Attendees </h3>
       
       {loading ? <CircularLoader /> : ( // Show the loader if loading is true
           <table>

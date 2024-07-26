@@ -101,7 +101,7 @@ console.log('orgunitsdata',orgUnitsData)
     };
 
     return (
-        <div>CourseDetails.js
+        <div>
             <table style={{width: '100%'}}>
             
                 <tr>

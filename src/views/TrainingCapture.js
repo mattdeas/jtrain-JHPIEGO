@@ -57,9 +57,6 @@ export const TrainingCapture = () => {
             program: defCourseProgramId,
         },
     })
-    console.log('data',data)
-console.log('defCourseOrgUnitId',defCourseOrgUnitId)
-console.log('defCourseProgramId',defCourseProgramId)
 
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');

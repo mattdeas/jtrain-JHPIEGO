@@ -9,6 +9,7 @@ import {
     TableRowHead,
     IconAddCircle24,
     IconView24,
+    CircularLoader,
 } from '@dhis2/ui'
 import React, { useState, useEffect } from 'react'
 import { Link, BrowserRouter, Switch, Route } from 'react-router-dom'
@@ -33,16 +34,43 @@ window.addEventListener('resize', handleResize);
 
 const itemsPerPage = 10;
 
+// const query = {
+//     instances: {
+//         resource: 'trackedEntityInstances',
+//         params: ({ ou ,trackedEntityType }) => ({
+//             ou : ou,
+//             trackedEntityType : trackedEntityType,
+//         }),
+//     },
+// }
+
 const query = {
-    // "page" variable below can be dinamically passed via refetch (see "handlePageChange" below)
     instances: {
         resource: 'trackedEntityInstances',
-        params: ({ ou ,trackedEntityType }) => ({
-            ou : ou,
-            trackedEntityType : trackedEntityType,
-        }),
+        params: ({ ou, trackedEntityType, page, pageSize, searchLastName, searchFirstName }) => {
+            const filters = [];
+            if (searchLastName) {
+                filters.push(`wXRW65yTN1d:like:${searchLastName}`);
+            }
+            if (searchFirstName) {
+                filters.push(`Lez2r3d0oxb:like:${searchFirstName}`);
+            }
+            return {
+                ou: ou,
+                trackedEntityType: trackedEntityType,
+                fields: [
+                    'trackedEntityInstance',
+                    'attributes[displayName,value]',
+                    'orgUnits[id,displayName]',
+                ],
+                page: page,
+                pageSize: pageSize,
+                order: 'wXRW65yTN1d:asc,Lez2r3d0oxb:desc', //LastName , FirstName SL
+                filter: filters,
+            };
+        },
     },
-}
+};
 // SHELVED TILL RELATIONSHIP BUG IS CLEARED
 // const mutationRelationships = {
 //     resource: 'relationships',
@@ -64,7 +92,7 @@ const query = {
 // };
 export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dElements, onAssign, refreshCount}) => {
 
-
+    const [isLoading, setIsLoading] = useState(false);
     
     const defStaffProgramId = utilGetConstantValueByName('jtrain-staffprogram');
     const defStaffProgramCourseId = utilGetConstantValueByName('jtrain-staffprogram-course');
@@ -79,12 +107,23 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
     const defCourseProgramId = utilGetConstantValueByName('jtrain-courseprogram');
     const defCourseProgramStageId = utilGetConstantValueByName('jtrain-courseprogramstage');
 
+    const [page, setPage] = useState(1); // Current page
+    const [pageSize, setPageSize] = useState(50); // Items per page
+    const [searchLastName, setLastName] = useState('');
+    const [searchFirstName, setFirstName] = useState('');
+    
+
     const { loading, error, data, refetch } = useDataQuery(query, {
         variables: {
             ou: defStaffOrgUnitId,
             trackedEntityType: defStaffTEIType,
+            page: page,
+            pageSize: pageSize,
+            searchLastName: searchLastName,
+            searchFirstName: searchFirstName,
         },
-    })
+    });
+
 
     
     useEffect(() => {
@@ -96,15 +135,25 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
     }, [refreshCount]); // Pass refreshCount as a dependency to useEffect
 
 
+    const handleSearchTermChangeLast = (event) => {
+        setLastName(event.target.value);
+    };
 
+    const handleSearchTermChangeFirst = (event) => {
+        setFirstName(event.target.value);
+    };
 
-    // State variable for search term
-    const [searchTerm, setSearchTerm] = useState('');
-
-    // Function to handle search term input change
-    const handleSearchTermChange = (event) => {
-        setSearchTerm(event.target.value);
-    }
+    const handleSearch = () => {
+        setPage(1); // Reset to the first page
+        refetch({
+            ou: defStaffOrgUnitId,
+            trackedEntityType: defStaffTEIType,
+            page: 1,
+            pageSize: pageSize,
+            searchLastName: searchLastName,
+            searchFirstName: searchFirstName,
+        });
+    };
 
     const today = new Date();
         const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
@@ -206,6 +255,16 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
         const dataValues = await fetchEvent(eventID);
 
         console.log('trackedEntityInstance', trackedEntityInstance)
+        setIsLoading(true);
+
+        // try {
+        //     // Perform the assign action here
+        //     // For example, you might call a mutation or an API
+        // } catch (error) {
+        //     console.error(error);
+        // } finally {
+            
+        // }
 
         const dataInputs = [];
         dataValues.forEach(item => {
@@ -222,6 +281,9 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
                     break;
             }
             dataInputs.push({ dataElement: item.dataElement, value: value });
+
+
+            
         });
 
         const HasAttendees = dataInputs.some(item => item.dataElement === defCourseAttendeesDE);
@@ -255,82 +317,93 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
         } catch (error) {
             console.error('An error occurred:', error);
         }
-        
+        setIsLoading(false);
     }
 
     
     return (
+        
         <div> 
+         {isLoading ? <CircularLoader large /> : <div>
             <h3>Search Trainee to Enroll </h3>
 
-            <input type="text" value={searchTerm} onChange={handleSearchTermChange} />
+{/* <input type="text" onChange={handleSearchTermChange} /> */}
 
-            {
-                // display that the data is being loaded
-                // when loading is true
-                loading && 'Loading...'
-            }
+{
+    // display that the data is being loaded
+    // when loading is true
+    loading && 'Loading...'
+}
 
-            {
-                // display the error message
-                // is an error occurred
-                error && error.message
-                
-            }
+{
+    // display the error message
+    // is an error occurred
+    error && error.message
+    
+}
 
-            {
-                // if there is any data available
-                data?.instances?.trackedEntityInstances && (
-                    <Table>
-      <TableHead>
-        <TableRowHead>
-          <TableCellHead>Last Name</TableCellHead>
-          <TableCellHead>First Name</TableCellHead>
-          <TableCellHead>Mobile #</TableCellHead>
-          <TableCellHead>Designation</TableCellHead>
-          <TableCellHead>Open</TableCellHead>
-          <TableCellHead>Enroll</TableCellHead>
-        </TableRowHead>
-      </TableHead>
-      <TableBody>
-      {data.instances.trackedEntityInstances
-        .filter(item => 
-        item.attributes.some(attr => attr.displayName === 'Last Name' && attr.value.toLowerCase().includes(searchTerm.toLowerCase())) &&
-        !(tei_id && tei_id.includes(item.trackedEntityInstance)) // Exclude the instances that are in tei_id
+{
+    // if there is any data available
+    data?.instances?.trackedEntityInstances && (
+        <div>
+        <input type="text" onChange={handleSearchTermChangeLast} placeholder="Last Name" />
+<input type="text" onChange={handleSearchTermChangeFirst} placeholder="First Name" />
+<button onClick={handleSearch}>Search</button>
+        <Table>
+<TableHead>
+<TableRowHead>
+<TableCellHead>Last Name</TableCellHead>
+<TableCellHead>First Name</TableCellHead>
+<TableCellHead>Mobile #</TableCellHead>
+<TableCellHead>Designation</TableCellHead>
+<TableCellHead>Open</TableCellHead>
+<TableCellHead>Enroll</TableCellHead>
+</TableRowHead>
+</TableHead>
+<TableBody>
+{data.instances.trackedEntityInstances
+.filter(item => 
+item.attributes.some(attr => attr.displayName === 'Last Name' && attr.value.toLowerCase().includes('')) &&
+!(tei_id && tei_id.includes(item.trackedEntityInstance)) // Exclude the instances that are in tei_id
+)
+.slice(0, 10)
+.map(
+({ trackedEntityInstance, attributes }) => {
+// Create an object from the attributes array
+const attributesObj = attributes.reduce((obj, item) => {
+    obj[item.displayName] = item.value;
+    return obj;
+}, {});
+
+return (
+    <TableRow key={trackedEntityInstance}>
+    {/* <!-- This area needs to be dynamic --> */}
+        <TableCell>{attributesObj['Last Name']}</TableCell>
+        <TableCell>{attributesObj['First Name']}</TableCell>
+        <TableCell>{attributesObj['Mobile #']}</TableCell>
+        <TableCell>{attributesObj['Designation']}</TableCell>
+        <TableCell >
+        <a href={`/staffview/${trackedEntityInstance}`} target="_blank" rel="noopener noreferrer"><IconView24 /></a>
+        
+        </TableCell>
+        {/* <TableCell>{trackedEntityInstance}</TableCell> */}
+           
+        <TableCell align="left">
+            <div onClick={() => handleAssign(trackedEntityInstance)}>
+            <IconAddCircle24 />
+            </div>
+        </TableCell>
+    </TableRow>
+);
+}
+)}
+            </TableBody>
+</Table>
+</div>
     )
-    .slice(0, 10)
-    .map(
-        ({ trackedEntityInstance, attributes }) => {
-            // Create an object from the attributes array
-            const attributesObj = attributes.reduce((obj, item) => {
-                obj[item.displayName] = item.value;
-                return obj;
-            }, {});
-
-            return (
-                <TableRow key={trackedEntityInstance}>
-                {/* <!-- This area needs to be dynamic --> */}
-                    <TableCell>{attributesObj['Last Name']}</TableCell>
-                    <TableCell>{attributesObj['First Name']}</TableCell>
-                    <TableCell>{attributesObj['Mobile #']}</TableCell>
-                    <TableCell>{attributesObj['Designation']}</TableCell>
-                    <TableCell >
-                    <a href={`/staffview/${trackedEntityInstance}`} target="_blank" rel="noopener noreferrer"><IconView24 /></a>
-                    
-                    </TableCell>
-                    {/* <TableCell>{trackedEntityInstance}</TableCell> */}
-                       
-                    <TableCell align="left">
-                        <div onClick={() => handleAssign(trackedEntityInstance)}><IconAddCircle24 /></div>
-                    </TableCell>
-                </TableRow>
-            );
-        }
-    )}
-                        </TableBody>
-    </Table>
-                )
-            }
+}
+         </div>}
+            
         </div>
     )
 }
