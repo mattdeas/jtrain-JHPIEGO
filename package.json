@@ -18,6 +18,7 @@
     "@dhis2/ui": "^9.4.2",
     "papaparse": "^5.4.1",
     "react-datepicker": "^5.0.0",
+    "react-google-charts": "^4.0.1",
     "react-router-dom": "^6.20.0",
     "yarn": "^1.22.22"
   }

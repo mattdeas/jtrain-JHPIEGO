@@ -11,7 +11,7 @@ import {
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { CourseDetails } from './CourseDetails';
-import { utilGetConstantValueByName } from '../utils/utils';
+import { useFetchAndStoreConstants, utilGetConstantValueByName } from '../utils/utils';
 import { IconAddCircle24, IconSubtractCircle24, IconView16, IconView24 } from '@dhis2/ui';
 
 function debounce(func, wait) {
@@ -42,7 +42,9 @@ const query = {
 }
 
 export const TrainingCapture = () => {
-    const { id } = useParams(); // Get the ID from the URL
+    const constants = useFetchAndStoreConstants();
+
+    
     const [isSearchTableExpanded, setSearchTableExpanded] = useState(true);
     const [courseSelectionLabel, setCourseSelectionLabel] = useState('');
 

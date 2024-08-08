@@ -75,7 +75,6 @@ export const CourseSearch = () => {
 
     const handleThematicAreaChange = (event) => {
         setSelectedThematicArea(event.target.value);
-        // Perform the search here
     }
 
     return (

@@ -11,7 +11,7 @@ import {
 } from '@dhis2/ui';
 import { Link } from 'react-router-dom';
 import { IconView16 } from '@dhis2/ui';
-import { utilGetConstantValueByName } from '../utils/utils';
+import { useFetchAndStoreConstants, utilGetConstantValueByName } from '../utils/utils';
 
 const query = {
     instances: {
@@ -51,6 +51,13 @@ const ORG_UNITS_QUERY = {
 };
 
 export const StaffSearch = () => {
+
+    //const constants = useFetchAndStoreConstants();
+
+    //if (!constants) {
+    //    return <div>Loading...</div>;
+    //}
+
     const defStaffOrgUnitId = utilGetConstantValueByName('jtrain-DefaultStaffOrgUnit');
     const defStaffType = utilGetConstantValueByName('jtrain-TEI-Type-Staff');
     const defStaffProgId = utilGetConstantValueByName('jtrain-staffprogram');
@@ -98,12 +105,45 @@ export const StaffSearch = () => {
             <input type="text" onChange={handleSearchTermChangeLast} placeholder="Last Name" />
             <input type="text" onChange={handleSearchTermChangeFirst} placeholder="First Name" />
             <button onClick={handleSearch}>Search</button>
+            <style>
+                {`
+                .table-container {
+                    max-height: 400px; /* Adjust the height as needed */
+                    overflow-y: auto;
+                }
+    
+                .sticky-header th {
+                    position: sticky;
+                    top: 0;
+                    background: white; /* Adjust the background color as needed */
+                    z-index: 1;
+                }
+    
+                .flex-container {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+    
+                .left-div {
+                    flex: 1;
+                }
+    
+                .right-div {
+                    flex: 1;
+                    text-align: right;
+                }
+                `}
+            </style>
             {loading && 'Loading...'}
             {error && error.message}
             {data?.instances?.trackedEntityInstances && (
                 <div>
+
+                <div className="table-container">
+                
                     <Table>
-                        <TableHead>
+                        <TableHead  className="sticky-header">
                             <TableRowHead>
                                 <TableCellHead>Last Name</TableCellHead>
                                 <TableCellHead>First Name</TableCellHead>
@@ -114,9 +154,6 @@ export const StaffSearch = () => {
                                 <TableCellHead>View</TableCellHead>
                             </TableRowHead>
                         </TableHead>
-                    </Table>
-                    <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
-                        <Table>
                             <TableBody>
                                 {data.instances.trackedEntityInstances.slice(0, 50).map(({ trackedEntityInstance, attributes }) => {
                                     const attributesObj = attributes.reduce((obj, item) => {

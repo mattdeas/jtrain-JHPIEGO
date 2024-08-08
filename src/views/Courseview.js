@@ -1,5 +1,6 @@
 import { useDataQuery, useDataMutation, useDataEngine } from '@dhis2/app-runtime';
 import { CourseDetailsCourseView } from './CourseDetailsCourseView';
+import { CourseDateAttendees } from './CourseDateAttendees';
 import { CourseDateStaffShow } from './CourseDate-StaffShow';
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import React, {useState, useEffect} from 'react'
@@ -10,6 +11,7 @@ import { IconAdd16, IconDelete16, IconCross16, IconSave16, IconView16 } from '@d
 import { CalendarInput } from '@dhis2/ui';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { OrganisationUnitTree } from '@dhis2/ui';
 
 function debounce(func, wait) {
     let timeout;
@@ -63,29 +65,29 @@ const eventsQuery = (id) => ({
 });
 
 
-const DataElement = ({ dataElementId, value }) => {
-    const dataElementQuery = {
-        dataElement: {
-            resource: 'dataElements',
-            id: dataElementId,
-            params: {
-                fields: ['displayName'],
-            },
-        },
-    };
+// const DataElement = ({ dataElementId, value }) => {
+//     const dataElementQuery = {
+//         dataElement: {
+//             resource: 'dataElements',
+//             id: dataElementId,
+//             params: {
+//                 fields: ['displayName'],
+//             },
+//         },
+//     };
 
-    const { loading, error, data } = useDataQuery(dataElementQuery);
+//     const { loading, error, data } = useDataQuery(dataElementQuery);
 
-    if (loading) return <td>Loading...</td>;
-    if (error) return <td>Error: {error.message}</td>;
+//     if (loading) return <td>Loading...</td>;
+//     if (error) return <td>Error: {error.message}</td>;
 
-    return (
-        <>
-            <td>{data.dataElement.displayName}</td>
-            <td>{value}</td>
-        </>
-    );
-};
+//     return (
+//         <>
+//             <td>{data.dataElement.displayName}</td>
+//             <td>{value}</td>
+//         </>
+//     );
+// };
 
 const mutation = {
     resource: 'trackedEntityInstances',
@@ -128,7 +130,13 @@ export const Courseview = () => {
     const [dateFields, setDateFields] = useState({});
     
     const [isViewClicked, setisViewClicked] = useState(false);
+    const [editCourseShow, setEditCourseShow] = useState(false);
     const [mutate, { loading, error }] = useDataMutation(mutation)
+
+    const defCourseOrgUnit = utilGetConstantValueByName('jtrain-defaultcourseorgunit')
+    const defLocationDE = utilGetConstantValueByName('jtrain-location-DE')
+
+
     const { loading: loadingEntity, error: errorEntity, data: dataEntity } = useDataQuery(qryTrackedEntityInstance, {
         variables: {
          id,
@@ -213,7 +221,9 @@ export const Courseview = () => {
     }
 };
 
-  
+  const handleEditButtonClick = () => {
+    setEditCourseShow(true);
+    };
 
   const handleInputChange = (event) => {
     console.log(event)
@@ -224,9 +234,10 @@ export const Courseview = () => {
         [name]: value,
     }));
     console.log('formfields', formFields)
-};
-const handleInputChangeCourse = (name, value) => {
-    console.log(name, value)
+    };
+    
+    const handleInputChangeCourse = (name, value) => {
+        console.log(name, value)
 
     // const { name, value } = event.target;
     setFormFieldsCourse(prevFields => ({
@@ -234,6 +245,18 @@ const handleInputChangeCourse = (name, value) => {
         [name]: value,
     }));
 
+
+    
+}
+const [selected, setSelected] = useState([]);
+
+const onTreeChange = ({ selected }) => {
+    setSelected(selected);
+
+    setFormFieldsCourse(prevFields => ({
+        ...prevFields,
+        [defLocationDE]: selected[0], // assuming selected is an array and you want to store the first value
+    }));
 }
 
 const handleInputChangeCourseDate = (name, date) => {
@@ -297,6 +320,23 @@ const handleInputChangeCourseDate = (name, date) => {
 
     const [responseMessage, setResponseMessage] = useState('');
     const { loading: loadingEvents, error: errorEvents, data: eventsData, refetch: refetchEvent } = useDataQuery(eventsQuery(id));
+
+    useEffect(() => {
+        if (!loadingEvents && !errorEvents && eventsData?.events) {
+            console.log('eventsDataevents', eventsData);
+            
+            // Sort events based on the date value of the dataElement "ODO4HZT4XSg"
+            const sortedEvents = eventsData.events.events.sort((a, b) => {
+                const dateA = new Date(a.dataValues.find(dv => dv.dataElement === "ODO4HZT4XSg")?.value);
+                const dateB = new Date(b.dataValues.find(dv => dv.dataElement === "ODO4HZT4XSg")?.value);
+                return dateB - dateA;
+            });
+    
+            setEvents(sortedEvents);
+        }   
+    }, [eventsData, loadingEvents, errorEvents]);
+    
+    
     useEffect(() => {
     if (!loadingEvents && !errorEvents && eventsData?.events) {
         console.log('eventsDataevents',eventsData)
@@ -309,7 +349,6 @@ const handleInputChangeCourseDate = (name, date) => {
     const doMutation = async () => {
         try {
                         // Pass the mutation object to the mutate function
-                        //const response = await mutate(MutateTEI);
                         const response = await mutate({ id: id,
                          orgUnit: defCourseOrgUnitId, 
                          attributes });
@@ -392,8 +431,55 @@ const handleInputChangeCourseDate = (name, date) => {
         console.log('ViewEvent',event)
     };
 
+    const [filterDate, setFilterDate] = useState('');
+    const [locationFilter, setLocationFilter] = useState('');
+    const [partnerFilter, setPartnerFilter] = useState('');
+    const [values, setValues] = useState({ location: '', partner: '' });
+
+    const handleTextChange = (event) => {
+        const { name, value } = event.target;
+        setValues({
+            ...values,
+            [name]: value,
+        });
+        if (name === 'location') {
+            setLocationFilter(value);
+        } else if (name === 'partner') {
+            setPartnerFilter(value);
+        }
+    };
+
+    const handleFilterCourseDate = (date) => { 
+        setFilterDate(date);
+    };
+
+    const filterEvents = (events, partnerFilter, filterDate) => {
+        return events.filter(event => {
+            const dataValues = event.dataValues.reduce((acc, dataValue) => {
+                acc[dataValue.dataElement] = dataValue.value;
+                return acc;
+            }, {});
     
+            const partnerMatch = dataValues['hGGDYuGuVeX'] ? dataValues['hGGDYuGuVeX'].toLowerCase().includes(partnerFilter.toLowerCase()) : false;
     
+            const startDate = new Date(dataValues['N3rXacKJAjy']);
+            const endDate = new Date(dataValues['ODO4HZT4XSg']);
+            const filterDateParsed = filterDate ? new Date(filterDate) : null;
+    
+            const dateMatch = filterDateParsed ? (filterDateParsed >= startDate && filterDateParsed <= endDate) : false;
+    
+            if (!partnerFilter && filterDateParsed) {
+                return dateMatch;
+            } else if (partnerFilter && !filterDateParsed) {
+                return partnerMatch;
+            } else {
+                return partnerMatch || dateMatch;
+            }
+        });
+    };
+    
+    //const filteredEvents = filterEvents(eventsData.events.events, partnerFilter, filterDate);
+    //console.log('filteredEvents',filteredEvents)
     return (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex' }}>
@@ -455,11 +541,27 @@ const handleInputChangeCourseDate = (name, date) => {
                 ))}
             </tbody>
             </table>
-            <button type="submit"><IconSave16 /> Save</button>
-            <Link to="/coursesearch">
-                <button type="button"><IconCross16/> Close</button>
-            </Link>
-            <button type="button" onClick={handleDelete}><IconDelete16 /> Delete</button>
+            <div>
+                {!editCourseShow && (
+                    <div>
+                        <button type="button" onClick={handleEditButtonClick}>Edit Course Details</button>
+                        <Link to="/coursesearch">
+                            <button type="button"><IconCross16/> Close</button>
+                        </Link>
+                    </div>
+                )}
+                {editCourseShow && (
+                    <div>                   
+                        <button type="submit"><IconSave16 /> Save</button>
+                        <Link to="/coursesearch">
+                            <button type="button"><IconCross16/> Close / Cancel </button>
+                        </Link>
+                        <button type="button" onClick={handleDelete}><IconDelete16 /> Delete</button>
+                    </div>
+                )}
+                
+            </div>
+            
             <p>{responseMessage}</p>
             
             
@@ -470,34 +572,91 @@ const handleInputChangeCourseDate = (name, date) => {
     )
 }
 {selectedEvent &&  (
-    <div><CourseDateStaffShow key={selectedEvent} tei_id={id} eventID={selectedEvent} />
-<button onClick={hideCourseDateShow}>Close</button>
-</div>
+    <div style={{ display: 'flex', flexDirection: 'column', width: '100vw', margin: 0, padding: 0 }}>
+    <CourseDateStaffShow key={selectedEvent} tei_id={id} eventID={selectedEvent} />
+    <CourseDateAttendees key={selectedEvent} eventID={selectedEvent} dElements={null} />
+    <button onClick={hideCourseDateShow} style={{ width: '100px', margin: 0, padding: 0 }}>Close</button>        
+    </div>
+
 )}
                 </div>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <p style={{ alignContent: 'center', paddingLeft: '25%', paddingTop: '20px', fontWeight: 'bold' }}>Course Events</p>
                 <div style={{ width: '100%', height: '70%', overflow: 'auto' }}>
                 {!isViewClicked && (
                     <div>
-                        <p style={{ alignContent: 'center', paddingLeft: '25%'}} >Course Events</p>
-                        {
-                        eventsData?.events?.events?.length > 0 ? (
-                            <table>
-                            <tbody>
-                                {eventsData.events.events.map((event) => (
-                                <tr key={event.event}>
-                                    <td><CourseDetailsCourseView id={event.event} key={refreshKey}/></td>
-                                    <td><div role="button" tabIndex="0" onClick={() => handleViewClick(event.event)}><IconView16 /></div></td>
-                                    <td><div role="button" tabIndex="0" onClick={() => handleDeleteEvent(event.event)}><IconDelete16  /></div></td>
-                                </tr>
-                                ))}
-                            </tbody>
-                            </table>
-                        ) : (
-                            <p>No events listed</p>
-                        )
-                        }
-                    </div>
+                    {/* <div>
+                                        <label>
+                                            Date:
+                                            <DatePicker
+                                                selected={filterDate}
+                                                onChange={(date) => handleFilterCourseDate(date)}
+                                                dateFormat="yyyy-MM-dd"
+                                                placeholderText='YYYY-MM-DD'
+                                            />
+                                        </label>
+                                        <label>
+                                            Partner:
+                                            <input
+                                                type="text"
+                                                name="partner"
+                                                value={values.partner}
+                                                onChange={handleTextChange}
+                                            />
+                                        </label>
+                                        <label>
+                                            Location:
+                                            <input
+                                                type="text"
+                                                name="location"
+                                                value={values.location}
+                                                onChange={handleTextChange}
+                                            />
+                                        </label>
+                                    </div> */}
+                    <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                    
+    {
+        eventsData?.events?.events?.length > 0 ? (
+            <table style={{ border: '1px solid lightgray', borderCollapse: 'collapse' }}>
+                <tbody>
+                    {eventsData.events.events.map((event) => (
+                        <tr key={event.event}>
+                            <td style={{ border: '1px solid lightgray' }}><CourseDetailsCourseView id={event.event} key={refreshKey}/></td>
+                            <td style={{ border: '1px solid lightgray' }}>
+                                <div role="button" tabIndex="0" onClick={() => handleViewClick(event.event)}>
+                                    <IconView16 />
+                                </div>
+                            </td>
+                            <td style={{ border: '1px solid lightgray' }}>
+                                <div role="button" tabIndex="0" onClick={() => handleDeleteEvent(event.event)}>
+                                    <IconDelete16 />
+                                </div>
+                            </td>
+                        </tr>
+                    ))}
+                    {/* {filteredEvents.map((event) => (
+                        <tr key={event.event}>
+                            <td style={{ border: '1px solid lightgray' }}><CourseDetailsCourseView id={event.event} key={refreshKey}/></td>
+                            <td style={{ border: '1px solid lightgray' }}>
+                                <div role="button" tabIndex="0" onClick={() => handleViewClick(event.event)}>
+                                    <IconView16 />
+                                </div>
+                            </td>
+                            <td style={{ border: '1px solid lightgray' }}>
+                                <div role="button" tabIndex="0" onClick={() => handleDeleteEvent(event.event)}>
+                                    <IconDelete16 />
+                                </div>
+                            </td>
+                        </tr>
+                    ))} */}
+                </tbody>
+            </table>
+        ) : (
+            <p>No events listed</p>
+        )
+    }
+</div></div>
                     )}
                     <div style={{paddingLeft: '5px'}}>
                         {!showSection && !isViewClicked && <button  onClick={handleButtonClick}><IconAdd16/> New Course Dates</button>}
@@ -519,19 +678,27 @@ const handleInputChangeCourseDate = (name, date) => {
                                         <tr key={item.dataElement.id}>
                                         <td>{item.dataElement.displayName}</td>
                                         <td>
-                                            {item.dataElement.valueType === 'DATE' ? (
-                                                <DatePicker
-    selected={dateFields[item.dataElement.id] ? new Date(dateFields[item.dataElement.id]) : new Date()}
-    onChange={(date) => handleInputChangeCourseDate(item.dataElement.id, date)}
-    dateFormat="yyyy-MM-dd"
-    placeholderText='YYYY-MM-DD'
-/>
-
-                                            ) : item.dataElement.valueType === 'TEXT' ? (
-                                            <input type="text"  onChange={e => handleInputChangeCourse(item.dataElement.id, e.target.value)}  />
-                                            ) : (
-                                            item.dataElement.valueType
-                                            )}
+                                        {item.dataElement.displayName === 'Locaation' ? (
+                                            <OrganisationUnitTree
+                                                // initiallyExpanded={[defStaffOrgUnitId]}
+                                                //initiallyExpanded={"/" + defCourseOrgUnit}
+                                                roots={defCourseOrgUnit} // replace with your root organisation unit ID
+                                                selected={selected}
+                                                onChange={onTreeChange}
+                                                singleSelection
+                                            />
+            ) : item.dataElement.valueType === 'DATE' ? (
+                <DatePicker
+                    selected={dateFields[item.dataElement.id] ? new Date(dateFields[item.dataElement.id]) : new Date()}
+                    onChange={(date) => handleInputChangeCourseDate(item.dataElement.id, date)}
+                    dateFormat="yyyy-MM-dd"
+                    placeholderText='YYYY-MM-DD'
+                />
+            ) : item.dataElement.valueType === 'TEXT' ? (
+                <input type="text" onChange={e => handleInputChangeCourse(item.dataElement.id, e.target.value)} />
+            ) : (
+                item.dataElement.valueType
+            )}
                                         </td>
                                         </tr>
                                     );

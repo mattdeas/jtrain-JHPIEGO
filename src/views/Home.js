@@ -1,12 +1,21 @@
 import React, { useEffect,useState } from 'react';
 import { useDataEngine } from '@dhis2/app-runtime';
-import { utilgetCodeByName } from '../utils/utils';
 import { ReportOverview } from './ReportOverview';
 
 
 export const Home = () => {
     const engine = useDataEngine();
-    const [code, setCode] = useState(null);
+
+    const [config, setConfig] = useState(null);
+
+    useEffect(() => {
+        fetch('/jtrain-config.json')
+            .then(response => response.json())
+            .then(data => sessionStorage.setItem('config', JSON.stringify(data)))
+            .catch(error => console.error('Error fetching config:', error));
+    }, []);
+
+    
 
     const constantsQuery = {
         constants: {
@@ -17,18 +26,7 @@ export const Home = () => {
         }
     };
 
-    // const getCodeByName = (name) => {
-    //     const sessionStorageConstants = sessionStorage.getItem('constants');
-    //     const constants = JSON.parse(sessionStorageConstants);
-    //     if (Array.isArray(constants)) {
-    //         const item = constants.find(d => d.name === name);
-    //         if (item) {
-    //             const codeWithoutName = item.code.replace(name + '-', '');
-    //             return codeWithoutName;
-    //         }
-    //     }
-    //     return null;
-    // };
+    
 
     useEffect(() => {
         const fetchData = async () => {
@@ -36,8 +34,6 @@ export const Home = () => {
                 const response = await engine.query(constantsQuery);
                 if (response && response.constants && Array.isArray(response.constants.constants)) {
                     sessionStorage.setItem('constants', JSON.stringify(response.constants.constants));
-                    const code = utilgetCodeByName('jtrain-TEI-Type-Staff');
-                    setCode(code);
                 }
             } catch (error) {
                 console.error('Error running query', error);
@@ -47,11 +43,15 @@ export const Home = () => {
         fetchData();
     }, [engine]);
 
+    
+    
+
+    //const testvalue = utilConfigConstantValueByName('CourseEndDate');
 
     return (
         <div>
             <h1>Home</h1>
-            {/* <p>Code for 'jtrain-TEI-Type-Staff': {code}</p> */}
+            {/* <p>API Base URL: {testvalue}</p> */}
             <ReportOverview />
         </div>
     );

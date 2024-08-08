@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useDataQuery } from '@dhis2/app-runtime';
-import { utilGetConstantValueByName } from '../utils/utils';
+import { utilConfigConstantValueByName } from '../utils/utils';
 
 export const ReportOverview = () => {
 
-    const defStaffOrgUnitId = utilGetConstantValueByName('jtrain-DefaultStaffOrgUnit')
-    const defCourseOrgUnitId = utilGetConstantValueByName('jtrain-defaultcourseorgunit')
-    const defStaffType = utilGetConstantValueByName('jtrain-TEI-Type-Staff')
-    const defCourseType = utilGetConstantValueByName('jtrain-TEI-Type-Course')
-    const defStaffProgId = utilGetConstantValueByName('jtrain-staffprogram' )
+    
+    //const defStaffOrgUnitId = utilGetConstantValueByName('jtrain-DefaultStaffOrgUnit')
+    // const defCourseOrgUnitId = utilGetConstantValueByName('jtrain-defaultcourseorgunit')
+    // const defStaffType = utilGetConstantValueByName('jtrain-TEI-Type-Staff')
+    // const defCourseType = utilGetConstantValueByName('jtrain-TEI-Type-Course')
+    // const defStaffProgId = utilGetConstantValueByName('jtrain-staffprogram' )
+
+    const defStaffOrgUnitId = utilConfigConstantValueByName('DefaultStaffOrgUnit')
+    const defCourseOrgUnitId = utilConfigConstantValueByName('DefaultCourseOrgUnit')
+    const defStaffType = utilConfigConstantValueByName('TEITypeStaff')
+    const defCourseType = utilConfigConstantValueByName('TEITypeCourse')
+    const defStaffProgId = utilConfigConstantValueByName('StaffProgram')
 
 
     const qryTEI = {
@@ -19,7 +26,8 @@ export const ReportOverview = () => {
                 ou : ou,
                 trackedEntityType : trackedEntityType,
                 fields: ['trackedEntityInstance'],
-            }),
+                paging: 'false',
+                pageSize: 10000,            }),
         },
     }
 
@@ -40,8 +48,6 @@ export const ReportOverview = () => {
             trackedEntityType: defStaffType,
         },
     })
-    console.log('defcourseorg', defCourseOrgUnitId)
-    console.log('defcoursetype', defCourseType)
     
     const { loading: loading2, error: error2, data: dataCourses } = useDataQuery(qryTEI, {
         variables: {
@@ -56,7 +62,6 @@ export const ReportOverview = () => {
             program: defStaffProgId,
         },
     })
-     console.log("Course", dataCourses)
 
     if (loading1 || loading2  || loading3) return <span>Loading...</span>;
     if (error1 || error2 ) return <span>Error: {error1.message}</span>;

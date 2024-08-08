@@ -234,20 +234,21 @@ export const CourseDateStaffShow = ({tei_id, eventID, reload, refreshCount}) => 
                     <Table>
       <TableHead>
       <TableRowHead>
-        <TableCellHead colSpan={7}>Course Details: <CourseDetailsCourseView id={eventID} /> </TableCellHead>
+        <TableCellHead style={{ display: 'flex', flexDirection: 'column', width: '80vw', margin: 0, padding: 0 }}>Course Details: 
+            <CourseDetailsCourseView id={eventID} /> </TableCellHead>
        </TableRowHead>
-        <TableRowHead>
+        {/* <TableRowHead>
         
           <TableCellHead>Last Name</TableCellHead>
           <TableCellHead>First Name</TableCellHead>
           <TableCellHead>Designation</TableCellHead>
           <TableCellHead>Location</TableCellHead>
           <TableCellHead>Open</TableCellHead>
-        </TableRowHead>
+        </TableRowHead> */}
       </TableHead>
-      <TableBody>
+      {/* <TableBody>
       {data.instances.trackedEntityInstances
-    .slice(0, 10)
+    .slice(0, 1000)
     .map(
         ({ trackedEntityInstance, attributes }) => {
             // Create an object from the attributes array
@@ -304,7 +305,7 @@ export const CourseDateStaffShow = ({tei_id, eventID, reload, refreshCount}) => 
             }
         }
     )}
-                        </TableBody>
+                        </TableBody> */}
     </Table>
                 )
             }

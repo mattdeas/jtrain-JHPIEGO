@@ -2,7 +2,7 @@ import { useDataQuery, useDataMutation, useDataEngine } from '@dhis2/app-runtime
 import { CourseDetailsStaffView } from './CourseDetailsStaffView';
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import React, {useState, useEffect} from 'react'
-import { utilGetConstantValueByName } from '../utils/utils';
+import { useFetchAndStoreConstants, utilGetConstantValueByName } from '../utils/utils';
 import { OrganisationUnitTree } from '@dhis2/ui';
 import { CourseDateAttendeesStaffCustomFields } from './CourseDateAttendees-Staff-CustomFields';
 import { IconSave16, IconCross16, IconDelete16 } from '@dhis2/ui';
@@ -75,6 +75,34 @@ const mutation = (id) => ({
 
 
 export const Staffview = () => {
+
+    const engine = useDataEngine();
+    const constantsQuery = {
+        constants: {
+            resource: "constants",
+            params: {
+                fields: ['id', 'name', 'code']
+            }
+        }
+    };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await engine.query(constantsQuery);
+                if (response && response.constants && Array.isArray(response.constants.constants)) {
+                    sessionStorage.setItem('constants', JSON.stringify(response.constants.constants));
+                }
+            } catch (error) {
+                console.error('Error running query', error);
+            }
+        };
+
+        fetchData();
+    }, [engine]);
+
+
+
     const { id } = useParams();
     const [trackedEntityInstance, setTrackedEntityInstance] = useState(null);
     const [formFields, setFormFields] = useState({});
@@ -102,7 +130,6 @@ export const Staffview = () => {
     const defStaffProgId = utilGetConstantValueByName('jtrain-staffprogram')
     const defStaffProgCourseId = utilGetConstantValueByName('jtrain-staffprogram-course')
     const defLocationTEA = utilGetConstantValueByName('jtrain-location-TEA')
-    const defShowScore = utilGetConstantValueByName('jtrain-ShowScore')
     console.log('locationTEA', defLocationTEA)
     const qryTrackedEntityInstance = {
         trackedEntityInstance: {
@@ -130,9 +157,6 @@ export const Staffview = () => {
         type: 'delete',
     };
 
-    const engine = useDataEngine();
-
-    
     const navigate = useNavigate();
 
   const handleDelete = async () => {

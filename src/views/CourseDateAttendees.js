@@ -72,7 +72,20 @@ export const CourseDateAttendees = ({ eventID, dElements }) => {
             </table>
       )}
 
-      <StaffSearchAttendees eventID={eventID} dataEvent={dataEvent} tei_id={dataElementObject && dataElementObject.value ? dataElementObject.value : ""} tei_count={attendeeCount} dElements={dElements} onAssign={handleReload} refreshCount={refreshCount} reload={reload} key={refreshCount}/>
+      {/* <StaffSearchAttendees eventID={eventID} dataEvent={dataEvent} tei_id={dataElementObject && dataElementObject.value ? dataElementObject.value : ""} tei_count={attendeeCount} dElements={dElements} onAssign={handleReload} refreshCount={refreshCount} reload={reload} key={refreshCount}/> */}
+      {dElements && (
+          <StaffSearchAttendees 
+            eventID={eventID} 
+            dataEvent={dataEvent} 
+            tei_id={dataElementObject && dataElementObject.value ? dataElementObject.value : ""} 
+            tei_count={attendeeCount} 
+            dElements={dElements} 
+            onAssign={handleReload} 
+            refreshCount={refreshCount} 
+            reload={reload} 
+            key={refreshCount}
+          />
+        )}
   </div>
     );
 }

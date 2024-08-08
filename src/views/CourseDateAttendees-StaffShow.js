@@ -4,6 +4,7 @@ import { CourseDateAttendeesStaffCustomFields } from './CourseDateAttendees-Staf
 import { utilGetConstantValueByName } from '../utils/utils';
 import { Table, TableBody, TableCell, TableCellHead, TableHead, TableRow, TableRowHead, IconView24, IconDelete24 } from '@dhis2/ui';
 import { Link } from 'react-router-dom';
+import { IconFileDocument24, IconSubtractCircle16 } from '@dhis2/ui';
 
 const ORG_UNITS_QUERY = {
     orgUnits: {
@@ -21,6 +22,8 @@ const query = {
             ou: ou,
             trackedEntityType: trackedEntityType,
             trackedEntityInstance: tei_id,
+            paging: false,
+            pageSize: 1000,
         }),
     },
 };
@@ -34,6 +37,7 @@ const qryStaffCourseDetails = {
             filter: filterEventDE + ':eq:' + EventDE,
             pageSize: 1000,
             fields: 'event,trackedEntityInstance',
+            paging: false,
         }),
     },
 };
@@ -69,6 +73,7 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onDelete }) =
             tei_id: tei_id,
             refreshKey,
             lazy: true,
+            
         },
     });
 
@@ -128,6 +133,16 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onDelete }) =
         );
     });
 
+    const [showCustomFields, setShowCustomFields] = useState({});
+
+    const handleShowCustomFields = (trackedEntityInstance) => {
+        setShowCustomFields(prevState => ({
+            ...prevState,
+            [trackedEntityInstance]: !prevState[trackedEntityInstance]
+        }));
+    };
+
+    
 
     return (
         <div>
@@ -185,16 +200,15 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onDelete }) =
                                 <TableRowHead>
                                     <TableCellHead>Last Name</TableCellHead>
                                     <TableCellHead>First Name</TableCellHead>
-                                    <TableCellHead>Mobile #</TableCellHead>
                                     <TableCellHead>Designation</TableCellHead>
-                                    <TableCellHead>Location</TableCellHead>
-                                    <TableCellHead>View</TableCellHead>
-                                    <TableCellHead colSpan='3' style={{ textAlign: 'center' }}>Course Information</TableCellHead>
+                                    <TableCellHead>View Enrollee</TableCellHead>
+                                    <TableCellHead>View Details</TableCellHead>
+                                    <TableCellHead colSpan='3' style={{ textAlign: 'center' }}>Delete</TableCellHead>
                                 </TableRowHead>
                             </TableHead>
                             <TableBody>
                                 {filteredInstances
-                                    .slice(0, 10)
+                                    .slice(0, 10000)
                                     .map(({ trackedEntityInstance, attributes }) => {
                                         const attributesObj = attributes.reduce((obj, item) => {
                                             obj[item.displayName] = item.value;
@@ -217,13 +231,21 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onDelete }) =
                                             <TableRow key={trackedEntityInstance}>
                                                 <TableCell>{attributesObj['Last Name']}</TableCell>
                                                 <TableCell>{attributesObj['First Name']}</TableCell>
-                                                <TableCell>{attributesObj['Mobile #']}</TableCell>
                                                 <TableCell>{attributesObj['Designation']}</TableCell>
                                                 <TableCell>
-                                                  <Link to={`/staffview/${trackedEntityInstance}`}><IconView24 /></Link>
+                                                  <Link to={`/staffview/${trackedEntityInstance}`}><IconView24 alt="View Enrollee Details" /></Link>
                                                 </TableCell>
-                                                <TableCell>
-                                                     <CourseDateAttendeesStaffCustomFields eventID={matchingEventValue} />
+                                                <TableCell >
+                                                <div onClick={() => handleShowCustomFields(trackedEntityInstance)}>
+                                                    {showCustomFields[trackedEntityInstance] ? (
+                                                        <>
+                                                            <IconSubtractCircle16 />
+                                                            <CourseDateAttendeesStaffCustomFields eventID={matchingEventValue} />
+                                                        </>
+                                                    ) : (
+                                                        <IconFileDocument24 />
+                                                    )}
+                                                </div>
                                                  </TableCell>
                                                  <TableCell>
                                                      <div onClick={() => handleDelete(trackedEntityInstance, matchingEventValue)}><IconDelete24 /></div>

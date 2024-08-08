@@ -12,6 +12,7 @@ import { ResizeObserver } from '@juggle/resize-observer';
 import { Courseview } from './views/Courseview';
 import MyComponent from "./views/TestTree";
 
+
 const ro = new ResizeObserver((entries, observer) => {
 // Changing the body size inside of the observer
 // will cause a resize loop and the next observation will be skipped
@@ -112,9 +113,9 @@ const MyApp = () => {
                             <Tab onClick={() => setSelectedTab('TrainingCapture')}>
                                 <Link to="/trainingcapture">Training Capture</Link>
                             </Tab>
-                            <Tab onClick={() => setSelectedTab('Settomgs')}>
+                            {/* <Tab onClick={() => setSelectedTab('Settomgs')}>
                                 <Link to="/settings">Settings</Link>
-                            </Tab>
+                            </Tab> */}
                         </TabBar>
                         </div>
                     </div>

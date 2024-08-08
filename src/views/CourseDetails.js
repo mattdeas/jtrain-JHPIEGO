@@ -9,11 +9,11 @@ import {
     TableRowHead,
 } from '@dhis2/ui';
 import React, { useState } from 'react';
-import { CourseDateAttendees } from './CourseDateAttendees'
+import { CourseDateAttendees } from './CourseDateAttendees';
 import { utilGetConstantValueByName } from '../utils/utils';
 import { IconView16, IconView24 } from '@dhis2/ui';
-
-
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 const ORG_UNITS_QUERY = {
     orgUnits: {
         resource: 'organisationUnits',
@@ -24,61 +24,72 @@ const ORG_UNITS_QUERY = {
 };
 
 export const CourseDetails = ({ course, updateHeadings }) => {
-
-    const defCourseProgramId = utilGetConstantValueByName('jtrain-courseprogram')
-    const defCourseOrgUnitId = utilGetConstantValueByName('jtrain-defaultcourseorgunit')
-    const defCourseProgramStageId = utilGetConstantValueByName('jtrain-courseprogramstage')
+    const defCourseProgramId = utilGetConstantValueByName('jtrain-courseprogram');
+    const defCourseOrgUnitId = utilGetConstantValueByName('jtrain-defaultcourseorgunit');
+    const defCourseProgramStageId = utilGetConstantValueByName('jtrain-courseprogramstage');
+    const defPartnerDE = utilGetConstantValueByName('jtrain-partnerDE');
     const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
-    console.log('course:', course)
-console.log('orgunitsdata',orgUnitsData)
+
     const qryProgramDataElements = {
         programStages: {
-          resource: `programStages/${defCourseProgramStageId}`,
-          params: {
-            fields: 'programStageDataElements[sortOrder,dataElement[id,displayName]]',
-          },
+            resource: `programStages/${defCourseProgramStageId}`,
+            params: {
+                fields: 'programStageDataElements[sortOrder,dataElement[id,displayName]]',
+            },
         },
-      };
+    };
 
-      const eventQuery = {
+    const eventQuery = {
         events: {
             resource: 'events',
             params: ({ trackedEntityInstance }) => ({
                 program: defCourseProgramId,
                 orgUnit: defCourseOrgUnitId,
                 trackedEntityInstance,
-                fields: 'event,eventDate,dataValues[dataElement,value]'
-            })
-        }
+                fields: 'event,eventDate,dataValues[dataElement,value]',
+            }),
+        },
     };
 
     const { loading, error, data, refetch } = useDataQuery(eventQuery, {
         variables: {
-            trackedEntityInstance: course.trackedEntityInstance
-        }
+            trackedEntityInstance: course.trackedEntityInstance,
+        },
     });
+
     const [selectedRow, setSelectedRow] = useState(null);
     const [showCourseDetails, setShowCourseDetails] = useState(false);
-    const [selectedCourseDate, setSelectedCourseDate] = useState(''); 
+    const [selectedCourseDate, setSelectedCourseDate] = useState('');
     const [showTable, setShowTable] = useState(true);
-    console.log('id:',course)
-
-    
-    
-    const dProgramDE = useDataQuery(qryProgramDataElements);
-    console.log('dataStages', dProgramDE);
-    if (dProgramDE.data && dProgramDE.data.programStages) {
-        console.log('dataStagesDE', dProgramDE.data.programStages.programStageDataElements);
-    }
-
+    const [locationFilter, setLocationFilter] = useState('');
+    const [partnerFilter, setPartnerFilter] = useState('');
     const [refreshKey, setRefreshKey] = useState(0);
+    const [values, setValues] = useState({ location: '', partner: '' });
+    const [filterDate, setFilterDate] = useState('');
 
-    // Check if data is loaded
-    if (dProgramDE.loading) return 'Loading...';
-    if (loading) return 'Loading...';
+    const dProgramDE = useDataQuery(qryProgramDataElements);
+
+    const handleTextChange = (event) => {
+        const { name, value } = event.target;
+        setValues({
+            ...values,
+            [name]: value,
+        });
+        if (name === 'location') {
+            setLocationFilter(value);
+        } else if (name === 'partner') {
+            setPartnerFilter(value);
+        }
+    };
+
+    const handleFilterCourseDate = (date) => { 
+        setFilterDate(date);
+    };
+
+    if (dProgramDE.loading || loading) return 'Loading...';
     if (error) return error.message;
     if (!data || !data.events) return 'No data';
-        // Transform the data into an array of objects where each object represents a row in the table
+
     const rows = data.events.events.map(({ event, eventDate, dataValues }) => {
         const row = { event, eventDate };
         dataValues.forEach(({ dataElement, value }) => {
@@ -90,99 +101,140 @@ console.log('orgunitsdata',orgUnitsData)
     const dataElements = [...new Set(data.events.events.flatMap(({ dataValues }) => dataValues.map(({ dataElement }) => dataElement)))];
 
     const onButtonClick = (variablesToPassBack) => {
-        
         const variablesString = Object.entries(variablesToPassBack)
-        .map(([key, value]) => `${key}-${value}`)
-        .join('-');
-        // Use variablesToPassBack in your function
-
+            .map(([key, value]) => `${key}-${value}`)
+            .join('-');
         updateHeadings(variablesString);
-
     };
+
+
+    const filteredRows = rows.filter(row => {
+        const partnerMatch = row['hGGDYuGuVeX'] ? row['hGGDYuGuVeX'].toLowerCase().includes(partnerFilter.toLowerCase()) : false;
+    
+        // Parse the dates
+        const startDate = new Date(row['N3rXacKJAjy']);
+        const endDate = new Date(row['ODO4HZT4XSg']);
+        const filterDateParsed = filterDate ? new Date(filterDate) : null;
+    
+        // Check if filterDate is between startDate and endDate
+        const dateMatch = filterDateParsed ? (filterDateParsed >= startDate && filterDateParsed <= endDate) : false;
+    
+        // Apply the appropriate filter based on the presence of partnerFilter and filterDate
+        if (!partnerFilter && filterDateParsed) {
+             return dateMatch;
+        } else if (partnerFilter && !filterDateParsed) {
+             return partnerMatch;
+        } else {
+            return partnerMatch || dateMatch;
+        }
+        return false;        
+    });
+    
 
     return (
         <div>
-            <table style={{width: '100%'}}>
-            
-                <tr>
-                    <td style={{verticalAlign: 'top'}}>
-                    {showTable && (
-                        <div style={{ width: '100%' }}>
-                            <h3>Course Details</h3>
-                            <p>Course Name: {course.courseName}</p>
-    
-                            {loading && 'Loading...'}
-                            {error && error.message}
-                            {showTable && data?.events && (
-                                <Table>
-                                    <TableRowHead>
-                                        {dProgramDE.data.programStages.programStageDataElements.map((dataElementObject, index) => {
-                                            if (dataElementObject.dataElement.displayName === 'jtrain_course_attendees') return null;
-                                            return (
-                                                <TableCellHead key={index}>
-                                                    {dataElementObject.dataElement.displayName === 'jtrain_course_attendees_count' ? '# Attendees' : dataElementObject.dataElement.displayName}
-                                                </TableCellHead>
-                                            );
-                                        })}
-                                    </TableRowHead>
-                                    <TableBody>
-                                        {rows.map(({ event, eventDate, ...values }) => (
-                                            <TableRow key={event} style={event === selectedRow ? {backgroundColor: 'blue'} : {}}>
-                                                {dProgramDE.data.programStages.programStageDataElements.map(dataElementObject => {
-                                                    if (dataElementObject.dataElement.displayName === 'jtrain_course_attendees') return null;
-                                                    if (dataElementObject.dataElement.displayName === 'Location') 
-                                                    return (
-                                                        <TableCell key={dataElementObject.dataElement.id}>
-                                                            {orgUnitsData.orgUnits.organisationUnits.find(ou => ou.id === values[dataElementObject.dataElement.id])?.displayName}
-                                                        </TableCell>
-                                                    
-                                                    );
-                                                    
-                                                    return (
-                                                        <TableCell key={dataElementObject.dataElement.id}>
-                                                            
-                                                            {values[dataElementObject.dataElement.id]}
-                                                        </TableCell>
-                                                    );
-                                                    
-                                                })}
-                                                <TableCell rowSpan={2}>
-                                                <button onClick={() => {
-                                                    const selectedCourseData = {
-                                                        event: event,
-                                                        ...values
-                                                    };
+            <table style={{ width: '100%' }}>
+                <tbody>
+                    <tr>
+                        <td style={{ verticalAlign: 'top' }}>
+                            {showTable && (
+                                <div style={{ width: '100%' }}>
+                                    <h3>Course Details</h3>
+                                    <p>Course Name: {course.courseName}</p>
+                                    <div>
+                                        <label>
+                                            Date:
+                                            <DatePicker
+                                                selected={filterDate}
+                                                onChange={(date) => handleFilterCourseDate(date)}
+                                                dateFormat="yyyy-MM-dd"
+                                                placeholderText='YYYY-MM-DD'
+                                            />
+                                        </label>
+                                        <br />
+                                        <label>
+                                            Partner:
+                                            <input
+                                                type="text"
+                                                name="partner"
+                                                value={values.partner}
+                                                onChange={handleTextChange}
+                                            />
+                                        </label>
+                                        
+                                    </div>
+                                    {loading && 'Loading...'}
+                                    {error && error.message}
+                                    {showTable && data?.events && (
+                                        <Table>
+                                            <TableHead>
+                                                <TableRowHead>
+                                                    {dProgramDE.data.programStages.programStageDataElements.map((dataElementObject, index) => {
+                                                        if (dataElementObject.dataElement.displayName === 'jtrain_course_attendees') return null;
+                                                        return (
+                                                            <TableCellHead key={index}>
+                                                                {dataElementObject.dataElement.displayName === 'jtrain_course_attendees_count' ? '# Attendees' : dataElementObject.dataElement.displayName}
+                                                            </TableCellHead>
+                                                        );
+                                                    })}
+                                                    <TableCellHead>View</TableCellHead>
+                                                </TableRowHead>
+                                            </TableHead>
+                                            <TableBody>
+                                                {filteredRows.map(({ event, eventDate, ...values }) => (
+                                                    <TableRow key={event} style={event === selectedRow ? { backgroundColor: 'blue' } : {}}>
+                                                        {dProgramDE.data.programStages.programStageDataElements.map(dataElementObject => {
+                                                            if (dataElementObject.dataElement.displayName === 'jtrain_course_attendees') return null;
+                                                            if (dataElementObject.dataElement.displayName === 'Location')
+                                                                return (
+                                                                    <TableCell key={dataElementObject.dataElement.id}>
+                                                                        {orgUnitsData.orgUnits.organisationUnits.find(ou => ou.id === values[dataElementObject.dataElement.id])?.displayName}
+                                                                    </TableCell>
+                                                                );
 
-                                                    // Gather the variables to pass back
-                                                    const variablesToPassBack = dProgramDE.data.programStages.programStageDataElements.reduce((acc, dataElementObject) => {
-                                                        if (!dataElementObject.dataElement.displayName.startsWith('jtrain')) {
-                                                            acc[dataElementObject.dataElement.displayName] = values[dataElementObject.dataElement.id];
-                                                        }
-                                                        return acc;
-                                                    }, {});
+                                                            return (
+                                                                <TableCell key={dataElementObject.dataElement.id}>
+                                                                    {values[dataElementObject.dataElement.id]}
+                                                                </TableCell>
+                                                            );
+                                                        })}
+                                                        <TableCell rowSpan={1}>
+                                                            <button onClick={() => {
+                                                                const selectedCourseData = {
+                                                                    event: event,
+                                                                    ...values
+                                                                };
 
-                                                    setSelectedCourseDate(selectedCourseData);
-                                                    setSelectedRow(event); // Set the selected row
-                                                    setShowCourseDetails(true);
-                                                    setRefreshKey(prevKey => prevKey + 1); // Increment the refresh key
-                                                    setShowTable(false);
-                                                    onButtonClick(variablesToPassBack);
-                                                }}><IconView24 /></button>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
+                                                                const variablesToPassBack = dProgramDE.data.programStages.programStageDataElements.reduce((acc, dataElementObject) => {
+                                                                    if (!dataElementObject.dataElement.displayName.startsWith('jtrain')) {
+                                                                        acc[dataElementObject.dataElement.displayName] = values[dataElementObject.dataElement.id];
+                                                                    }
+                                                                    return acc;
+                                                                }, {});
+
+                                                                setSelectedCourseDate(selectedCourseData);
+                                                                setSelectedRow(event);
+                                                                setShowCourseDetails(true);
+                                                                setRefreshKey(prevKey => prevKey + 1);
+                                                                setShowTable(false);
+                                                                onButtonClick(variablesToPassBack);
+                                                            }}><IconView24 /></button>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    )}
+                                </div>
                             )}
-                        </div>
-                    )}
-                    </td>
-                    <td style={{ rowspan: 2 }}>
-                        <div>
-                            {selectedCourseDate.event && <CourseDateAttendees key={refreshKey} eventID={selectedCourseDate.event} dElements={dataElements}/>}
-                        </div>
-                    </td>
-                </tr>
+                        </td>
+                        <td rowSpan={1}>
+                            <div>
+                                {selectedCourseDate.event && <CourseDateAttendees key={refreshKey} eventID={selectedCourseDate.event} dElements={dataElements} />}
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     );

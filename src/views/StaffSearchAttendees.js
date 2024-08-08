@@ -111,7 +111,7 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
     const [pageSize, setPageSize] = useState(50); // Items per page
     const [searchLastName, setLastName] = useState('');
     const [searchFirstName, setFirstName] = useState('');
-    
+    const [assignedPerson, setAssignedPerson] = useState(null);
 
     const { loading, error, data, refetch } = useDataQuery(query, {
         variables: {
@@ -319,7 +319,7 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
         }
         setIsLoading(false);
     }
-
+    
     
     return (
         
@@ -346,9 +346,19 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
     // if there is any data available
     data?.instances?.trackedEntityInstances && (
         <div>
-        <input type="text" onChange={handleSearchTermChangeLast} placeholder="Last Name" />
-<input type="text" onChange={handleSearchTermChangeFirst} placeholder="First Name" />
-<button onClick={handleSearch}>Search</button>
+        <input 
+        type="text" 
+        onChange={handleSearchTermChangeLast} 
+        placeholder="Last Name" 
+        onKeyPress={(e) => { if (e.key === 'Enter') handleSearch(); }}
+        />
+        <input 
+        type="text" 
+        onChange={handleSearchTermChangeFirst} 
+        placeholder="First Name" 
+        onKeyPress={(e) => { if (e.key === 'Enter') handleSearch(); }}
+        />
+<button onClick={handleSearch}>Search</button>{assignedPerson && <p>{assignedPerson} was added.</p>}
         <Table>
 <TableHead>
 <TableRowHead>
@@ -389,7 +399,8 @@ return (
         {/* <TableCell>{trackedEntityInstance}</TableCell> */}
            
         <TableCell align="left">
-            <div onClick={() => handleAssign(trackedEntityInstance)}>
+            <div onClick={() => {handleAssign(trackedEntityInstance);
+                setAssignedPerson(`${attributesObj['First Name']} ${attributesObj['Last Name']}`);}}>
             <IconAddCircle24 />
             </div>
         </TableCell>

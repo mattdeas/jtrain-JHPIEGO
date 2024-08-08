@@ -38,11 +38,17 @@ export const useFetchAndStoreConstants = () => {
     return constants;
 };
 
+export const utilConfigConstantValueByName = (name) => {
+    const config = JSON.parse(sessionStorage.getItem('config'));
+    if (!config) return null;
+    return config[name] || null;
+};
+
 export const utilGetConstantValueByName = (name) => {
     const sessionStorageConstants = sessionStorage.getItem('constants');
-    if(sessionStorageConstants == null)
-    {
-        sessionStorageConstants = getConsta
+    if (!sessionStorageConstants) {
+        console.error('Constants not found in sessionStorage. Ensure constants are fetched and stored before calling this function.');
+        return null;
     }
     const constants = JSON.parse(sessionStorageConstants);
     if (Array.isArray(constants)) {
@@ -52,10 +58,8 @@ export const utilGetConstantValueByName = (name) => {
             return codeWithoutName;
         }
     }
-
     return null;
 };
-
 
 export const utilgetCodeByName = (name) => {
     const sessionStorageConstants = sessionStorage.getItem('constants');
