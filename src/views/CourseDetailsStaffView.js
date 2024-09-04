@@ -10,7 +10,7 @@ import {
     TableRowHead,
 } from '@dhis2/ui';
 import React, { useEffect, useState } from 'react';
-import { utilGetConstantValueByName } from '../utils/utils';
+import { utilConfigConstantValueByName } from '../utils/utils';
 
 
 
@@ -58,8 +58,8 @@ const teiQuery = {
 
 export const CourseDetailsStaffView = ({ course }) => {
   console.log('course', course)
-  const defCourseProgramId = utilGetConstantValueByName('jtrain-courseprogramstage')
-  const defCourseTEITypeID = utilGetConstantValueByName('jtrain-TEI-Type-Course')
+  // const defCourseProgramId =  utilConfigConstantValueByName('CourseProgramStageId')
+  const defCourseProgramId =  "h9zPG79AmgH";
   const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
   const { loading, error, data } = useDataQuery({
       programStages: {

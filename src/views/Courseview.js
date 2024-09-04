@@ -4,10 +4,10 @@ import { CourseDateAttendees } from './CourseDateAttendees';
 import { CourseDateStaffShow } from './CourseDate-StaffShow';
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import React, {useState, useEffect} from 'react'
-import { utilGetConstantValueByName, utilgetCodeByName } from '../utils/utils';
+import { utilConfigConstantValueByName } from '../utils/utils';
 import { CourseEditEvent} from './CourseEditEvent'
 import { Calendar } from '@dhis2-ui/calendar'
-import { IconAdd16, IconDelete16, IconCross16, IconSave16, IconView16 } from '@dhis2/ui';
+import { IconAdd16, IconDelete16, IconCross16, IconSave16, IconView16, IconEdit16 } from '@dhis2/ui';
 import { CalendarInput } from '@dhis2/ui';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -33,9 +33,9 @@ window.addEventListener('resize', handleResize);
 const today = new Date();
 const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-const defCourseOrgUnitId = utilGetConstantValueByName('jtrain-defaultcourseorgunit')
-    const defCourseProgramId = utilgetCodeByName('jtrain-courseprogram')
-    const defCourseProgStageId = utilgetCodeByName('jtrain-courseprogramstage')
+const defCourseOrgUnitId = utilConfigConstantValueByName('DefaultCourseOrgUnit')
+    const defCourseProgramId = utilConfigConstantValueByName('CourseProgram')
+    const defCourseProgStageId = utilConfigConstantValueByName('CourseProgramStageId')
 
 
 
@@ -119,7 +119,14 @@ const mutationCourseEvent = (program, programStage, orgUnit, trackedEntityInstan
       ],
     }),
   });
-
+  const ORG_UNITS_QUERY = {
+    orgUnits: {
+        resource: 'organisationUnits',
+        params: {
+            paging: false,
+        },
+    },
+};
 
 export const Courseview = () => {
     const { id } = useParams();
@@ -127,15 +134,21 @@ export const Courseview = () => {
     const [trackedEntityInstance, setTrackedEntityInstance] = useState(null);
     const [formFields, setFormFields] = useState({});
     const [formFieldsCourse, setFormFieldsCourse] = useState({});
+    const [formFieldsCourseEdit, setFormFieldsCourseEdit] = useState({});
     const [dateFields, setDateFields] = useState({});
-    
+    const [showTree, setShowTree] = useState(false);
+
     const [isViewClicked, setisViewClicked] = useState(false);
     const [editCourseShow, setEditCourseShow] = useState(false);
     const [mutate, { loading, error }] = useDataMutation(mutation)
 
-    const defCourseOrgUnit = utilGetConstantValueByName('jtrain-defaultcourseorgunit')
-    const defLocationDE = utilGetConstantValueByName('jtrain-location-DE')
+    const defCourseOrgUnit = utilConfigConstantValueByName('DefaultCourseOrgUnit')
+    const defLocationDE = utilConfigConstantValueByName('LocationDE')
+    const defCourseEndDate =  utilConfigConstantValueByName('CourseEndDate')
 
+    const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
+
+ 
 
     const { loading: loadingEntity, error: errorEntity, data: dataEntity } = useDataQuery(qryTrackedEntityInstance, {
         variables: {
@@ -167,6 +180,9 @@ export const Courseview = () => {
     }
     
     const [showSection, setShowSection] = useState(false);
+    const [showSectionEdit, setShowSectionEdit] = useState(false);
+    const [selectedEditEventDE, setSelectedEditEventDE] = useState(null);
+    const [selectedLocationName, setSelectedLocationName] = useState('');
 
     const deleteMutation = {
         resource: 'trackedEntityInstances',
@@ -221,8 +237,37 @@ export const Courseview = () => {
     }
 };
 
-  const handleEditButtonClick = () => {
-    setEditCourseShow(true);
+  const handleEditEvent = (event) => {
+    const dataValuesObject = event.dataValues.reduce((acc, { dataElement, value }) => {
+        acc[dataElement] = value;
+        return acc;
+    }, {});
+
+    const selectedLocation = dataValuesObject[defLocationDE]; // Extract the last value
+    if (selectedLocation) {
+        setSelectedLocationName(
+            selectedLocation
+                .toString()
+                .split('/')
+                .slice(2)
+                .map(id => {
+                    const orgUnit = orgUnitsData?.orgUnits?.organisationUnits?.find(orgUnit => orgUnit.id === id);
+                    return orgUnit ? orgUnit.displayName : id;
+                })
+                .join(' - ')
+        );
+    } else {
+        setSelectedLocationName('');
+    }
+
+
+    setSelected(selectedLocation ? [selectedLocation] : [])
+    console.log(selectedLocation)
+    setSelectedEditEventDE(dataValuesObject);
+    setSelectedEditEvent(event);
+    setFormFieldsEdit(dataValuesObject);
+    setShowSectionEdit(true);
+    console.log('selectedEditEventDE',selectedEditEventDE)
     };
 
   const handleInputChange = (event) => {
@@ -259,6 +304,15 @@ const onTreeChange = ({ selected }) => {
     }));
 }
 
+const onTreeChangeEdit = ({ selected }) => {
+    setSelected(selected);
+
+    setFormFieldsEdit(prevFields => ({
+        ...prevFields,
+        [defLocationDE]: selected[0], // assuming selected is an array and you want to store the first value
+    }));
+}
+
 const handleInputChangeCourseDate = (name, date) => {
     if (date) {
         const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
@@ -267,6 +321,22 @@ const handleInputChangeCourseDate = (name, date) => {
 
 
         setFormFieldsCourse(prevFields => ({
+            ...prevFields,
+            [name]: value,
+        }));
+
+        setDateFields(prevFields => ({
+            ...prevFields,
+            [name]: value,
+        }));
+    }
+};
+
+const handleInputChangeCourseDateEdit = (name, date) => {
+    if (date) {
+        const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+        setFormFieldsEdit(prevFields => ({
             ...prevFields,
             [name]: value,
         }));
@@ -291,8 +361,8 @@ const handleInputChangeCourseDate = (name, date) => {
         const dataValues = Object.entries(formFieldsCourse).map(([dataElement, value]) => ({ dataElement, value }));
         
         //Default values for Course Attendees and Counts
-        const defCourseAttendeesId = utilGetConstantValueByName('jtrain-course-attendees')
-        const defCourseAttendeesCountId = utilGetConstantValueByName('jtrain-course-attendees-count')
+        const defCourseAttendeesId = utilConfigConstantValueByName('CourseAttendees')
+        const defCourseAttendeesCountId = utilConfigConstantValueByName('CourseAttendeesCount')
         dataValues.push({ dataElement: defCourseAttendeesId, value: '' });
         dataValues.push({ dataElement: defCourseAttendeesCountId, value: '0' });
 
@@ -309,6 +379,44 @@ const handleInputChangeCourseDate = (name, date) => {
           console.error('Error creating event:', error);
         }
       };
+
+      const handleSaveEdit = async () => {
+        const dataValues = Object.entries(formFieldsEdit).map(([dataElement, value]) => ({ dataElement, value }));
+    console.log('selectedEditEvent',selectedEditEvent.event)
+        // Default values for Course Attendees and Counts
+        //const defCourseAttendeesId = utilConfigConstantValueByName('CourseAttendees');
+        //const defCourseAttendeesCountId = utilConfigConstantValueByName('CourseAttendeesCount');
+        //dataValues.push({ dataElement: defCourseAttendeesId, value: '' });
+        //dataValues.push({ dataElement: defCourseAttendeesCountId, value: '0' });
+    
+        // Create the mutation for updating the event
+        const updateEventMutation = {
+            resource: 'events',
+            type: 'update',
+            id: selectedEditEvent.event, // Assuming selectedEditEvent contains the event ID
+            data: {
+                program: defCourseProgramId,
+                programStage: defCourseProgStageId,
+                orgUnit: defCourseOrgUnitId,
+                trackedEntityInstance: id,
+                dataValues: dataValues,
+                status: 'ACTIVE',
+                eventDate: formattedDate,
+            },
+        };
+    
+        console.log(dataValues);
+    
+        try {
+            const response = await engine.mutate(updateEventMutation);
+            console.log('Event updated successfully', response);
+    
+            // Refresh the page
+           // window.location.reload();
+        } catch (error) {
+            console.error('Error updating event:', error);
+        }
+    };
     
     <button onClick={() => handleAssign(trackedEntityInstance)}>
                                 Assign
@@ -317,6 +425,8 @@ const handleInputChangeCourseDate = (name, date) => {
   const handleButtonClick = () => {
     setShowSection(true);
   };
+
+  
 
     const [responseMessage, setResponseMessage] = useState('');
     const { loading: loadingEvents, error: errorEvents, data: eventsData, refetch: refetchEvent } = useDataQuery(eventsQuery(id));
@@ -327,8 +437,8 @@ const handleInputChangeCourseDate = (name, date) => {
             
             // Sort events based on the date value of the dataElement "ODO4HZT4XSg"
             const sortedEvents = eventsData.events.events.sort((a, b) => {
-                const dateA = new Date(a.dataValues.find(dv => dv.dataElement === "ODO4HZT4XSg")?.value);
-                const dateB = new Date(b.dataValues.find(dv => dv.dataElement === "ODO4HZT4XSg")?.value);
+                const dateA = new Date(a.dataValues.find(dv => dv.dataElement === defCourseEndDate)?.value);
+                const dateB = new Date(b.dataValues.find(dv => dv.dataElement === defCourseEndDate)?.value);
                 return dateB - dateA;
             });
     
@@ -402,6 +512,32 @@ const handleInputChangeCourseDate = (name, date) => {
         }
     }, [trackedEntityInstance]);
 
+
+    const findAttributeValueEdit = (attributeId) => {
+        
+        //Location return as array
+        if(attributeId === defLocationTEA) {
+            if(formFields[attributeId] !== undefined && formFields[attributeId] !== null && formFields[attributeId] !== '') {
+                return [formFields[attributeId]];
+            }
+            else
+            return [];
+        }
+        // If the attribute value exists in formFields, return it
+
+        if (formFields[attributeId]) {
+            return formFields[attributeId];
+        }
+    
+        // Otherwise, find the attribute value in trackedEntityInstance
+        if (trackedEntityInstance) {
+            const attribute = trackedEntityInstance.find(attr => attr.attribute === attributeId);
+            return attribute ? attribute.value : '';
+        }
+    
+        return '';
+    };
+
     const findAttributeValue = (attributeId) => {
         // If the attribute value exists in formFields, return it
         if (formFields[attributeId]) {
@@ -418,6 +554,7 @@ const handleInputChangeCourseDate = (name, date) => {
     };
 
     const [selectedEvent, setSelectedEvent] = useState(null);
+    const [selectedEditEvent, setSelectedEditEvent] = useState(null);
 
     const handleViewClick = (event) => {
         setSelectedEvent(event);
@@ -449,34 +586,44 @@ const handleInputChangeCourseDate = (name, date) => {
         }
     };
 
+
+
+    
     const handleFilterCourseDate = (date) => { 
         setFilterDate(date);
     };
+    const [formFieldsEdit, setFormFieldsEdit] = useState(selectedEditEventDE || {});
 
-    const filterEvents = (events, partnerFilter, filterDate) => {
-        return events.filter(event => {
-            const dataValues = event.dataValues.reduce((acc, dataValue) => {
-                acc[dataValue.dataElement] = dataValue.value;
-                return acc;
-            }, {});
-    
-            const partnerMatch = dataValues['hGGDYuGuVeX'] ? dataValues['hGGDYuGuVeX'].toLowerCase().includes(partnerFilter.toLowerCase()) : false;
-    
-            const startDate = new Date(dataValues['N3rXacKJAjy']);
-            const endDate = new Date(dataValues['ODO4HZT4XSg']);
-            const filterDateParsed = filterDate ? new Date(filterDate) : null;
-    
-            const dateMatch = filterDateParsed ? (filterDateParsed >= startDate && filterDateParsed <= endDate) : false;
-    
-            if (!partnerFilter && filterDateParsed) {
-                return dateMatch;
-            } else if (partnerFilter && !filterDateParsed) {
-                return partnerMatch;
-            } else {
-                return partnerMatch || dateMatch;
-            }
-        });
+    const handleInputChangeCourseEdit = (dataElementId, value) => {
+        setFormFieldsEdit(prevFields => ({
+            ...prevFields,
+            [dataElementId]: value,
+        }));
     };
+    // const filterEvents = (events, partnerFilter, filterDate) => {
+    //     return events.filter(event => {
+    //         const dataValues = event.dataValues.reduce((acc, dataValue) => {
+    //             acc[dataValue.dataElement] = dataValue.value;
+    //             return acc;
+    //         }, {});
+    
+    //         const partnerMatch = dataValues['hGGDYuGuVeX'] ? dataValues['hGGDYuGuVeX'].toLowerCase().includes(partnerFilter.toLowerCase()) : false;
+    
+    //         const startDate = new Date(dataValues['N3rXacKJAjy']);
+    //         const endDate = new Date(dataValues['ODO4HZT4XSg']);
+    //         const filterDateParsed = filterDate ? new Date(filterDate) : null;
+    
+    //         const dateMatch = filterDateParsed ? (filterDateParsed >= startDate && filterDateParsed <= endDate) : false;
+    
+    //         if (!partnerFilter && filterDateParsed) {
+    //             return dateMatch;
+    //         } else if (partnerFilter && !filterDateParsed) {
+    //             return partnerMatch;
+    //         } else {
+    //             return partnerMatch || dateMatch;
+    //         }
+    //     });
+    // };
     
     //const filteredEvents = filterEvents(eventsData.events.events, partnerFilter, filterDate);
     //console.log('filteredEvents',filteredEvents)
@@ -544,7 +691,7 @@ const handleInputChangeCourseDate = (name, date) => {
             <div>
                 {!editCourseShow && (
                     <div>
-                        <button type="button" onClick={handleEditButtonClick}>Edit Course Details</button>
+                        <button type="button" >Edit Course Details</button>
                         <Link to="/coursesearch">
                             <button type="button"><IconCross16/> Close</button>
                         </Link>
@@ -622,41 +769,34 @@ const handleInputChangeCourseDate = (name, date) => {
                 <tbody>
                     {eventsData.events.events.map((event) => (
                         <tr key={event.event}>
-                            <td style={{ border: '1px solid lightgray' }}><CourseDetailsCourseView id={event.event} key={refreshKey}/></td>
-                            <td style={{ border: '1px solid lightgray' }}>
+                            <td ><CourseDetailsCourseView id={event.event} key={refreshKey}/></td>
+                            <td >
                                 <div role="button" tabIndex="0" onClick={() => handleViewClick(event.event)}>
-                                    <IconView16 />
+                                 <b><IconView16 /></b>
                                 </div>
                             </td>
-                            <td style={{ border: '1px solid lightgray' }}>
+                            <td>
+                            <div role="button" tabIndex="0" onClick={() => handleEditEvent(event)}>
+                                    <IconEdit16 />
+                                </div>
+                            </td>
+                            <td>
                                 <div role="button" tabIndex="0" onClick={() => handleDeleteEvent(event.event)}>
                                     <IconDelete16 />
                                 </div>
                             </td>
                         </tr>
                     ))}
-                    {/* {filteredEvents.map((event) => (
-                        <tr key={event.event}>
-                            <td style={{ border: '1px solid lightgray' }}><CourseDetailsCourseView id={event.event} key={refreshKey}/></td>
-                            <td style={{ border: '1px solid lightgray' }}>
-                                <div role="button" tabIndex="0" onClick={() => handleViewClick(event.event)}>
-                                    <IconView16 />
-                                </div>
-                            </td>
-                            <td style={{ border: '1px solid lightgray' }}>
-                                <div role="button" tabIndex="0" onClick={() => handleDeleteEvent(event.event)}>
-                                    <IconDelete16 />
-                                </div>
-                            </td>
-                        </tr>
-                    ))} */}
+                    
                 </tbody>
             </table>
         ) : (
             <p>No events listed</p>
         )
     }
-</div></div>
+</div>
+
+</div>
                     )}
                     <div style={{paddingLeft: '5px'}}>
                         {!showSection && !isViewClicked && <button  onClick={handleButtonClick}><IconAdd16/> New Course Dates</button>}
@@ -678,15 +818,18 @@ const handleInputChangeCourseDate = (name, date) => {
                                         <tr key={item.dataElement.id}>
                                         <td>{item.dataElement.displayName}</td>
                                         <td>
-                                        {item.dataElement.displayName === 'Locaation' ? (
+                                        {item.dataElement.displayName === 'Location' ? (
+                                        <div>
                                             <OrganisationUnitTree
-                                                // initiallyExpanded={[defStaffOrgUnitId]}
+                                                initiallyExpanded={selected}
                                                 //initiallyExpanded={"/" + defCourseOrgUnit}
                                                 roots={defCourseOrgUnit} // replace with your root organisation unit ID
                                                 selected={selected}
                                                 onChange={onTreeChange}
                                                 singleSelection
                                             />
+                                        
+                                        </div>
             ) : item.dataElement.valueType === 'DATE' ? (
                 <DatePicker
                     selected={dateFields[item.dataElement.id] ? new Date(dateFields[item.dataElement.id]) : new Date()}
@@ -707,6 +850,72 @@ const handleInputChangeCourseDate = (name, date) => {
                             </table>
                             <button onClick={() => setShowSection(false)}><IconCross16 />Cancel</button>
                             <button onClick={handleSave}><IconSave16 /> Save</button>
+                            </>
+                        )}
+                    </div>
+                    <div>
+                        {showSectionEdit && dataProgramDE && (
+                            <>
+                            <table>
+                                <thead>
+                                edit
+                                </thead>
+                                <tbody>
+                                {dataProgramDE.qPDE.programStageDataElements.map((item, index) => {
+                                    if (item.dataElement.displayName.startsWith('jtrain')) {
+                                        return null;
+                                    }
+
+                                    return (
+                                        <tr key={item.dataElement.id}>
+                                        <td>{item.dataElement.displayName}</td>
+                                        <td>
+                                        {item.dataElement.displayName === 'Location' ? (
+                                            <div>
+                                            {/* <input type="text" value={selectedEditEventDE[item.dataElement.id] + '-' + defCourseOrgUnit || ''} />\
+                                            <input 
+        type="text" 
+        value={selected || selectedEditEventDE[item.dataElement.id] || ''} 
+    /> */}
+<p>{selectedLocationName}</p>
+
+    <button onClick={() => setShowTree(!showTree)}>
+                                            Change Location
+                                        </button>
+      {showTree &&                                       
+                                            <OrganisationUnitTree
+                                                initiallyExpanded={[defCourseOrgUnit]}
+                                                //initiallyExpanded={"/" + defCourseOrgUnit}
+                                                roots={defCourseOrgUnit} // replace with your root organisation unit ID
+                                                selected={selected}
+                                                onChange={onTreeChangeEdit}
+                                                singleSelection
+                                            />}
+                                            
+                                            </div>
+            ) : item.dataElement.valueType === 'DATE' ? (
+                <DatePicker
+                    selected={formFieldsEdit[item.dataElement.id] ? new Date(formFieldsEdit[item.dataElement.id]) : null}
+                    onChange={(date) => handleInputChangeCourseDateEdit(item.dataElement.id, date)}
+                    dateFormat="yyyy-MM-dd"
+                    placeholderText='YYYY-MM-DD'
+                />
+            ) : item.dataElement.valueType === 'TEXT' ? (
+                <input 
+                    type="text" 
+                    value={formFieldsEdit[item.dataElement.id] }
+                    onChange={e => handleInputChangeCourseEdit(item.dataElement.id, e.target.value)}  />
+            ) : (
+                item.dataElement.valueType
+            )}
+                                        </td>
+                                        </tr>
+                                    );
+                                    })}
+                                </tbody>
+                            </table>
+                            <button onClick={() => setShowSection(false)}><IconCross16 />Cancel</button>
+                            <button onClick={handleSaveEdit}><IconSave16 /> Save</button>
                             </>
                         )}
                     </div>

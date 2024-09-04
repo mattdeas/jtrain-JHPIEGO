@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import { TabBar, Tab } from '@dhis2-ui/tab';
 import { Home,  CourseSearch, StaffSearch, Staffadd, TrainingCapture, Staffview, Settings,
-    CourseDetailsStaffView, BulkStaffAdd, CourseDateAttendeesStaffCustomFields, CourseDetailsCourseView, CourseAttendee, CourseDateAttendees} from './views';
+    CourseDetailsStaffView,  CourseDateAttendeesStaffCustomFields, CourseDetailsCourseView, CourseAttendee, CourseDateAttendees} from './views';
 
 
 import styles from './App.module.css';
@@ -54,6 +54,40 @@ const MainContent = () => {
     
     const [selectedTab, setSelectedTab] = useState('');
     const location = useLocation();
+    const [config, setConfig] = useState(null);
+
+    useEffect(() => {
+        const config = {
+            "CourseEndDate": "ODO4HZT4XSg",
+            "CourseStartDate": "N3rXacKJAjy",
+            "DefaultStaffOrgUnit": "Esaneu7V7rq",
+            "TEITypeCourse": "EcbFeAtWDmP",
+            "TEITypeStaff": "AsxfMid3pVW",
+            "CourseAttendees": "r6m3Tekr5DO",
+            "CourseAttendeesCount": "IA7YxfolpEM",
+            "CourseEventId": "dTrDnb4e8Ee",
+            "CoursePostTestScore": "zvXaKJnl14I",
+            "CoursePretestSscore": "IAphSuyuH15",
+            "CourseProgram": "Lw1g7haLUd9",
+            "CourseProgramStageId": "h9zPG79AmgH",
+            "DefaultCourseOrgUnit": "Esaneu7V7rq",
+            "Location": "Esaneu7V7rq",
+            "LocationDE": "Pe5Lkrbvnos",
+            "LocationTEA": "PYHaJIsQyxj",
+            "StaffProgram": "vtSLYBYufMn",
+            "StaffProgramCourse": "C6BqK9IAR7I",
+            "ThematicAreaOptionset": "AvtckM3AMNR",
+            "IndicatorTotalFemaleTrainee": "fWteSZrcYjO",
+            "IndicatorTotalMaleTrainee": "zuqccgxi4dF",
+            "IndicatorTotalUnknownTrainee": "Wyfg7HQa40s"
+        };
+
+        // Store the config object in sessionStorage and set it in state
+        sessionStorage.setItem('config', JSON.stringify(config));
+        setConfig(config);
+    }, []);
+
+
 
     useEffect(() => {
         const currentPath = location.pathname;
@@ -81,7 +115,6 @@ const MainContent = () => {
                 <Route path="/testcomponent/:id" element={<CourseDetailsStaffView />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/testtree" element={<MyComponent/>} />
-                <Route path="/bulkstaffadd" element={<BulkStaffAdd />} />
             </Routes>
         </div>
     );
@@ -94,8 +127,8 @@ const MyApp = () => {
     
     return (
         <Router>
-            <div>
-                <div className={styles.heading}>
+             <div>
+             <div>
                     <img src={logo} alt="jtrain logo" /> 
                     <div className={styles.container}>
                     <div className={styles.top}>
@@ -113,14 +146,16 @@ const MyApp = () => {
                             <Tab onClick={() => setSelectedTab('TrainingCapture')}>
                                 <Link to="/trainingcapture">Training Capture</Link>
                             </Tab>
-                            {/* <Tab onClick={() => setSelectedTab('Settomgs')}>
-                                <Link to="/settings">Settings</Link>
-                            </Tab> */}
                         </TabBar>
                         </div>
                     </div>
-                        <hr />
-                        <MainContent selectedTab={selectedTab} />
+                        
+                        <div style={{ flexGrow: 1, overflowY: 'auto'}}>
+                            <div style={{ paddingLeft: '25px' }}>
+                            <MainContent selectedTab={selectedTab} />
+                            </div>
+                        </div>
+                        
                     </div>
                 </div>
             </div>

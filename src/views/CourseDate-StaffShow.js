@@ -12,7 +12,7 @@ import { CircularLoader, IconView16, IconView24,
 } from '@dhis2/ui'
 import React, { useState, useEffect } from 'react'
 import { Link} from 'react-router-dom'
-import { utilGetConstantValueByName } from '../utils/utils';
+import { utilConfigConstantValueByName } from '../utils/utils';
 import { CourseDateAttendeesStaffCustomFields } from './CourseDateAttendees-Staff-CustomFields';
 import { CourseDetailsCourseView } from './CourseDetailsCourseView';
 import { StaffShow } from './CourseDateAttendees-StaffShow';
@@ -81,13 +81,12 @@ export const CourseDateStaffShow = ({tei_id, eventID, reload, refreshCount}) => 
     const [deleteEvent] = useDataMutation(deleteMutation);
     const [updateEvent] = useDataMutation(updateMutation);
 
-    const defStaffTEI = utilGetConstantValueByName('jtrain-TEI-Type-Staff')
-    const defStaffOrg = utilGetConstantValueByName('jtrain-DefaultStaffOrgUnit')
+    const defStaffTEI = utilConfigConstantValueByName('TEITypeStaff')
+    
+    const defStaffOrg = utilConfigConstantValueByName('DefaultStaffOrgUnit')
 
-    const defStaffProgram = utilGetConstantValueByName('jtrain-staffprogram')
-    const defStaffCourseDE = utilGetConstantValueByName('jtrain-course-eventid')
-    const defCourseAttendeesDE = utilGetConstantValueByName('jtrain-course-attendees')
-    const defCourseAttendeesCountDE = utilGetConstantValueByName('jtrain-course-attendees-count')
+    const defStaffProgram = utilConfigConstantValueByName('StaffProgram')
+    const defStaffCourseDE = utilConfigConstantValueByName('CourseEventId')
     
 
     useEffect(() => {
@@ -232,20 +231,16 @@ export const CourseDateStaffShow = ({tei_id, eventID, reload, refreshCount}) => 
                 data?.instances?.trackedEntityInstances && (
                     
                     <Table>
-      <TableHead>
-      <TableRowHead>
-        <TableCellHead style={{ display: 'flex', flexDirection: 'column', width: '80vw', margin: 0, padding: 0 }}>Course Details: 
-            <CourseDetailsCourseView id={eventID} /> </TableCellHead>
-       </TableRowHead>
-        {/* <TableRowHead>
-        
-          <TableCellHead>Last Name</TableCellHead>
-          <TableCellHead>First Name</TableCellHead>
-          <TableCellHead>Designation</TableCellHead>
-          <TableCellHead>Location</TableCellHead>
-          <TableCellHead>Open</TableCellHead>
-        </TableRowHead> */}
-      </TableHead>
+      <TableRow>
+      <div>
+            <TableCellHead style={{ display: 'flex', flexDirection: 'column', width: '80vw', margin: 0, padding: 0 }}>Course Details: </TableCellHead>
+            <CourseDetailsCourseView id={eventID} /> 
+            <p>{eventID}</p>
+      </div>
+      </TableRow>
+       <TableRow>
+            <button onClick={() => refetch()}>Edit Course Information</button>
+       </TableRow>
       {/* <TableBody>
       {data.instances.trackedEntityInstances
     .slice(0, 1000)

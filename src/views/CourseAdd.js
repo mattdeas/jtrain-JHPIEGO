@@ -2,7 +2,7 @@ import { useDataQuery, useDataMutation } from '@dhis2/app-runtime'
 import { BrowserRouter as Router, Route, Link, Routes, useLocation, useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { useDataEngine } from '@dhis2/app-runtime';
-import { utilGetConstantValueByName } from '../utils/utils';
+import {  utilConfigConstantValueByName } from '../utils/utils';
 import { IconCross16, IconSave16 } from '@dhis2/ui';
 
     const qryConstants = {
@@ -59,13 +59,14 @@ import { IconCross16, IconSave16 } from '@dhis2/ui';
             const { name, value } = event.target;
             setFormFields(prevValues => ({ ...prevValues, [name]: value }));
         };
-
-        const defCourseOrgUnitId = utilGetConstantValueByName('jtrain-defaultcourseorgunit');
-        const defCourseType = utilGetConstantValueByName('jtrain-TEI-Type-Course');
-        const defCourseProgramId = utilGetConstantValueByName('jtrain-courseprogram');
+        
+        const defCourseOrgUnitId = utilConfigConstantValueByName('DefaultCourseOrgUnit');
+        const defCourseType = utilConfigConstantValueByName('TEITypeCourse');
+        const defCourseProgramId = utilConfigConstantValueByName('CourseProgram');
 
         const handleFormSubmit = async (event) => {
             event.preventDefault();
+            console.log('event', event);
             const newEntity = {
                 attributes: data.program.programTrackedEntityAttributes.map(attr => ({
                     attribute: attr.trackedEntityAttribute.id,
@@ -104,7 +105,6 @@ import { IconCross16, IconSave16 } from '@dhis2/ui';
         console.log({ dSysConstants });
 
         if (dSysConstants && dSysConstants.data && dSysConstants.data.attributes && dSysConstants.data.attributes.constants) {
-            // Find the jtrain-TEI-Type-Staff and jtrain-DefaultStaffOrgUnit objects
         }
 
         const { loading: loading1, error1, data } = useDataQuery(qryProgramFields, {

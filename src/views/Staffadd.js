@@ -11,7 +11,7 @@ import {
 } from '@dhis2/ui'
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import React, {useState, useEffect} from 'react'
-import { utilGetConstantValueByName } from '../utils/utils';
+import { utilGetConstantValueByName,  utilConfigConstantValueByName } from '../utils/utils';
 import { OrganisationUnitTree } from '@dhis2/ui';
 
 const today = new Date();
@@ -82,10 +82,10 @@ export const Staffadd = () => {
     const [message, setMessage] = useState('');
     const engine = useDataEngine();
 
-    const defStaffOrgUnitId = utilGetConstantValueByName('jtrain-DefaultStaffOrgUnit')
-    const defStaffProgId = utilGetConstantValueByName('jtrain-staffprogram')
-    const defStaffEntityType = utilGetConstantValueByName('jtrain-TEI-Type-Staff')
-    const defLocationTEA = utilGetConstantValueByName('jtrain-location-TEA')
+    const defStaffOrgUnitId = utilConfigConstantValueByName('DefaultStaffOrgUnit')
+    const defStaffProgId = utilConfigConstantValueByName('StaffProgram')
+    const defStaffEntityType = utilConfigConstantValueByName('TEITypeStaff')
+    const defLocationTEA = utilConfigConstantValueByName('LocationTEA')
 
     const { loading: loadingEntity, error: errorEntity, data: dataEntity } = useDataQuery(qryTrackedEntityInstance, {
         variables: {
@@ -168,25 +168,25 @@ export const Staffadd = () => {
   };
     
     let staffMemberid, defaultStaffOrgUnit, defaultStaffProg;
-    console.log({ dSysConstants })
-    // Check if dSysConstants and constants exist
-    if (dSysConstants && dSysConstants.data && dSysConstants.data.attributes && dSysConstants.data.attributes.constants) {
-        // Find the jtrain-TEI-Type-Staff and jtrain-DefaultStaffOrgUnit objects
-        const staffMemberObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-TEI-Type-Staff');
-        const defaultStaffOrgUnitObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-DefaultStaffOrgUnit');
-        const defaultStaffProgObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-StaffProgram');
+    // console.log({ dSysConstants })
+    // // Check if dSysConstants and constants exist
+    // if (dSysConstants && dSysConstants.data && dSysConstants.data.attributes && dSysConstants.data.attributes.constants) {
+    //     // Find the jtrain-TEI-Type-Staff and jtrain-DefaultStaffOrgUnit objects
+    //     const staffMemberObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-TEI-Type-Staff');
+    //     const defaultStaffOrgUnitObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-DefaultStaffOrgUnit');
+    //     const defaultStaffProgObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-StaffProgram');
         
-        // Extract the values
-        staffMemberid = staffMemberObj ? staffMemberObj.code : null;
-        defaultStaffOrgUnit = defaultStaffOrgUnitObj ? defaultStaffOrgUnitObj.code : null;
-        defaultStaffProg = defaultStaffProgObj ? defaultStaffProgObj.code : null;
-    }
+    //     // Extract the values
+    //     staffMemberid = staffMemberObj ? staffMemberObj.code : null;
+    //     defaultStaffOrgUnit = defaultStaffOrgUnitObj ? defaultStaffOrgUnitObj.code : null;
+    //     defaultStaffProg = defaultStaffProgObj ? defaultStaffProgObj.code : null;
+    // }
 
-    const { loading: loading1, error1, data } = useDataQuery(qryProgramFields, {
-        variables: {
-          id:  defStaffProgId, // Use the ID of the program you want to fetch
-        },
-    });
+    // const { loading: loading1, error1, data } = useDataQuery(qryProgramFields, {
+    //     variables: {
+    //       id:  defStaffProgId, // Use the ID of the program you want to fetch
+    //     },
+    // });
 
     const [formFields, setFormFields] = useState({});
 

@@ -9,7 +9,7 @@ import {
     TableRowHead,
 } from '@dhis2/ui';
 import React, { useState } from 'react';
-import { utilGetConstantValueByName } from '../utils/utils';  
+import { utilConfigConstantValueByName } from '../utils/utils';  
 
 
 const eventQuery = {
@@ -34,7 +34,9 @@ const eventQuery = {
 
 export const CourseDetailsCourseView = ({ id }) => {
 
-  const defCourseProgStageId = utilGetConstantValueByName('jtrain-courseprogramstage')
+  const defCourseProgStageId = utilConfigConstantValueByName('CourseProgramStageId')
+  const defStaffOrgUnitId  = utilConfigConstantValueByName('CourseProgramStageId')
+  //const defCourseProgStageId = "h9zPG79AmgH";
     const { loading, error, data } = useDataQuery({
         programStages: {
           resource: `programStages/${defCourseProgStageId}`,
@@ -43,7 +45,6 @@ export const CourseDetailsCourseView = ({ id }) => {
           },
         },
       });
-    console.log('dataStages', data);
     const [selectedCourseDate, setSelectedCourseDate] = useState(''); 
 
     const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);    
@@ -105,7 +106,7 @@ export const CourseDetailsCourseView = ({ id }) => {
 
     if (dataElement.displayName === 'Location') {
       return <TableCell key={dataElement.id}>
-      {orgUnitsData.orgUnits.organisationUnits.find(orgUnit => orgUnit.id === dataElementToValue[dataElement.id]).displayName}
+      {orgUnitsData && orgUnitsData.orgUnits && orgUnitsData.orgUnits.organisationUnits && orgUnitsData.orgUnits.organisationUnits.find(orgUnit => orgUnit.id === dataElementToValue[dataElement.id])?.displayName || ''}
       </TableCell>;
     }
     else

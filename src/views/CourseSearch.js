@@ -15,6 +15,7 @@ import { Link, useParams } from 'react-router-dom'
 import { CourseAdd} from './CourseAdd'
 import { utilgetCodeByName } from '../utils/utils'
 import { IconAdd24, IconView24 } from '@dhis2/ui'
+import { utilConfigConstantValueByName } from '../utils/utils'
 
 
 
@@ -46,9 +47,9 @@ export const CourseSearch = () => {
         refetch();
     };
 
-    const defCourseOrgUnitId = utilgetCodeByName('jtrain-defaultcourseorgunit')
-    const defCourseProgramId = utilgetCodeByName('jtrain-courseprogram')
-    const defThemAreaId = utilgetCodeByName('jtrain-thematicarea-optionset')
+    const defCourseOrgUnitId = utilConfigConstantValueByName('DefaultCourseOrgUnit')
+    const defCourseProgramId = utilConfigConstantValueByName('CourseProgram')
+    const defThemAreaId = utilConfigConstantValueByName('ThematicAreaOptionset')
 
     const { loading, error, data, refetch } = useDataQuery(query, {
         variables: {

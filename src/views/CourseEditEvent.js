@@ -1,9 +1,22 @@
 import React, { useEffect, useState } from 'react';
 
-const CourseEditEvent = ({ eventID }) => {
-  const [showSection, setShowSection] = useState(false);
-  const [dataProgramDE, setDataProgramDE] = useState(null);
+export const CourseEditEvent = ({ eventID }) => {
+  const defCourseOrgUnitId = utilConfigConstantValueByName('DefaultCourseOrgUnit')
+  const defCourseProgramId = utilConfigConstantValueByName('CourseProgram')
+  const defCourseProgStageId = utilConfigConstantValueByName('CourseProgramStageId')
 
+  const [showSection, setShowSection] = useState(false);
+
+  const qryProgramDataElements = {
+    "qPDE": {
+        resource: 'programStages',
+           "id": defCourseProgStageId,
+           "params": {
+               "fields": `programStageDataElements[program[id,${defCourseProgramId}],dataElement[id,displayName,valueType],sortOrder]`,
+           },
+
+    },
+}
 
   const eventQuery = () => ({
     events: {
@@ -14,8 +27,10 @@ const CourseEditEvent = ({ eventID }) => {
     },
   });
 
+
   const { loading: loadingEvent, error: errorEvent, data: dataEvent } = useDataQuery(eventQuery);
-  
+  const { loading: loading2, error2, data: dataProgramDE } = useDataQuery(qryProgramDataElements);
+
   useEffect(() => {
     // Fetch the event information using eventID
     // Update the state variables showSection and dataProgramDE based on the fetched data
@@ -64,5 +79,3 @@ const CourseEditEvent = ({ eventID }) => {
     </div>
   );
 };
-
-export default CourseEditEvent;

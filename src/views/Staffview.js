@@ -2,11 +2,11 @@ import { useDataQuery, useDataMutation, useDataEngine } from '@dhis2/app-runtime
 import { CourseDetailsStaffView } from './CourseDetailsStaffView';
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
 import React, {useState, useEffect} from 'react'
-import { useFetchAndStoreConstants, utilGetConstantValueByName } from '../utils/utils';
 import { OrganisationUnitTree } from '@dhis2/ui';
 import { CourseDateAttendeesStaffCustomFields } from './CourseDateAttendees-Staff-CustomFields';
 import { IconSave16, IconCross16, IconDelete16 } from '@dhis2/ui';
 import { useNavigate } from "react-router-dom";
+import { utilConfigConstantValueByName } from '../utils/utils';
 
 function debounce(func, wait) {
     let timeout;
@@ -109,27 +109,27 @@ export const Staffview = () => {
     const [mutate, { loading, error }] = useDataMutation(mutation(id))
     const [showTree, setShowTree] = useState(false);
 
-    if(sessionStorage.getItem('constants') == null)
-    {
-        const engine = useDataEngine();
+    // if(sessionStorage.getItem('constants') == null)
+    // {
+    //     const engine = useDataEngine();
     
-        useEffect(() => {
-            const fetchData = async () => {
-                const { loading, error, data } = await engine.query(utilConstantsQueryStructure);
-                console.log('data', data);
-                if (!loading && !error && data) {
-                    sessionStorage.setItem('constants', JSON.stringify(data.constants.constants));
-                }
-            };
+    //     useEffect(() => {
+    //         const fetchData = async () => {
+    //             const { loading, error, data } = await engine.query(utilConstantsQueryStructure);
+    //             console.log('data', data);
+    //             if (!loading && !error && data) {
+    //                 sessionStorage.setItem('constants', JSON.stringify(data.constants.constants));
+    //             }
+    //         };
         
-            fetchData();
-        }, [engine]);
-    }
+    //         fetchData();
+    //     }, [engine]);
+    // }
     const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
-    const defStaffOrgUnitId = utilGetConstantValueByName('jtrain-DefaultStaffOrgUnit')
-    const defStaffProgId = utilGetConstantValueByName('jtrain-staffprogram')
-    const defStaffProgCourseId = utilGetConstantValueByName('jtrain-staffprogram-course')
-    const defLocationTEA = utilGetConstantValueByName('jtrain-location-TEA')
+    const defStaffOrgUnitId = utilConfigConstantValueByName('DefaultStaffOrgUnit')
+    const defStaffProgId = utilConfigConstantValueByName('StaffProgram')
+    const defStaffProgCourseId = utilConfigConstantValueByName('StaffProgramCourse')
+    const defLocationTEA = utilConfigConstantValueByName('LocationTEA')
     console.log('locationTEA', defLocationTEA)
     const qryTrackedEntityInstance = {
         trackedEntityInstance: {

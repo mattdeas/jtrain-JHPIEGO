@@ -11,7 +11,7 @@ import {
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { CourseDetails } from './CourseDetails';
-import { useFetchAndStoreConstants, utilGetConstantValueByName } from '../utils/utils';
+import { useFetchAndStoreConstants, utilConfigConstantValueByName } from '../utils/utils';
 import { IconAddCircle24, IconSubtractCircle24, IconView16, IconView24 } from '@dhis2/ui';
 
 function debounce(func, wait) {
@@ -48,10 +48,10 @@ export const TrainingCapture = () => {
     const [isSearchTableExpanded, setSearchTableExpanded] = useState(true);
     const [courseSelectionLabel, setCourseSelectionLabel] = useState('');
 
-    const defCourseProgramId = utilGetConstantValueByName('jtrain-courseprogram');
-    const defCourseOrgUnitId = utilGetConstantValueByName('jtrain-defaultcourseorgunit');
-    const defCourseStartDate = utilGetConstantValueByName('jtrain-CourseStartDate');
-    const defCourseEndDate = utilGetConstantValueByName('jtrain-CourseEndDate');
+    const defCourseProgramId = utilConfigConstantValueByName('CourseProgram');
+    const defCourseOrgUnitId = utilConfigConstantValueByName('DefaultCourseOrgUnit');
+    const defCourseStartDate = utilConfigConstantValueByName('CourseStartDate');
+    const defCourseEndDate = utilConfigConstantValueByName('CourseEndDate');
     
     const { loading, error, data } = useDataQuery(query, {
         variables: {

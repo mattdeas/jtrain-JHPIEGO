@@ -264,9 +264,9 @@ export const Staff_add = () => {
     // Check if dSysConstants and constants exist
     if (dSysConstants && dSysConstants.data && dSysConstants.data.attributes && dSysConstants.data.attributes.constants) {
         // Find the jtrain-TEI-Type-Staff and jtrain-DefaultStaffOrgUnit objects
-        const staffMemberObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-TEI-Type-Staff');
-        const defaultStaffOrgUnitObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-DefaultStaffOrgUnit');
-        const defaultStaffProgObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'jtrain-StaffProgram');
+        const staffMemberObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'TEITypeStaff');
+        const defaultStaffOrgUnitObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'DefaultStaffOrgUnit');
+        const defaultStaffProgObj = dSysConstants.data.attributes.constants.find(item => item.displayName === 'StaffProgram');
         
         // Extract the values
         staffMemberid = staffMemberObj ? staffMemberObj.code : null;

@@ -11,7 +11,7 @@ import {
 } from '@dhis2/ui';
 import { Link } from 'react-router-dom';
 import { IconView16 } from '@dhis2/ui';
-import { useFetchAndStoreConstants, utilGetConstantValueByName } from '../utils/utils';
+import { utilConfigConstantValueByName } from '../utils/utils';
 
 const query = {
     instances: {
@@ -58,9 +58,9 @@ export const StaffSearch = () => {
     //    return <div>Loading...</div>;
     //}
 
-    const defStaffOrgUnitId = utilGetConstantValueByName('jtrain-DefaultStaffOrgUnit');
-    const defStaffType = utilGetConstantValueByName('jtrain-TEI-Type-Staff');
-    const defStaffProgId = utilGetConstantValueByName('jtrain-staffprogram');
+    const defStaffOrgUnitId = utilConfigConstantValueByName('DefaultStaffOrgUnit');
+    const defStaffType = utilConfigConstantValueByName('TEITypeStaff');
+    const defStaffProgId = utilConfigConstantValueByName('StaffProgram');
     const [page, setPage] = useState(1); // Current page
     const [pageSize, setPageSize] = useState(50); // Items per page
     const [searchLastName, setLastName] = useState('');

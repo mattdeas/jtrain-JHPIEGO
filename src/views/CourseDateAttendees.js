@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDataQuery, useDataMutation } from '@dhis2/app-runtime';
 import { StaffSearchAttendees } from './StaffSearchAttendees';
 import { StaffShow } from './CourseDateAttendees-StaffShow';
-import { utilGetConstantValueByName } from '../utils/utils';
+import { utilConfigConstantValueByName } from '../utils/utils';
 import { CircularLoader } from '@dhis2/ui';
 
 export const CourseDateAttendees = ({ eventID, dElements }) => {
@@ -48,11 +48,12 @@ export const CourseDateAttendees = ({ eventID, dElements }) => {
   if (errorEvent) return <span>Error1: {errorEvent.message}</span>;
 
   const dataElementObject = dataEvent.events.dataValues.find(
-    (dataValue) => dataValue.dataElement === utilGetConstantValueByName('jtrain-course-attendees')
+    (dataValue) => dataValue.dataElement === utilConfigConstantValueByName('CourseAttendees')
   );
-
+  
   const attendeeCountObj = dataEvent.events.dataValues.find(
-    (dataValue) => dataValue.dataElement === utilGetConstantValueByName('jtrain-course-attendees-count')
+    // (dataValue) => dataValue.dataElement === utilConfigConstantValueByName('CourseAttendeesCount')
+    (dataValue) => dataValue.dataElement === "IA7YxfolpEM"
   );
 
   const attendeeCount = parseInt(attendeeCountObj.value)

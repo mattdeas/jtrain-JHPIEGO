@@ -13,7 +13,7 @@ import {
 } from '@dhis2/ui'
 import React, { useState, useEffect } from 'react'
 import { Link, BrowserRouter, Switch, Route } from 'react-router-dom'
-import { utilGetConstantValueByName } from '../utils/utils';
+import { utilConfigConstantValueByName } from '../utils/utils';
 
 function debounce(func, wait) {
     let timeout;
@@ -94,18 +94,17 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
 
     const [isLoading, setIsLoading] = useState(false);
     
-    const defStaffProgramId = utilGetConstantValueByName('jtrain-staffprogram');
-    const defStaffProgramCourseId = utilGetConstantValueByName('jtrain-staffprogram-course');
-    const defStaffOrgUnitId = utilGetConstantValueByName('jtrain-DefaultStaffOrgUnit');
-    const defStaffTEIType = utilGetConstantValueByName('jtrain-TEI-Type-Staff');
-    const defCourseEventId = utilGetConstantValueByName('jtrain-course-eventid');
-    const defCourseAttendeesDE = utilGetConstantValueByName('jtrain-course-attendees');
-    const defCourseAttendeesCountDE = utilGetConstantValueByName('jtrain-course-attendees-count');
-    const defShowScore = utilGetConstantValueByName('jtrain-ShowScores');
-    const defCoursePreScore = utilGetConstantValueByName('jtrain-course-pretest-score');
-    const defCoursePostScore = utilGetConstantValueByName('jtrain-course-posttest-score');
-    const defCourseProgramId = utilGetConstantValueByName('jtrain-courseprogram');
-    const defCourseProgramStageId = utilGetConstantValueByName('jtrain-courseprogramstage');
+    const defStaffProgramId = utilConfigConstantValueByName('StaffProgram');
+    const defStaffProgramCourseId = utilConfigConstantValueByName('StaffProgramCourse');
+    const defStaffOrgUnitId = utilConfigConstantValueByName('DefaultStaffOrgUnit');
+    const defStaffTEIType = utilConfigConstantValueByName('TEITypeStaff');
+    const defCourseEventId = utilConfigConstantValueByName('CourseEventId');
+    const defCourseAttendeesDE = utilConfigConstantValueByName('CourseAttendees');
+    const defCourseAttendeesCountDE = utilConfigConstantValueByName('CourseAttendeesCount');
+    const defCoursePreScore = utilConfigConstantValueByName('CoursePretestScore');
+    const defCoursePostScore = utilConfigConstantValueByName('CoursePosttestScore');
+    const defCourseProgramId = utilConfigConstantValueByName('CourseProgram');
+    const defCourseProgramStageId = utilConfigConstantValueByName('CourseProgramStage');
 
     const [page, setPage] = useState(1); // Current page
     const [pageSize, setPageSize] = useState(50); // Items per page

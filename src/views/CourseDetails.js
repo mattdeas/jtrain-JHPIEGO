@@ -10,7 +10,7 @@ import {
 } from '@dhis2/ui';
 import React, { useState } from 'react';
 import { CourseDateAttendees } from './CourseDateAttendees';
-import { utilGetConstantValueByName } from '../utils/utils';
+import { utilGetConstantValueByName,  utilConfigConstantValueByName } from '../utils/utils';
 import { IconView16, IconView24 } from '@dhis2/ui';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -22,12 +22,14 @@ const ORG_UNITS_QUERY = {
         },
     },
 };
-
+// "CourseProgramStageId": "h9zPG79AmgH",
 export const CourseDetails = ({ course, updateHeadings }) => {
-    const defCourseProgramId = utilGetConstantValueByName('jtrain-courseprogram');
-    const defCourseOrgUnitId = utilGetConstantValueByName('jtrain-defaultcourseorgunit');
-    const defCourseProgramStageId = utilGetConstantValueByName('jtrain-courseprogramstage');
-    const defPartnerDE = utilGetConstantValueByName('jtrain-partnerDE');
+    const defCourseProgramId = utilConfigConstantValueByName('CourseProgram');
+    const defCourseOrgUnitId = utilConfigConstantValueByName('DefaultCourseOrgUnit');
+    //const defCourseProgramStageId = utilConfigConstantValueByName('CourseProgramStageId');
+    // "CourseProgramStageId": "h9zPG79AmgH",
+    const defCourseProgramStageId = "h9zPG79AmgH";
+    console.log('defCourseProgramStageId', defCourseProgramStageId);
     const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
 
     const qryProgramDataElements = {
@@ -188,7 +190,7 @@ export const CourseDetails = ({ course, updateHeadings }) => {
                                                             if (dataElementObject.dataElement.displayName === 'Location')
                                                                 return (
                                                                     <TableCell key={dataElementObject.dataElement.id}>
-                                                                        {orgUnitsData.orgUnits.organisationUnits.find(ou => ou.id === values[dataElementObject.dataElement.id])?.displayName}
+                                                                        {orgUnitsData?.orgUnits?.organisationUnits?.find(ou => ou.id === values[dataElementObject.dataElement.id])?.displayName || ''}
                                                                     </TableCell>
                                                                 );
 

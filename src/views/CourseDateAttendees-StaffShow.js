@@ -1,7 +1,7 @@
 import { useDataQuery,useDataMutation, useDataEngine } from '@dhis2/app-runtime'
 import React, { useState, useEffect } from 'react'
 import { CourseDateAttendeesStaffCustomFields } from './CourseDateAttendees-Staff-CustomFields';
-import { utilGetConstantValueByName } from '../utils/utils';
+import { utilConfigConstantValueByName } from '../utils/utils';
 import { Table, TableBody, TableCell, TableCellHead, TableHead, TableRow, TableRowHead, IconView24, IconDelete24 } from '@dhis2/ui';
 import { Link } from 'react-router-dom';
 import { IconFileDocument24, IconSubtractCircle16 } from '@dhis2/ui';
@@ -56,16 +56,12 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onDelete }) =
     const [refreshKey, setRefreshKey] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const defStaffEntityType = utilGetConstantValueByName('jtrain-TEI-Type-Staff');
-    const defStaffOrgUnit = utilGetConstantValueByName('jtrain-DefaultStaffOrgUnit');
-    const defCourseOrgUnitId = utilGetConstantValueByName('jtrain-defaultcourseorgunit');
-    const defCourseEventId = utilGetConstantValueByName('jtrain-course-eventid');
-    const defStaffProgram = utilGetConstantValueByName('jtrain-staffprogram');
-    const defCourseProgramId = utilGetConstantValueByName('jtrain-courseprogram');
-    const defCourseProgramStageId = utilGetConstantValueByName('jtrain-courseprogramstage');
-    const defCourseAttendeesCountDEId = utilGetConstantValueByName('jtrain-course-attendees-count');
-    const defCourseAttendeesId = utilGetConstantValueByName('jtrain-course-attendees');
-
+    const defStaffEntityType = utilConfigConstantValueByName('TEITypeStaff');
+    const defStaffOrgUnit = utilConfigConstantValueByName('DefaultStaffOrgUnit');
+    const defCourseOrgUnitId = utilConfigConstantValueByName('DefaultCourseOrgUnit');
+    const defCourseEventId = utilConfigConstantValueByName('CourseEventId');
+    const defStaffProgram = utilConfigConstantValueByName('StaffProgram');
+    console.log('defStaffProgram', defStaffProgram);
     const { loading: loadingQry, error: errorQry, data: dataQry, refetch: refetchQry } = useDataQuery(query, {
         variables: {
             ou: defStaffOrgUnit,

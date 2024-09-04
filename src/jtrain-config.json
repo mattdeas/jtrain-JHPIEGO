@@ -1,5 +1,5 @@
 {
-  "TestValue" : "TestValueInPublic",
+  "TestValue" : "TestValueInSource",
   "CourseEndDate": "ODO4HZT4XSg",
   "CourseStartDate": "N3rXacKJAjy",
   "DefaultStaffOrgUnit": "Esaneu7V7rq",
@@ -22,5 +22,4 @@
   "IndicatorTotalFemaleTrainee": "fWteSZrcYjO",
   "IndicatorTotalMaleTrainee": "mtKAszEGXQ2",
   "IndicatorTotalUnknownTrainee": "Wyfg7HQa40s"
-
 }

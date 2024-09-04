@@ -1,58 +1,55 @@
-import React, { useEffect,useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDataEngine } from '@dhis2/app-runtime';
 import { ReportOverview } from './ReportOverview';
-
+import { utilConfigConstantValueByName } from '../utils/utils';
 
 export const Home = () => {
     const engine = useDataEngine();
-
     const [config, setConfig] = useState(null);
 
     useEffect(() => {
-        fetch('/jtrain-config.json')
-            .then(response => response.json())
-            .then(data => sessionStorage.setItem('config', JSON.stringify(data)))
-            .catch(error => console.error('Error fetching config:', error));
-    }, []);
-
-    
-
-    const constantsQuery = {
-        constants: {
-            resource: "constants",
-            params: {
-                fields: ['id', 'name', 'code']
-            }
-        }
-    };
-
-    
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await engine.query(constantsQuery);
-                if (response && response.constants && Array.isArray(response.constants.constants)) {
-                    sessionStorage.setItem('constants', JSON.stringify(response.constants.constants));
-                }
-            } catch (error) {
-                console.error('Error running query', error);
-            }
+        const config = {
+            "CourseEndDate": "ODO4HZT4XSg",
+            "CourseStartDate": "N3rXacKJAjy",
+            "DefaultStaffOrgUnit": "Esaneu7V7rq",
+            "TEITypeCourse": "EcbFeAtWDmP",
+            "TEITypeStaff": "AsxfMid3pVW",
+            "CourseAttendees": "r6m3Tekr5DO",
+            "CourseAttendeesCount": "IA7YxfolpEM",
+            "CourseEventId": "dTrDnb4e8Ee",
+            "CoursePostTestScore": "zvXaKJnl14I",
+            "CoursePretestSscore": "IAphSuyuH15",
+            "CourseProgram": "Lw1g7haLUd9",
+            "CourseProgramStageId": "h9zPG79AmgH",
+            "DefaultCourseOrgUnit": "Esaneu7V7rq",
+            "Location": "Esaneu7V7rq",
+            "LocationDE": "Pe5Lkrbvnos",
+            "LocationTEA": "PYHaJIsQyxj",
+            "StaffProgram": "vtSLYBYufMn",
+            "StaffProgramCourse": "C6BqK9IAR7I",
+            "ThematicAreaOptionset": "AvtckM3AMNR",
+            "IndicatorTotalFemaleTrainee": "fWteSZrcYjO",
+            "IndicatorTotalMaleTrainee": "mtKAszEGXQ2",
+            "IndicatorTotalUnknownTrainee": "Wyfg7HQa40s"
         };
 
-        fetchData();
-    }, [engine]);
+        // Store the config object in sessionStorage and set it in state
+        sessionStorage.setItem('config', JSON.stringify(config));
+        setConfig(config);
+    }, []);
 
-    
-    
-
-    //const testvalue = utilConfigConstantValueByName('CourseEndDate');
+    // const testValue = config ? utilConfigConstantValueByName('CourseEndDate') : 'Loading...';
 
     return (
         <div>
             <h1>Home</h1>
-            {/* <p>API Base URL: {testvalue}</p> */}
-            <ReportOverview />
+            {config ? (
+                <>
+                    <ReportOverview />
+                </>
+            ) : (
+                <p>Loading configuration...</p>
+            )}
         </div>
     );
-}
+};
