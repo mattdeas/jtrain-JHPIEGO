@@ -22,15 +22,18 @@ const ORG_UNITS_QUERY = {
         },
     },
 };
-// "CourseProgramStageId": "h9zPG79AmgH",
 export const CourseDetails = ({ course, updateHeadings }) => {
     const defCourseProgramId = utilConfigConstantValueByName('CourseProgram');
     const defCourseOrgUnitId = utilConfigConstantValueByName('DefaultCourseOrgUnit');
-    //const defCourseProgramStageId = utilConfigConstantValueByName('CourseProgramStageId');
-    // "CourseProgramStageId": "h9zPG79AmgH",
-    const defCourseProgramStageId = "h9zPG79AmgH";
+    const defCourseProgramStageId = utilConfigConstantValueByName('CourseProgramStageId');
+    const defCourseDEPartner = utilConfigConstantValueByName('CourseDEPartner');
+    const defCourseDEStartDate = utilConfigConstantValueByName('CourseStartDate');
+    const defCourseDEEndDate = utilConfigConstantValueByName('CourseEndDate');
     console.log('defCourseProgramStageId', defCourseProgramStageId);
     const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
+
+    
+
 
     const qryProgramDataElements = {
         programStages: {
@@ -111,11 +114,11 @@ export const CourseDetails = ({ course, updateHeadings }) => {
 
 
     const filteredRows = rows.filter(row => {
-        const partnerMatch = row['hGGDYuGuVeX'] ? row['hGGDYuGuVeX'].toLowerCase().includes(partnerFilter.toLowerCase()) : false;
+        const partnerMatch = row[defCourseDEPartner] ? row[defCourseDEPartner].toLowerCase().includes(partnerFilter.toLowerCase()) : false;
     
         // Parse the dates
-        const startDate = new Date(row['N3rXacKJAjy']);
-        const endDate = new Date(row['ODO4HZT4XSg']);
+        const startDate = new Date(row[defCourseDEStartDate]);
+        const endDate = new Date(row[defCourseDEEndDate]);
         const filterDateParsed = filterDate ? new Date(filterDate) : null;
     
         // Check if filterDate is between startDate and endDate

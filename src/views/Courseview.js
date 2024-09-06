@@ -139,6 +139,7 @@ export const Courseview = () => {
     const [showTree, setShowTree] = useState(false);
 
     const [isViewClicked, setisViewClicked] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
     const [editCourseShow, setEditCourseShow] = useState(false);
     const [mutate, { loading, error }] = useDataMutation(mutation)
 
@@ -243,6 +244,7 @@ export const Courseview = () => {
         return acc;
     }, {});
 
+
     const selectedLocation = dataValuesObject[defLocationDE]; // Extract the last value
     if (selectedLocation) {
         setSelectedLocationName(
@@ -267,6 +269,7 @@ export const Courseview = () => {
     setSelectedEditEvent(event);
     setFormFieldsEdit(dataValuesObject);
     setShowSectionEdit(true);
+    setIsEditing(true);
     console.log('selectedEditEventDE',selectedEditEventDE)
     };
 
@@ -416,6 +419,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
         } catch (error) {
             console.error('Error updating event:', error);
         }
+        setIsEditing(false);
     };
     
     <button onClick={() => handleAssign(trackedEntityInstance)}>
@@ -799,7 +803,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
 </div>
                     )}
                     <div style={{paddingLeft: '5px'}}>
-                        {!showSection && !isViewClicked && <button  onClick={handleButtonClick}><IconAdd16/> New Course Dates</button>}
+                        {!showSection && !isViewClicked && !isEditing && <button  onClick={handleButtonClick}><IconAdd16/> New Course Dates</button>}
                     </div>
                     <div>
                         {showSection && dataProgramDE && (
@@ -855,10 +859,10 @@ const handleInputChangeCourseDateEdit = (name, date) => {
                     </div>
                     <div>
                         {showSectionEdit && dataProgramDE && (
-                            <>
+                            <> 
+                            {/* THIS IS THE EDIT SECTION */}
                             <table>
                                 <thead>
-                                edit
                                 </thead>
                                 <tbody>
                                 {dataProgramDE.qPDE.programStageDataElements.map((item, index) => {
@@ -914,7 +918,10 @@ const handleInputChangeCourseDateEdit = (name, date) => {
                                     })}
                                 </tbody>
                             </table>
-                            <button onClick={() => setShowSection(false)}><IconCross16 />Cancel</button>
+                            <button onClick={() => {
+                                setShowSectionEdit(false);
+                                setIsEditing(false);
+                            }}><IconCross16 />Cancel</button>
                             <button onClick={handleSaveEdit}><IconSave16 /> Save</button>
                             </>
                         )}

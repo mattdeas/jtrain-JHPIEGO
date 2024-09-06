@@ -70,6 +70,9 @@ const MainContent = () => {
             "CoursePretestSscore": "IAphSuyuH15",
             "CourseProgram": "Lw1g7haLUd9",
             "CourseProgramStageId": "h9zPG79AmgH",
+            "CourseProgramAttributeCourseName": "Vnm7OVecUi1",
+            "CourseDEPartner" : "hGGDYuGuVeX",
+            
             "DefaultCourseOrgUnit": "Esaneu7V7rq",
             "Location": "Esaneu7V7rq",
             "LocationDE": "Pe5Lkrbvnos",
