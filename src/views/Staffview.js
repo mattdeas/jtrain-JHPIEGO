@@ -109,22 +109,7 @@ export const Staffview = () => {
     const [mutate, { loading, error }] = useDataMutation(mutation(id))
     const [showTree, setShowTree] = useState(false);
 
-    // if(sessionStorage.getItem('constants') == null)
-    // {
-    //     const engine = useDataEngine();
-    
-    //     useEffect(() => {
-    //         const fetchData = async () => {
-    //             const { loading, error, data } = await engine.query(utilConstantsQueryStructure);
-    //             console.log('data', data);
-    //             if (!loading && !error && data) {
-    //                 sessionStorage.setItem('constants', JSON.stringify(data.constants.constants));
-    //             }
-    //         };
-        
-    //         fetchData();
-    //     }, [engine]);
-    // }
+ 
     const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
     const defStaffOrgUnitId = utilConfigConstantValueByName('DefaultStaffOrgUnit')
     const defStaffProgId = utilConfigConstantValueByName('StaffProgram')

@@ -71,7 +71,7 @@ export const TrainingCapture = () => {
 
     const updateHeadings = (xString) => {
         // Concatenate xString to courseSelectionLabel
-        setCourseSelectionLabel(prevLabel => `${prevLabel} - ${xString}`);
+        setCourseSelectionLabel(prevLabel => `${prevLabel} ${xString} `);
         setSearchTableExpanded(false);
     };
     const updateHeadingsParent = () => {
@@ -96,7 +96,7 @@ export const TrainingCapture = () => {
         <strong>{isSearchTableExpanded ? <IconSubtractCircle24 /> : <IconAddCircle24 />}</strong>
     </div>
     <strong style={{ paddingLeft: '10px' }}>
-        Course Selection                     
+        Course Selection                 
         {isSearchTableExpanded ? '' : courseSelectionLabel}
     </strong>
 </div>

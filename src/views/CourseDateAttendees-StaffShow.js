@@ -194,6 +194,7 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onDelete }) =
                         <Table>
                             <TableHead className="sticky-header">
                                 <TableRowHead>
+                                    {/* <TableCellHead>ID</TableCellHead> */}
                                     <TableCellHead>Last Name</TableCellHead>
                                     <TableCellHead>First Name</TableCellHead>
                                     <TableCellHead>Designation</TableCellHead>
@@ -225,6 +226,7 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onDelete }) =
     
                                         return (
                                             <TableRow key={trackedEntityInstance}>
+                                                {/* <TableCell>{trackedEntityInstance}</TableCell> */}
                                                 <TableCell>{attributesObj['Last Name']}</TableCell>
                                                 <TableCell>{attributesObj['First Name']}</TableCell>
                                                 <TableCell>{attributesObj['Designation']}</TableCell>

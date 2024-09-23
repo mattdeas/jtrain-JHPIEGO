@@ -182,11 +182,11 @@ export const Staffadd = () => {
     //     defaultStaffProg = defaultStaffProgObj ? defaultStaffProgObj.code : null;
     // }
 
-    // const { loading: loading1, error1, data } = useDataQuery(qryProgramFields, {
-    //     variables: {
-    //       id:  defStaffProgId, // Use the ID of the program you want to fetch
-    //     },
-    // });
+    const { loading: loading1, error1, data } = useDataQuery(qryProgramFields, {
+        variables: {
+          id:  defStaffProgId, // Use the ID of the program you want to fetch
+        },
+    });
 
     const [formFields, setFormFields] = useState({});
 
@@ -246,17 +246,9 @@ export const Staffadd = () => {
   <div>
     <h1>Staff Details</h1>
 
-    {
-      // display that the data is being loaded
-      // when loading is true
-      loading1 && 'Loading...'
-    }
+    
 
-    {
-      // display the error message
-      // is an error occurred
-      error && error.message
-    }
+   
 
     {
     // if there is any data available

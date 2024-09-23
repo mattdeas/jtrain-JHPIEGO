@@ -49,7 +49,7 @@ window.addEventListener('resize', handleResize);
 
 
 
-//yarn start --proxy https://dhis2.af.jhpiego.org --proxyPort 8082
+//yarn start --proxy https://dhis2.sl.jhpiego.org --proxyPort 8082
 const MainContent = () => {
     
     const [selectedTab, setSelectedTab] = useState('');
@@ -67,7 +67,8 @@ const MainContent = () => {
             "CourseAttendeesCount": "IA7YxfolpEM",
             "CourseEventId": "dTrDnb4e8Ee",
             "CoursePostTestScore": "zvXaKJnl14I",
-            "CoursePretestSscore": "IAphSuyuH15",
+            "CoursePreTestScore": "IAphSuyuH15",
+
             "CourseProgram": "Lw1g7haLUd9",
             "CourseProgramStageId": "h9zPG79AmgH",
             "CourseProgramAttributeCourseName": "Vnm7OVecUi1",

@@ -52,8 +52,8 @@ export const CourseDateAttendees = ({ eventID, dElements }) => {
   );
   
   const attendeeCountObj = dataEvent.events.dataValues.find(
-    // (dataValue) => dataValue.dataElement === utilConfigConstantValueByName('CourseAttendeesCount')
-    (dataValue) => dataValue.dataElement === "IA7YxfolpEM"
+     (dataValue) => dataValue.dataElement === utilConfigConstantValueByName('CourseAttendeesCount')
+    //(dataValue) => dataValue.dataElement === "IA7YxfolpEM"
   );
 
   const attendeeCount = parseInt(attendeeCountObj.value)

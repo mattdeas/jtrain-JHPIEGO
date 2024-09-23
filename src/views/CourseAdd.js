@@ -39,7 +39,6 @@ import { IconCross16, IconSave16 } from '@dhis2/ui';
         const { id } = useParams();
         const [message, setMessage] = useState('');
         const [formFields, setFormFields] = useState({});
-        const dSysConstants = useDataQuery(qryConstants);
         const [trackedEntityInstance, setTrackedEntityInstance] = useState(null);
         const engine = useDataEngine();
 
@@ -92,6 +91,7 @@ import { IconCross16, IconSave16 } from '@dhis2/ui';
                 incidentDate: new Date().toISOString().split('T')[0],
             };
 
+            console.log(newEntity)
             await engine.mutate({
                 resource: 'enrollments',
                 type: 'create',
@@ -102,10 +102,7 @@ import { IconCross16, IconSave16 } from '@dhis2/ui';
             props.onSaved();
         };
 
-        console.log({ dSysConstants });
-
-        if (dSysConstants && dSysConstants.data && dSysConstants.data.attributes && dSysConstants.data.attributes.constants) {
-        }
+        
 
         const { loading: loading1, error1, data } = useDataQuery(qryProgramFields, {
             variables: {

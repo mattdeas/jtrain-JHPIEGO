@@ -101,8 +101,8 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
     const defCourseEventId = utilConfigConstantValueByName('CourseEventId');
     const defCourseAttendeesDE = utilConfigConstantValueByName('CourseAttendees');
     const defCourseAttendeesCountDE = utilConfigConstantValueByName('CourseAttendeesCount');
-    const defCoursePreScore = utilConfigConstantValueByName('CoursePretestScore');
-    const defCoursePostScore = utilConfigConstantValueByName('CoursePosttestScore');
+    const defCoursePreScore = utilConfigConstantValueByName('CoursePreTestScore');
+    const defCoursePostScore = utilConfigConstantValueByName('CoursePostTestScore');
     const defCourseProgramId = utilConfigConstantValueByName('CourseProgram');
     const defCourseProgramStageId = utilConfigConstantValueByName('CourseProgramStage');
 
@@ -300,6 +300,8 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
 
      const dataStaffDefault = [];
      dataStaffDefault.push({ dataElement: defCourseEventId, value: eventID });
+     console.log('defCoursePreScore', defCoursePreScore)
+     console.log('defCoursePostScore', defCoursePostScore)
      dataStaffDefault.push({ dataElement: defCoursePreScore, value: 0 });
      dataStaffDefault.push({ dataElement: defCoursePostScore, value: 0 });
      console.log('StaffUpdateTEI', trackedEntityInstance)
@@ -310,7 +312,8 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
             
             // Add a delay before calling onAssign and refetch
             setTimeout(() => {
-                onAssign();
+                console.log('Calling onAssign');
+                onAssign(); // Ensure this is called
                 refetch();
             }, 1000); // Delay of 1 second
         } catch (error) {
@@ -348,11 +351,13 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
         <input 
         type="text" 
         onChange={handleSearchTermChangeLast} 
+        value={searchLastName}
         placeholder="Last Name" 
         onKeyPress={(e) => { if (e.key === 'Enter') handleSearch(); }}
         />
         <input 
         type="text" 
+        value={searchFirstName}
         onChange={handleSearchTermChangeFirst} 
         placeholder="First Name" 
         onKeyPress={(e) => { if (e.key === 'Enter') handleSearch(); }}

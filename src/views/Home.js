@@ -18,7 +18,7 @@ export const Home = () => {
             "CourseAttendeesCount": "IA7YxfolpEM",
             "CourseEventId": "dTrDnb4e8Ee",
             "CoursePostTestScore": "zvXaKJnl14I",
-            "CoursePretestSscore": "IAphSuyuH15",
+            "CoursePreTestScore": "IAphSuyuH15",
             "CourseProgram": "Lw1g7haLUd9",
             "CourseProgramStageId": "h9zPG79AmgH",
             "DefaultCourseOrgUnit": "Esaneu7V7rq",

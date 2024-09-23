@@ -99,16 +99,17 @@ export const StaffSearch = () => {
         });
     };
 
+   
     return (
         <div>
             <h1>Search Staff</h1>
-            <input type="text" onChange={handleSearchTermChangeLast} placeholder="Last Name" />
-            <input type="text" onChange={handleSearchTermChangeFirst} placeholder="First Name" />
+            <input type="text" onChange={handleSearchTermChangeLast} placeholder="Last Name" onKeyPress={(e) => { if (e.key === 'Enter') handleSearch(); }} />
+            <input type="text" onChange={handleSearchTermChangeFirst} placeholder="First Name"  onKeyPress={(e) => { if (e.key === 'Enter') handleSearch(); }}/>
             <button onClick={handleSearch}>Search</button>
             <style>
                 {`
                 .table-container {
-                    max-height: 400px; /* Adjust the height as needed */
+                    max-height: 378px; /* Adjust the height as needed */
                     overflow-y: auto;
                 }
     
@@ -173,8 +174,8 @@ export const StaffSearch = () => {
                                                         .split('/')
                                                         .slice(2)
                                                         .map(id => {
-                                                            const orgUnit = orgUnitsData.orgUnits.organisationUnits.find(orgUnit => orgUnit.id === id);
-                                                            return orgUnit ? orgUnit.displayName : id;
+                                                            const orgUnit = orgUnitsData.orgUnits.organisationUnits.find(orgUnit => orgUnit.id === id.split('/').pop());
+                                                            return orgUnit ? orgUnit.displayName : id.split('/').pop();
                                                         })
                                                         .join(' - ')
                                                     : ''}

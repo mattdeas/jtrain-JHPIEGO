@@ -106,9 +106,9 @@ export const CourseDetails = ({ course, updateHeadings }) => {
     const dataElements = [...new Set(data.events.events.flatMap(({ dataValues }) => dataValues.map(({ dataElement }) => dataElement)))];
 
     const onButtonClick = (variablesToPassBack) => {
-        const variablesString = Object.entries(variablesToPassBack)
-            .map(([key, value]) => `${key}-${value}`)
-            .join('-');
+        let variablesString = Object.entries(variablesToPassBack)
+            .map(([key, value]) => `${key} - ${value}`)
+            .join(' - ');
         updateHeadings(variablesString);
     };
 
@@ -193,7 +193,7 @@ export const CourseDetails = ({ course, updateHeadings }) => {
                                                             if (dataElementObject.dataElement.displayName === 'Location')
                                                                 return (
                                                                     <TableCell key={dataElementObject.dataElement.id}>
-                                                                        {orgUnitsData?.orgUnits?.organisationUnits?.find(ou => ou.id === values[dataElementObject.dataElement.id])?.displayName || ''}
+                                                                        {orgUnitsData?.orgUnits?.organisationUnits?.find(ou => ou.id === values[dataElementObject.dataElement.id].split('/').pop())?.displayName || ''}
                                                                     </TableCell>
                                                                 );
 
@@ -212,7 +212,16 @@ export const CourseDetails = ({ course, updateHeadings }) => {
 
                                                                 const variablesToPassBack = dProgramDE.data.programStages.programStageDataElements.reduce((acc, dataElementObject) => {
                                                                     if (!dataElementObject.dataElement.displayName.startsWith('jtrain')) {
-                                                                        acc[dataElementObject.dataElement.displayName] = values[dataElementObject.dataElement.id];
+                                                                        if(dataElementObject.dataElement.displayName.toLowerCase().startsWith('course')){
+                                                                            acc[dataElementObject.dataElement.displayName] = values[dataElementObject.dataElement.id].replace('course', '');    
+                                                                            acc[dataElementObject.dataElement.displayName] = acc[dataElementObject.dataElement.displayName].replace('Course', '');
+                                                                        }
+                                                                        if(dataElementObject.dataElement.displayName.toLowerCase().startsWith('location')){
+                                                                            acc[dataElementObject.dataElement.displayName] = orgUnitsData?.orgUnits?.organisationUnits?.find(ou => ou.id === values[dataElementObject.dataElement.id].split('/').pop())?.displayName || '';
+                                                                        }
+                                                                        else{
+                                                                            acc[dataElementObject.dataElement.displayName] = values[dataElementObject.dataElement.id];
+                                                                        }
                                                                     }
                                                                     return acc;
                                                                 }, {});

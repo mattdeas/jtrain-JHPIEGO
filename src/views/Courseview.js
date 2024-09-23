@@ -102,7 +102,7 @@ const mutation = {
 
 
 
-const mutationCourseEvent = (program, programStage, orgUnit, trackedEntityInstance, idataValues) => ({
+const mutationCourseEvent = (program, programStage, orgUnit, trackedEntityInstance, idataValues, eventDate) => ({
     resource: 'events',
     type: 'create',
     data: () => ({
@@ -114,7 +114,7 @@ const mutationCourseEvent = (program, programStage, orgUnit, trackedEntityInstan
           orgUnit: orgUnit,
           dataValues: idataValues,
           status: 'ACTIVE',
-          eventDate: formattedDate,
+          eventDate: eventDate,
         },
       ],
     }),
@@ -238,6 +238,14 @@ export const Courseview = () => {
     }
 };
 
+
+const handleAddTrainees = (eventToDelete) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this event?");
+    if (confirmDelete) {
+        console.log('eventtodel',eventToDelete)
+        deleteEvent(eventToDelete);
+    }
+};
   const handleEditEvent = (event) => {
     const dataValuesObject = event.dataValues.reduce((acc, { dataElement, value }) => {
         acc[dataElement] = value;
@@ -366,11 +374,14 @@ const handleInputChangeCourseDateEdit = (name, date) => {
         //Default values for Course Attendees and Counts
         const defCourseAttendeesId = utilConfigConstantValueByName('CourseAttendees')
         const defCourseAttendeesCountId = utilConfigConstantValueByName('CourseAttendeesCount')
+        const defCourseStartDate = utilConfigConstantValueByName('CourseStartDate')
         dataValues.push({ dataElement: defCourseAttendeesId, value: '' });
         dataValues.push({ dataElement: defCourseAttendeesCountId, value: '0' });
 
+        const eventDateValue = formFieldsCourse[defCourseStartDate];
+        const eventDate = eventDateValue ? eventDateValue : formattedDate; // Use the extracted date or fallback to today's date
         //const myMutation = mutationCourseEvent('P59PhQsB6tb', 'r0gHZqEq6DE', 'VgrqnQEtyOP', id, dataValues);
-        const myMutation = mutationCourseEvent(defCourseProgramId, defCourseProgStageId, defCourseOrgUnitId, id, dataValues);
+        const myMutation = mutationCourseEvent(defCourseProgramId, defCourseProgStageId, defCourseOrgUnitId, id, dataValues, eventDate);
         console.log(dataValues)
         try {
           const response = await engine.mutate(myMutation);
@@ -787,6 +798,11 @@ const handleInputChangeCourseDateEdit = (name, date) => {
                             <td>
                                 <div role="button" tabIndex="0" onClick={() => handleDeleteEvent(event.event)}>
                                     <IconDelete16 />
+                                </div>
+                            </td>
+                            <td>
+                                <div role="button" tabIndex="0" onClick={() => handleAddTrainees(event.event)}>
+                                    <IconAdd16 />
                                 </div>
                             </td>
                         </tr>

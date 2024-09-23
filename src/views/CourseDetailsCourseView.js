@@ -36,7 +36,6 @@ export const CourseDetailsCourseView = ({ id }) => {
 
   const defCourseProgStageId = utilConfigConstantValueByName('CourseProgramStageId')
   const defStaffOrgUnitId  = utilConfigConstantValueByName('CourseProgramStageId')
-  //const defCourseProgStageId = "h9zPG79AmgH";
     const { loading, error, data } = useDataQuery({
         programStages: {
           resource: `programStages/${defCourseProgStageId}`,
@@ -106,7 +105,7 @@ export const CourseDetailsCourseView = ({ id }) => {
 
     if (dataElement.displayName === 'Location') {
       return <TableCell key={dataElement.id}>
-      {orgUnitsData && orgUnitsData.orgUnits && orgUnitsData.orgUnits.organisationUnits && orgUnitsData.orgUnits.organisationUnits.find(orgUnit => orgUnit.id === dataElementToValue[dataElement.id])?.displayName || ''}
+      {orgUnitsData?.orgUnits?.organisationUnits?.find(orgUnit => orgUnit.id === dataElementToValue[dataElement.id].split('/').pop())?.displayName || ''}
       </TableCell>;
     }
     else
