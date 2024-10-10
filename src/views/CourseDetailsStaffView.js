@@ -178,11 +178,11 @@ export const CourseDetailsStaffView = ({ course }) => {
             const orgUnitId = fullOrgUnitId.split('/').pop();
     
             // Find the orgUnit by the extracted orgUnitId
-            const orgUnit = orgUnitsData.orgUnits.organisationUnits.find(orgUnit => orgUnit.id === orgUnitId);
+            {/* const orgUnit = orgUnitsData.orgUnits.organisationUnits.find(orgUnit => orgUnit.id === orgUnitId); */}
 
             return (
                 <TableCell key={dataElement.id}>
-                    {orgUnit ? orgUnit.displayName : orgUnitId}
+                    {/* {orgUnit ? orgUnit.displayName : orgUnitId} */}
                 </TableCell>
             );
 

@@ -55,6 +55,7 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onDelete }) =
     const [delTEIs, setDelTEIs] = useState([]);
     const [refreshKey, setRefreshKey] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
+    const [isFileIconVisible, setIsFileIconVisible] = useState(true);
 
     const defStaffEntityType = utilConfigConstantValueByName('TEITypeStaff');
     const defStaffOrgUnit = utilConfigConstantValueByName('DefaultStaffOrgUnit');
@@ -83,6 +84,11 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onDelete }) =
         },
     });
 
+    const handleDivClick = (trackedEntityInstance) => {
+        if (!showCustomFields[trackedEntityInstance]) {
+            handleShowCustomFields(trackedEntityInstance);
+        }
+    };
     const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
 
     useEffect(() => {
@@ -138,10 +144,14 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onDelete }) =
         }));
     };
 
-    
+    const handleToggleTestSection = () => {
+        setShowTestSection(prevState => !prevState);
+        console.log('Toggled test section');
+    };
 
     return (
         <div>
+        <IconFileDocument24 onClick={handleToggleTestSection} />
             <style>
                 {`
                 .table-container {
@@ -234,16 +244,30 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onDelete }) =
                                                   <Link to={`/staffview/${trackedEntityInstance}`}><IconView24 alt="View Enrollee Details" /></Link>
                                                 </TableCell>
                                                 <TableCell >
-                                                <div onClick={() => handleShowCustomFields(trackedEntityInstance)}>
-                                                    {showCustomFields[trackedEntityInstance] ? (
-                                                        <>
-                                                            <IconSubtractCircle16 />
-                                                            <CourseDateAttendeesStaffCustomFields eventID={matchingEventValue} />
-                                                        </>
-                                                    ) : (
-                                                        <IconFileDocument24 />
-                                                    )}
-                                                </div>
+                                                <div>
+                                                {isFileIconVisible ? (
+                <div onClick={() => { 
+                    console.log('IconFileDocument24 clicked');
+                    setIsFileIconVisible(false);
+                    handleShowCustomFields(trackedEntityInstance); 
+                }} style={{ display: 'inline-block', cursor: 'pointer' }}>
+                    <IconFileDocument24 />
+                </div>
+            ) : (
+                <div onClick={() => { 
+                    console.log('IconSubtractCircle16 clicked');
+                    setIsFileIconVisible(true);
+                    handleShowCustomFields(trackedEntityInstance); 
+                }} style={{ display: 'inline-block', cursor: 'pointer' }}>
+                    <IconSubtractCircle16 />
+                </div>
+            )}
+
+            {showCustomFields[trackedEntityInstance] && (
+                <CourseDateAttendeesStaffCustomFields eventID={matchingEventValue} />
+            )}
+            </div>
+            
                                                  </TableCell>
                                                  <TableCell>
                                                      <div onClick={() => handleDelete(trackedEntityInstance, matchingEventValue)}><IconDelete24 /></div>

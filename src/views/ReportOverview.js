@@ -392,7 +392,8 @@ const fetchTrainingsPerDistrictPerYear = async (setVariable) => {
                 resource: 'organisationUnits',
                 params: {
                     filter: `id:in:[${districtIds.join(',')}]`,
-                    fields: 'id,displayName'
+                    fields: 'id,displayName',
+                    pageSize: 10000
                 }
             }
         };
@@ -474,7 +475,8 @@ console.log('District ID to Name Map:', districtIdToName);
                     stage: defCourseProgStage,
                     displayProperty: 'NAME',
                     totalPages: 'false',
-                    outputType: 'EVENT'
+                    outputType: 'EVENT',
+                    pageSize: 10000
                 }
             }
         };
@@ -652,117 +654,109 @@ console.log('District ID to Name Map:', districtIdToName);
 
     return (
         <div>
-        <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: '20px' }}>
-        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-            <div style={{
-                display: 'inline-block',
-                padding: '10px 20px',
-                fontWeight: 'bold',
-                fontSize: '2em',
-                borderRadius: '10px',
-                backgroundColor: '#f0f0f0',
-                textAlign: 'center'
-            }}>
-                {dataStaff.instances.trackedEntityInstances.length}
+            <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: '20px', overflowX: 'auto' }}>
+                <div style={{ textAlign: 'center', marginBottom: '20px', flex: '1 1 auto', minWidth: '200px' }}>
+                    <div style={{
+                        display: 'inline-block',
+                        padding: '10px 20px',
+                        fontWeight: 'bold',
+                        fontSize: '2em',
+                        borderRadius: '10px',
+                        backgroundColor: '#f0f0f0',
+                        textAlign: 'center'
+                    }}>
+                        {dataStaff.instances.trackedEntityInstances.length}
+                    </div>
+                    <p style={{ marginTop: '10px', fontSize: '1.2em' }}>Total Trainees Enrolled</p>
+                </div>
+                <div style={{ textAlign: 'center', marginBottom: '20px', flex: '1 1 auto', minWidth: '200px' }}>
+                    <div style={{
+                        display: 'inline-block',
+                        padding: '10px 20px',
+                        fontWeight: 'bold',
+                        fontSize: '2em',
+                        borderRadius: '10px',
+                        backgroundColor: '#f0f0f0',
+                        textAlign: 'center'
+                    }}>
+                        {TotalTrainingEvents}
+                    </div>
+                    <p style={{ marginTop: '10px', fontSize: '1.2em' }}>Total Courses Held</p>
+                </div>
+                <div style={{ textAlign: 'center', marginBottom: '20px', flex: '1 1 auto', minWidth: '200px' }}>
+                    <div style={{
+                        display: 'inline-block',
+                        padding: '10px 20px',
+                        fontWeight: 'bold',
+                        fontSize: '2em',
+                        borderRadius: '10px',
+                        backgroundColor: '#f0f0f0',
+                        textAlign: 'center'
+                    }}>
+                        {TrainingTotal}
+                    </div>
+                    <p style={{ marginTop: '10px', fontSize: '1.2em' }}>Total Trainees attending Events</p>
+                </div>
             </div>
-            <p style={{ marginTop: '10px', fontSize: '1.2em' }}>Total Trainees Enrolled</p>
-        </div>
-        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-            <div style={{
-                display: 'inline-block',
-                padding: '10px 20px',
-                fontWeight: 'bold',
-                fontSize: '2em',
-                borderRadius: '10px',
-                backgroundColor: '#f0f0f0',
-                textAlign: 'center'
-            }}>
-                {TotalTrainingEvents}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <p style={{ marginTop: '10px', fontSize: '1.2em' }}>Total Trainees attending Events</p>
+                <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: '20px', overflowX: 'auto' }}>
+                    <div style={{ flex: '1 1 auto', minWidth: '200px' }}>
+                        <Chart
+                            chartType="Bar"
+                            width="100%"
+                            height="400px"
+                            data={data}
+                            options={options}
+                        />
+                    </div>
+                    <div style={{ flex: '1 1 auto', minWidth: '200px' }}>
+                        <Chart
+                            chartType="Bar"
+                            width="100%"
+                            height="400px"
+                            data={TPY}
+                            options={optionsTPY}
+                        />
+                    </div>
+                    <div style={{ flex: '1 1 auto', minWidth: '200px' }}>
+                        <Chart
+                            chartType="Bar"
+                            width="100%"
+                            height="400px"
+                            data={TrainingTotalDesignation}
+                            options={optionsDesignation}
+                        />
+                    </div>
+                </div>
+                <div style={{ overflowX: 'auto' }}>
+                    <Chart
+                        chartType="Bar"
+                        width="100%"
+                        height="400px"
+                        data={TPYP}
+                        options={optionsPartnersYear}
+                    />
+                </div>
+                <div style={{ overflowX: 'auto' }}>
+                    <Chart 
+                        chartType="Bar"
+                        width="100%"
+                        height="400px"
+                        data={TrainingsPerDistrict}
+                        options={optionsPerDistrict}
+                    />
+                </div>
+                <div style={{ overflowX: 'auto' }}>
+                    <Chart 
+                        chartType="Bar"
+                        width="100%"
+                        height="400px"
+                        data={TrainingsPerDistrictYear}
+                        options={optionsPerDistrictYear}
+                    />
+                </div>
             </div>
-            <p style={{ marginTop: '10px', fontSize: '1.2em' }}>Total Courses Held</p>
-        </div>
-        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-            <div style={{
-                display: 'inline-block',
-                padding: '10px 20px',
-                fontWeight: 'bold',
-                fontSize: '2em',
-                borderRadius: '10px',
-                backgroundColor: '#f0f0f0',
-                textAlign: 'center'
-            }}>
-                {TrainingTotal}
-            </div>
-            <p style={{ marginTop: '10px', fontSize: '1.2em' }}>Total Trainees attending Events</p>
-        </div>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-    {/* <div style={{ backgroundColor: '#f0f0f0', textAlign: 'center' }}>
-        {TrainingTotal}
-    </div> */}
-    <p style={{ marginTop: '10px', fontSize: '1.2em' }}>Total Trainees attending Events</p>
-    <div style={{ display: 'flex', flexWrap: 'nowrap', gap: '20px', width: '100%' }}>
-        <Chart
-            chartType="Bar"
-            width="100%"
-            height="400px"
-            data={data}
-            options={options}
-        />
-
-        {/* <Chart
-            chartType="PieChart"
-            data={piedata}
-            options={pieoptions}
-            width={"100%"}
-            height={"400px"}
-        /> */}
-
-        <Chart
-            chartType="Bar"
-            width="100%"
-            height="400px"
-            data={TPY}
-            options={optionsTPY}
-        />
-
-        <Chart
-            chartType="Bar"
-            width="100%"
-            height="400px"
-            data={TrainingTotalDesignation}
-            options={optionsDesignation}
-        />
-    </div>
-    <div>
-        <Chart
-            chartType="Bar"
-            width="100%"
-            height="400px"
-            data={TPYP}
-            options={optionsPartnersYear}
-        />
-    </div>
-    <div>
-        <Chart 
-            chartType="Bar"
-            width={"100%"}
-            height={"400px"}
-            data={TrainingsPerDistrict}
-            options={optionsPerDistrict}
-        />
-    </div>
-    <div>
-    <Chart 
-            chartType="Bar"
-            width={"100%"}
-            height={"400px"}
-            data={TrainingsPerDistrictYear}
-            options={optionsPerDistrictYear}
-        />
-    </div>
-</div>
-            
         </div>
     );
 }

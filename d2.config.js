@@ -26,7 +26,8 @@ const config = {
             "ThematicAreaOptionset":"AvtckM3AMNR",
             "IndicatorTotalFemaleTrainee": "fWteSZrcYjO",
             "IndicatorTotalMaleTrainee": "mtKAszEGXQ2",
-            "IndicatorTotalUnknownTrainee": "Wyfg7HQa40s"
+            "IndicatorTotalUnknownTrainee": "Wyfg7HQa40s",
+            "testvariable": "12345"
     }
 }
 

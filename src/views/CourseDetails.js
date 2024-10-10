@@ -52,6 +52,8 @@ export const CourseDetails = ({ course, updateHeadings }) => {
                 orgUnit: defCourseOrgUnitId,
                 trackedEntityInstance,
                 fields: 'event,eventDate,dataValues[dataElement,value]',
+                paging: false,
+                pageSize: 10000,
             }),
         },
     };

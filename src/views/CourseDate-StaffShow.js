@@ -235,7 +235,6 @@ export const CourseDateStaffShow = ({tei_id, eventID, reload, refreshCount}) => 
       <div>
             <TableCellHead style={{ display: 'flex', flexDirection: 'column', width: '80vw', margin: 0, padding: 0 }}>Course Details: </TableCellHead>
             <CourseDetailsCourseView id={eventID} /> 
-            <p>{eventID}</p>
       </div>
       </TableRow>
        <TableRow>
