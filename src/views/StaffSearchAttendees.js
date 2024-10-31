@@ -253,7 +253,6 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
     const handleAssign = async (trackedEntityInstance) => {
         const dataValues = await fetchEvent(eventID);
 
-        console.log('trackedEntityInstance', trackedEntityInstance)
         setIsLoading(true);
 
         // try {
@@ -294,17 +293,12 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
 
 
    const myMutation = UpdateEvent(defCourseProgramId, defCourseProgramStageId, defStaffOrgUnitId, eventID, dataInputs);
-   console.log('myMutation', myMutation)
    const response = await engine.mutate(myMutation);
-   console.log('response', response)
 
      const dataStaffDefault = [];
      dataStaffDefault.push({ dataElement: defCourseEventId, value: eventID });
-     console.log('defCoursePreScore', defCoursePreScore)
-     console.log('defCoursePostScore', defCoursePostScore)
      dataStaffDefault.push({ dataElement: defCoursePreScore, value: 0 });
      dataStaffDefault.push({ dataElement: defCoursePostScore, value: 0 });
-     console.log('StaffUpdateTEI', trackedEntityInstance)
      const myStaffUpdate = CreateEvent(defStaffProgramId, defStaffProgramCourseId, defStaffOrgUnitId, dataStaffDefault, trackedEntityInstance);
      try {
             const response2 = await engine.mutate(myStaffUpdate);

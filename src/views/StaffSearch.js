@@ -169,16 +169,19 @@ export const StaffSearch = () => {
                                             <TableCell>{attributesObj['Designation']}</TableCell>
                                             <TableCell>{attributesObj['Mobile #']}</TableCell>
                                             <TableCell>
-                                                {attributesObj['Location']
-                                                    ? attributesObj['Location']
-                                                        .split('/')
-                                                        .slice(2)
-                                                        .map(id => {
-                                                            const orgUnit = orgUnitsData.orgUnits.organisationUnits.find(orgUnit => orgUnit.id === id.split('/').pop());
-                                                            return orgUnit ? orgUnit.displayName : id.split('/').pop();
-                                                        })
-                                                        .join(' - ')
-                                                    : ''}
+                                            {attributesObj['Location']
+                                            ? attributesObj['Location']
+                                                .split('/')
+                                                .slice(2)
+                                                .map(id => {
+                                                    if (!orgUnitsData || !orgUnitsData.orgUnits || !orgUnitsData.orgUnits.organisationUnits) {
+                                                        return ''; // Return empty string if orgUnitsData is not available
+                                                    }
+                                                    const orgUnit = orgUnitsData.orgUnits.organisationUnits.find(orgUnit => orgUnit.id === id.split('/').pop());
+                                                    return orgUnit ? orgUnit.displayName : id.split('/').pop();
+                                                })
+                                                .join(' - ')
+                                            : ''}
                                             </TableCell>
                                             <TableCell>{attributesObj['PIN']}</TableCell>
                                             <TableCell>

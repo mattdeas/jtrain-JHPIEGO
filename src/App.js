@@ -179,6 +179,32 @@ const MyApp = () => {
                                 <Link to="/trainingcapture">Training Capture</Link>
                             </Tab>
                         </TabBar>
+                        {/* <TabBar className={styles.tabBar}>
+            <Tab
+                onClick={() => setSelectedTab('Home')}
+                className={`${styles.tab} ${selectedTab === 'Home' ? styles.selectedTab : ''}`}
+            >
+                <Link to="/">Home</Link>
+            </Tab>
+            <Tab
+                onClick={() => setSelectedTab('Course')}
+                className={`${styles.tab} ${selectedTab === 'Course' ? styles.selectedTab : ''}`}
+            >
+                <Link to="/coursesearch">Course</Link>
+            </Tab>
+            <Tab
+                onClick={() => setSelectedTab('StaffSearch')}
+                className={`${styles.tab} ${selectedTab === 'StaffSearch' ? styles.selectedTab : ''}`}
+            >
+                <Link to="/staffsearch">Staff</Link>
+            </Tab>
+            <Tab
+                onClick={() => setSelectedTab('TrainingCapture')}
+                className={`${styles.tab} ${selectedTab === 'TrainingCapture' ? styles.selectedTab : ''}`}
+            >
+                <Link to="/trainingcapture">Training Capture</Link>
+            </Tab>
+        </TabBar> */}
                         </div>
                     </div>
                         

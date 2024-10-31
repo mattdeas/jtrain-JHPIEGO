@@ -149,9 +149,73 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onDelete }) =
         console.log('Toggled test section');
     };
 
+    const handleDelete = async (trackedEntityInstance, MaineventID) => {
+        console.log(`Deleting tracked entity instance: ${trackedEntityInstance} with event ID: ${MaineventID}`);
+
+        const deleteMutation = {
+            resource: `events/${MaineventID}`,
+            type: 'delete',
+        };
+
+        if (window.confirm('Are you sure you want to delete this event?')) {
+            try {
+                // Fetch the event details
+                const eventDetails = await engine.query({
+                    event: {
+                        resource: `events/${eventID}`,
+                    },
+                });
+
+                const eventData = eventDetails.event;
+
+                // Update the data values
+                const defCourseAttendeesCountDE = utilConfigConstantValueByName('CourseAttendeesCount'); 
+                const defCourseAttendeesDE =   utilConfigConstantValueByName('CourseAttendees');
+
+                const updatedDataValues = eventData.dataValues.map(dataValue => {
+                    if (dataValue.dataElement === defCourseAttendeesCountDE) {
+                        return {
+                            ...dataValue,
+                            value: parseInt(dataValue.value, 10) - 1,
+                        };
+                    } else if (dataValue.dataElement === defCourseAttendeesDE) {
+                        return {
+                            ...dataValue,
+                            value: dataValue.value.replace(`${trackedEntityInstance};`, ''),
+                        };
+                    }
+                    return dataValue;
+                });
+
+                console.log('eventsdata',eventData)
+                // Create the update mutation
+                const updateMutation = {
+                    resource: `events/${eventID}`,
+                    type: 'update',
+                    data: {
+                        ...eventData,
+                        dataValues: updatedDataValues,
+                    },
+                };
+
+                // Perform the update
+                await engine.mutate(updateMutation);
+                //alert('updated event',eventID)
+                // Perform the delete
+                //await engine.mutate(deleteMutation);
+
+                //alert('Event deleted successfully');
+                // Add any additional logic here, such as updating the state or refetching data
+            } catch (error) {
+                console.error('Failed to delete event:', error);
+                alert('Failed to delete event');
+            }
+        }
+    };
+
     return (
         <div>
-        <IconFileDocument24 onClick={handleToggleTestSection} />
+        {/* <IconFileDocument24 onClick={handleToggleTestSection} /> */}
             <style>
                 {`
                 .table-container {

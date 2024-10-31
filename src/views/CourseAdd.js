@@ -66,23 +66,36 @@ import { IconCross16, IconSave16 } from '@dhis2/ui';
         const handleFormSubmit = async (event) => {
             event.preventDefault();
             console.log('event', event);
+        
+            // Fetch the program details to get the correct trackedEntityType
+            const programDetails = await engine.query({
+                program: {
+                    resource: `programs/${defCourseProgramId}`,
+                    params: {
+                        fields: ['trackedEntityType[id]'],
+                    },
+                },
+            });
+        
+            const trackedEntityType = programDetails.program.trackedEntityType.id;
+        
             const newEntity = {
                 attributes: data.program.programTrackedEntityAttributes.map(attr => ({
                     attribute: attr.trackedEntityAttribute.id,
                     value: formFields[attr.trackedEntityAttribute.id],
                 })),
                 orgUnit: defCourseOrgUnitId,
-                trackedEntityType: defCourseType,
+                trackedEntityType: trackedEntityType, // Use the correct trackedEntityType
             };
-
+        
             const createResponse = await engine.mutate({
                 resource: 'trackedEntityInstances',
                 type: 'create',
                 data: newEntity,
             });
-
+        
             const teiId = createResponse.response.importSummaries[0].reference;
-
+        
             const enrollmentData = {
                 trackedEntityInstance: teiId,
                 program: defCourseProgramId,
@@ -90,14 +103,14 @@ import { IconCross16, IconSave16 } from '@dhis2/ui';
                 enrollmentDate: new Date().toISOString().split('T')[0],
                 incidentDate: new Date().toISOString().split('T')[0],
             };
-
-            console.log(newEntity)
+        
+            console.log(newEntity);
             await engine.mutate({
                 resource: 'enrollments',
                 type: 'create',
                 data: enrollmentData,
             });
-
+        
             setMessage('Saved successfully');
             props.onSaved();
         };

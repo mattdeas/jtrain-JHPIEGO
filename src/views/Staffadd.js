@@ -13,6 +13,7 @@ import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} 
 import React, {useState, useEffect} from 'react'
 import { utilGetConstantValueByName,  utilConfigConstantValueByName } from '../utils/utils';
 import { OrganisationUnitTree } from '@dhis2/ui';
+import { CircularLoader } from '@dhis2/ui';
 
 const today = new Date();
 //const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
@@ -155,8 +156,10 @@ export const Staffadd = () => {
     setMessage('Saved successfully');
     //props.onSaved();
         //redirct to the staffview page with the id 
-
-    
+        setTimeout(() => {
+            setLoading(false); // Hide loading spinner
+            navigate('/staffsearch');
+        }, 3000);
     };
 
 
@@ -317,6 +320,11 @@ export const Staffadd = () => {
     )
 }
     {message && <p>{message}</p>}
+    {/* {loading && (
+                <div className="loader">
+                    <CircularLoader type="ThreeDots" color="#00BFFF" height={80} width={80} />
+                </div>
+            )} */}
   </div>
 )
 }

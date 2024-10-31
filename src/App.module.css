@@ -41,4 +41,26 @@
     font-size: 20px;
 }
 
+.tab {
+    /* padding: 10px 20px; */
+    border-radius: 25px;
+    margin-right: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.tab a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.tab:hover {
+    background-color: #e0e0e0;
+}
+
+.selectedTab {
+    background-color: blue;
+    color: white;
+}
+
 iframe#webpack-dev-server-client-overlay{display:none!important}

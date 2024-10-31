@@ -3,11 +3,12 @@ import { CourseDetailsCourseView } from './CourseDetailsCourseView';
 import { CourseDateAttendees } from './CourseDateAttendees';
 import { CourseDateStaffShow } from './CourseDate-StaffShow';
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import React, {useState, useEffect} from 'react'
 import { utilConfigConstantValueByName } from '../utils/utils';
 import { CourseEditEvent} from './CourseEditEvent'
 import { Calendar } from '@dhis2-ui/calendar'
-import { IconAdd16, IconDelete16, IconCross16, IconSave16, IconView16, IconEdit16 } from '@dhis2/ui';
+import { IconAdd16, IconDelete16, IconCross16, IconSave16, IconView16, IconEdit16 , IconArrowLeftMulti24} from '@dhis2/ui';
 import { CalendarInput } from '@dhis2/ui';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -63,31 +64,6 @@ const eventsQuery = (id) => ({
         },
     },
 });
-
-
-// const DataElement = ({ dataElementId, value }) => {
-//     const dataElementQuery = {
-//         dataElement: {
-//             resource: 'dataElements',
-//             id: dataElementId,
-//             params: {
-//                 fields: ['displayName'],
-//             },
-//         },
-//     };
-
-//     const { loading, error, data } = useDataQuery(dataElementQuery);
-
-//     if (loading) return <td>Loading...</td>;
-//     if (error) return <td>Error: {error.message}</td>;
-
-//     return (
-//         <>
-//             <td>{data.dataElement.displayName}</td>
-//             <td>{value}</td>
-//         </>
-//     );
-// };
 
 const mutation = {
     resource: 'trackedEntityInstances',
@@ -148,8 +124,8 @@ export const Courseview = () => {
     const defCourseEndDate =  utilConfigConstantValueByName('CourseEndDate')
 
     const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
-
- 
+    const navigate = useNavigate(); 
+    const [key, setKey] = useState(0); 
 
     const { loading: loadingEntity, error: errorEntity, data: dataEntity } = useDataQuery(qryTrackedEntityInstance, {
         variables: {
@@ -195,9 +171,9 @@ export const Courseview = () => {
   const { loading: loading2, error2, data: dataProgramDE } = useDataQuery(qryProgramDataElements);
   
   const engine = useDataEngine();
-
+//Possibly hold off on this - functionality via jTRAIN.
   const handleDelete = async () => {
-      if (window.confirm('Are you sure you want to delete this course?')) {
+      if (window.confirm('Are you sure you want to delete this course? NOTE - THIS WILL REMOVE ALL TRAINEE DATA FOR THIS COURSE')) {
           try {
               await engine.mutate(deleteMutation);
               alert('Course deleted successfully');
@@ -380,15 +356,19 @@ const handleInputChangeCourseDateEdit = (name, date) => {
 
         const eventDateValue = formFieldsCourse[defCourseStartDate];
         const eventDate = eventDateValue ? eventDateValue : formattedDate; // Use the extracted date or fallback to today's date
-        //const myMutation = mutationCourseEvent('P59PhQsB6tb', 'r0gHZqEq6DE', 'VgrqnQEtyOP', id, dataValues);
+        
         const myMutation = mutationCourseEvent(defCourseProgramId, defCourseProgStageId, defCourseOrgUnitId, id, dataValues, eventDate);
         console.log(dataValues)
         try {
           const response = await engine.mutate(myMutation);
           console.log('Event created successfully', response);
           
-          // Refresh the page
-         window.location.reload();
+           // Navigate to the same page to refresh the content
+           // Update the key state variable to force a re-render
+           refetchEvent();
+           setShowSection(false);
+           setKey(prevKey => prevKey + 1);
+           
         } catch (error) {
           console.error('Error creating event:', error);
         }
@@ -426,7 +406,9 @@ const handleInputChangeCourseDateEdit = (name, date) => {
             console.log('Event updated successfully', response);
     
             // Refresh the page
-           // window.location.reload();
+            refetchEvent();
+            setShowSectionEdit(false);
+            setKey(prevKey => prevKey + 1);
         } catch (error) {
             console.error('Error updating event:', error);
         }
@@ -643,7 +625,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
     //const filteredEvents = filterEvents(eventsData.events.events, partnerFilter, filterDate);
     //console.log('filteredEvents',filteredEvents)
     return (
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div key={key}  style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex' }}>
                 <div style={{ flex: '0 0 25%', minHeight: '90vh' }}>
   
@@ -706,9 +688,11 @@ const handleInputChangeCourseDateEdit = (name, date) => {
             <div>
                 {!editCourseShow && (
                     <div>
-                        <button type="button" >Edit Course Details</button>
+                        {/* <button type="button" >Edit Course Details</button> */}
                         <Link to="/coursesearch">
-                            <button type="button"><IconCross16/> Close</button>
+                        <button type="button" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <IconArrowLeftMulti24 style={{ marginRight: '8px' }} /> Return to Search
+                        </button>
                         </Link>
                     </div>
                 )}
@@ -801,9 +785,9 @@ const handleInputChangeCourseDateEdit = (name, date) => {
                                 </div>
                             </td>
                             <td>
-                                <div role="button" tabIndex="0" onClick={() => handleAddTrainees(event.event)}>
+                                {/* <div role="button" tabIndex="0" onClick={() => handleAddTrainees(event.event)}>
                                     <IconAdd16 />
-                                </div>
+                                </div> */}
                             </td>
                         </tr>
                     ))}

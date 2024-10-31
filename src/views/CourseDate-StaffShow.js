@@ -238,7 +238,7 @@ export const CourseDateStaffShow = ({tei_id, eventID, reload, refreshCount}) => 
       </div>
       </TableRow>
        <TableRow>
-            <button onClick={() => refetch()}>Edit Course Information</button>
+            {/* <button onClick={() => refetch()}>Edit Course Information</button> */}
        </TableRow>
       {/* <TableBody>
       {data.instances.trackedEntityInstances
