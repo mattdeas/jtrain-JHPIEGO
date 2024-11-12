@@ -1,9 +1,10 @@
-import { useDataQuery, useDataEngine } from "@dhis2/app-runtime";
+import {  useDataEngine } from "@dhis2/app-runtime";
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams, useNavigate} from 'react-router-dom';
 import { TabBar, Tab } from '@dhis2-ui/tab';
 import { Home,  CourseSearch, StaffSearch, Staffadd, TrainingCapture, Staffview, Settings,
     CourseDetailsStaffView,  CourseDateAttendeesStaffCustomFields, CourseDetailsCourseView, CourseAttendee, CourseDateAttendees} from './views';
+import { NavigationBar } from './navigation';
 
 
 import styles from './App.module.css';
@@ -132,10 +133,11 @@ const MainContent = () => {
         } else {
             setSelectedTab('Home');
         }
-    }, [location]);
+    }, [location, setSelectedTab]);
 
     return (
         <div>
+            <NavigationBar selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/coursesearch" element={<CourseSearch />} />
@@ -155,67 +157,27 @@ const MainContent = () => {
 
 const MyApp = () => {
     const [selectedTab, setSelectedTab] = useState('Home');
+    
 
+    const handleNavigation = (path, tab) => {
+        setSelectedTab(tab);
+        navigate(path);
+    };
     
     return (
         <Router>
              <div>
-             <div>
-                    <img src={logo} alt="jtrain logo" /> 
+             <img src={logo} alt="jtrain logo" />
                     <div className={styles.container}>
-                    <div className={styles.top}>
-                        <div style={{ height: '50px' }}>
-                            <TabBar className={styles.TabBar}>
-                            <Tab onClick={() => setSelectedTab('Home')}>
-                                <Link to="/">Home</Link>
-                            </Tab>
-                            <Tab onClick={() => setSelectedTab('Course')}>
-                                <Link to="/coursesearch">Course</Link>
-                            </Tab>
-                            <Tab onClick={() => setSelectedTab('StaffSearch')}>
-                                <Link to="/staffsearch">Staff</Link>
-                            </Tab>
-                            <Tab onClick={() => setSelectedTab('TrainingCapture')}>
-                                <Link to="/trainingcapture">Training Capture</Link>
-                            </Tab>
-                        </TabBar>
-                        {/* <TabBar className={styles.tabBar}>
-            <Tab
-                onClick={() => setSelectedTab('Home')}
-                className={`${styles.tab} ${selectedTab === 'Home' ? styles.selectedTab : ''}`}
-            >
-                <Link to="/">Home</Link>
-            </Tab>
-            <Tab
-                onClick={() => setSelectedTab('Course')}
-                className={`${styles.tab} ${selectedTab === 'Course' ? styles.selectedTab : ''}`}
-            >
-                <Link to="/coursesearch">Course</Link>
-            </Tab>
-            <Tab
-                onClick={() => setSelectedTab('StaffSearch')}
-                className={`${styles.tab} ${selectedTab === 'StaffSearch' ? styles.selectedTab : ''}`}
-            >
-                <Link to="/staffsearch">Staff</Link>
-            </Tab>
-            <Tab
-                onClick={() => setSelectedTab('TrainingCapture')}
-                className={`${styles.tab} ${selectedTab === 'TrainingCapture' ? styles.selectedTab : ''}`}
-            >
-                <Link to="/trainingcapture">Training Capture</Link>
-            </Tab>
-        </TabBar> */}
+                        <div className={styles.top}>
+                            <MainContent selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
                         </div>
-                    </div>
-                        
-                        <div style={{ flexGrow: 1, overflowY: 'auto'}}>
+                        <div style={{ flexGrow: 1, overflowY: 'auto' }}>
                             <div style={{ paddingLeft: '25px' }}>
-                            <MainContent selectedTab={selectedTab} />
+                                {/* Your content here */}
                             </div>
                         </div>
-                        
                     </div>
-                </div>
             </div>
         </Router>
         

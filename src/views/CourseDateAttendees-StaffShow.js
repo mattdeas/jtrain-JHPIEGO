@@ -48,7 +48,7 @@ const eventQuery = (eventID) => ({
     },
 });
 
-export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onDelete }) => {
+export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) => {
     const engine = useDataEngine();
     const [eventIds, setEventIds] = useState([]);
     const [currentEventId, setCurrentEventId] = useState(null);
@@ -144,18 +144,10 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onDelete }) =
         }));
     };
 
-    const handleToggleTestSection = () => {
-        setShowTestSection(prevState => !prevState);
-        console.log('Toggled test section');
-    };
+    
 
     const handleDelete = async (trackedEntityInstance, MaineventID) => {
-        console.log(`Deleting tracked entity instance: ${trackedEntityInstance} with event ID: ${MaineventID}`);
-
-        const deleteMutation = {
-            resource: `events/${MaineventID}`,
-            type: 'delete',
-        };
+              
 
         if (window.confirm('Are you sure you want to delete this event?')) {
             try {
@@ -201,11 +193,15 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onDelete }) =
                 // Perform the update
                 await engine.mutate(updateMutation);
                 //alert('updated event',eventID)
-                // Perform the delete
-                //await engine.mutate(deleteMutation);
+
 
                 //alert('Event deleted successfully');
                 // Add any additional logic here, such as updating the state or refetching data
+                // Re-fetch the data to refresh the control
+                console.log('about to run')
+                
+                onRemove();
+
             } catch (error) {
                 console.error('Failed to delete event:', error);
                 alert('Failed to delete event');

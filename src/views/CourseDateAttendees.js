@@ -5,7 +5,7 @@ import { StaffShow } from './CourseDateAttendees-StaffShow';
 import { utilConfigConstantValueByName } from '../utils/utils';
 import { CircularLoader } from '@dhis2/ui';
 
-export const CourseDateAttendees = ({ eventID, dElements }) => {
+export const CourseDateAttendees = ({ eventID, dElements, onDelete }) => {
   
     const [reload, setReload] = useState(false);
     const [refreshCount,setRefreshCount] = useState(0)
@@ -65,7 +65,7 @@ export const CourseDateAttendees = ({ eventID, dElements }) => {
           <table>
               <tbody>
               {dataElementObject ? (
-              <StaffShow tei_id={dataElementObject.value} eventID={eventID} reload={reload}  refreshCount={refreshCount} onDelete={handleReload} key={refreshCount} />
+              <StaffShow tei_id={dataElementObject.value} eventID={eventID} reload={reload}  refreshCount={refreshCount} onRemove={handleReload} key={refreshCount} />
             ) : (
               <tr><td>No attendees</td></tr>
             )}

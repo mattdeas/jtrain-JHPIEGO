@@ -650,7 +650,7 @@ console.log('District ID to Name Map:', districtIdToName);
     //   };
 
     if (loading1 || loading2 || loading3 || loading) return <span>Loading...</span>;
-    if (error1 || error2 || error3 || error) return <span>Error: {error?.message || error1?.message || error2?.message || error3?.message}</span>;
+    if (error1 || error2 || error3 || error) return <span>Error1: {error?.message || error1?.message || error2?.message || error3?.message}</span>;
 
     return (
         <div>

@@ -74,6 +74,9 @@ export const CourseDetails = ({ course, updateHeadings }) => {
     const [values, setValues] = useState({ location: '', partner: '' });
     const [filterDate, setFilterDate] = useState('');
 
+    const handleDelete = () => {
+        setRefreshKey(prevKey => prevKey + 1);
+    }
     const dProgramDE = useDataQuery(qryProgramDataElements);
 
     const handleTextChange = (event) => {
@@ -246,7 +249,7 @@ export const CourseDetails = ({ course, updateHeadings }) => {
                         </td>
                         <td rowSpan={1}>
                             <div>
-                                {selectedCourseDate.event && <CourseDateAttendees key={refreshKey} eventID={selectedCourseDate.event} dElements={dataElements} />}
+                                {selectedCourseDate.event && <CourseDateAttendees key={refreshKey} eventID={selectedCourseDate.event} dElements={dataElements} onDelete={handleDelete} />}
                             </div>
                         </td>
                     </tr>
