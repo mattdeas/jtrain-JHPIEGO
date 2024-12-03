@@ -1,0 +1,432 @@
+{
+    "trackedEntityTypes": [{
+            "name": "Course",
+            "created": "2023-11-06T13:54:06.702",
+            "lastUpdated": "2023-11-06T13:54:06.702",
+            "translations": [],
+            "createdBy": {
+                "id": "Xq3Khx2JHk0",
+                "code": null,
+                "name": "Scott Merritt",
+                "displayName": "Scott Merritt",
+                "username": "smerritt"
+            },
+            "lastUpdatedBy": {
+                "id": "Xq3Khx2JHk0",
+                "code": null,
+                "name": "Scott Merritt",
+                "displayName": "Scott Merritt",
+                "username": "smerritt"
+            },
+            "sharing": {
+                "owner": "Xq3Khx2JHk0",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "trackedEntityTypeAttributes": [],
+            "featureType": "NONE",
+            "minAttributesRequiredToSearch": 1,
+            "maxTeiCountToReturn": 0,
+            "allowAuditLog": false,
+            "id": "EcbFeAtWDmP",
+            "attributeValues": []
+        },{
+            "name": "Training Course",
+            "created": "2024-06-10T13:43:09.637",
+            "lastUpdated": "2024-09-05T11:02:07.846",
+            "translations": [],
+            "createdBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "lastUpdatedBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "sharing": {
+                "owner": "UKGTn6ua5jk",
+                "external": false,
+                "users": {},
+                "userGroups": {
+                    
+                },
+                "public": "rw------"
+            },
+            "trackedEntityTypeAttributes": [{
+                    "name": "Training Course Course Name",
+                    "created": "2024-07-05T12:59:33.830",
+                    "lastUpdated": "2024-07-10T06:06:14.648",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "trackedEntityType": {
+                        "id": "w47JOP0TBtT"
+                    },
+                    "trackedEntityAttribute": {
+                        "id": "Vnm7OVecUi1"
+                    },
+                    "displayInList": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "null Course Name",
+                    "displayName": "Training Course Course Name",
+                    "favorite": false,
+                    "id": "iw3G8s1nBW0",
+                    "attributeValues": []
+                }
+            ],
+            "featureType": "NONE",
+            "minAttributesRequiredToSearch": 1,
+            "maxTeiCountToReturn": 0,
+            "allowAuditLog": false,
+            "id": "w47JOP0TBtT",
+            "attributeValues": []
+        },
+		{
+            "name": "Trainees",
+            "created": "2024-06-10T12:52:27.376",
+            "lastUpdated": "2024-10-25T14:42:40.347",
+            "translations": [],
+            "createdBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "lastUpdatedBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "sharing": {
+                "owner": "UKGTn6ua5jk",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "trackedEntityTypeAttributes": [{
+                    "name": "Trainees First Name",
+                    "created": "2024-06-26T12:33:30.891",
+                    "lastUpdated": "2024-10-25T14:42:40.348",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "trackedEntityType": {
+                        "id": "AsxfMid3pVW"
+                    },
+                    "trackedEntityAttribute": {
+                        "id": "Lez2r3d0oxb"
+                    },
+                    "displayInList": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "null First Name",
+                    "displayName": "Trainees First Name",
+                    "favorite": false,
+                    "id": "nAFphnr0oSG",
+                    "attributeValues": []
+                }, {
+                    "name": "Trainees Last Name",
+                    "created": "2024-06-26T12:33:30.891",
+                    "lastUpdated": "2024-10-25T14:42:40.348",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "trackedEntityType": {
+                        "id": "AsxfMid3pVW"
+                    },
+                    "trackedEntityAttribute": {
+                        "id": "wXRW65yTN1d"
+                    },
+                    "displayInList": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "null Last Name",
+                    "displayName": "Trainees Last Name",
+                    "favorite": false,
+                    "id": "XG7Sl0lK4bS",
+                    "attributeValues": []
+                }, {
+                    "name": "Trainees Gender",
+                    "created": "2024-07-22T15:38:46.727",
+                    "lastUpdated": "2024-10-25T14:42:40.348",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "trackedEntityType": {
+                        "id": "AsxfMid3pVW"
+                    },
+                    "trackedEntityAttribute": {
+                        "id": "gp99rd73agU"
+                    },
+                    "displayInList": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "null Gender",
+                    "displayName": "Trainees Gender",
+                    "favorite": false,
+                    "id": "ZgUGaA5EQ8M",
+                    "attributeValues": []
+                }, {
+                    "name": "Trainees Designation",
+                    "created": "2024-07-04T13:49:15.452",
+                    "lastUpdated": "2024-10-25T14:42:40.348",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "trackedEntityType": {
+                        "id": "AsxfMid3pVW"
+                    },
+                    "trackedEntityAttribute": {
+                        "id": "dvXhBHwjKJP"
+                    },
+                    "displayInList": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "null Designation",
+                    "displayName": "Trainees Designation",
+                    "favorite": false,
+                    "id": "LoWLLmosvPk",
+                    "attributeValues": []
+                }, {
+                    "name": "Trainees Mobile #",
+                    "created": "2024-07-04T13:49:15.452",
+                    "lastUpdated": "2024-10-25T14:42:40.348",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "trackedEntityType": {
+                        "id": "AsxfMid3pVW"
+                    },
+                    "trackedEntityAttribute": {
+                        "id": "oQOXEo1p0Cd"
+                    },
+                    "displayInList": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "null Mobile #",
+                    "displayName": "Trainees Mobile #",
+                    "favorite": false,
+                    "id": "dQbDPbX2i8j",
+                    "attributeValues": []
+                }, {
+                    "name": "Trainees Location",
+                    "created": "2024-06-26T12:33:30.891",
+                    "lastUpdated": "2024-10-25T14:42:40.348",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "trackedEntityType": {
+                        "id": "AsxfMid3pVW"
+                    },
+                    "trackedEntityAttribute": {
+                        "id": "PYHaJIsQyxj"
+                    },
+                    "displayInList": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "null Location",
+                    "displayName": "Trainees Location",
+                    "favorite": false,
+                    "id": "AwlhWCIVF2b",
+                    "attributeValues": []
+                }, {
+                    "name": "Trainees Assigned Facility",
+                    "created": "2024-10-25T14:42:40.249",
+                    "lastUpdated": "2024-10-25T14:42:40.348",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "trackedEntityType": {
+                        "id": "AsxfMid3pVW"
+                    },
+                    "trackedEntityAttribute": {
+                        "id": "ss2ZPOBNOj3"
+                    },
+                    "displayInList": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "null Assigned Facility",
+                    "displayName": "Trainees Assigned Facility",
+                    "favorite": false,
+                    "id": "NZgPFFifRl7",
+                    "attributeValues": []
+                }, {
+                    "name": "Trainees PIN",
+                    "created": "2024-07-04T13:50:25.663",
+                    "lastUpdated": "2024-10-25T14:42:40.348",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "trackedEntityType": {
+                        "id": "AsxfMid3pVW"
+                    },
+                    "trackedEntityAttribute": {
+                        "id": "exxsjX2VQFq"
+                    },
+                    "displayInList": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "null PIN",
+                    "displayName": "Trainees PIN",
+                    "favorite": false,
+                    "id": "x6qSQwJKfi9",
+                    "attributeValues": []
+                }
+            ],
+            "featureType": "NONE",
+            "minAttributesRequiredToSearch": 1,
+            "maxTeiCountToReturn": 0,
+            "allowAuditLog": false,
+            "id": "AsxfMid3pVW",
+            "attributeValues": []
+        }
+    ]
+}

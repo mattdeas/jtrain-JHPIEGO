@@ -1,0 +1,1 @@
+curl "https://dhis2.jhpiego.org/api/dataStore/jtrain/appSettings" -X DELETE -u <<USERNAME>>:<<PASSWORD>>

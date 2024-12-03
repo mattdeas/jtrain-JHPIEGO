@@ -9,7 +9,7 @@ import {
     TableRow,
     TableRowHead,
 } from '@dhis2/ui'
-import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams, useNavigate} from 'react-router-dom';
 import React, {useState, useEffect} from 'react'
 import { utilGetConstantValueByName,  utilConfigConstantValueByName } from '../utils/utils';
 import { OrganisationUnitTree } from '@dhis2/ui';
@@ -97,7 +97,7 @@ export const Staffadd = () => {
     // Use the useDataMutation hook
     const [mutate, { loading: loading2, error }] = useDataMutation(mutation);
 
-
+    const navigate = useNavigate();
     const handleInputChange = (event) => {
         console.log(event)
 
@@ -157,7 +157,7 @@ export const Staffadd = () => {
     //props.onSaved();
         //redirct to the staffview page with the id 
         setTimeout(() => {
-            setLoading(false); // Hide loading spinner
+            //setLoading(false); // Hide loading spinner
             navigate('/staffsearch');
         }, 3000);
     };

@@ -1,0 +1,226 @@
+{
+"programIndicators": [{
+            "name": "jtrain-TotalTraineeFemale",
+            "created": "2024-08-08T12:28:21.453",
+            "lastUpdated": "2024-08-15T11:17:08.744",
+            "translations": [],
+            "createdBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "lastUpdatedBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "sharing": {
+                "owner": "UKGTn6ua5jk",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "jtrain-TotalTraineeFemale",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "program": {
+                "id": "vtSLYBYufMn"
+            },
+            "expression": "V{enrollment_count}",
+            "filter": "A{gp99rd73agU} == 'Female'",
+            "decimals": 0,
+            "analyticsType": "ENROLLMENT",
+            "analyticsPeriodBoundaries": [{
+                    "created": "2024-08-15T11:17:08.744",
+                    "lastUpdated": "2024-08-15T11:17:08.744",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "ENROLLMENT_DATE",
+                    "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+                    "favorite": false,
+                    "id": "kNGglya6C6s",
+                    "attributeValues": []
+                }, {
+                    "created": "2024-08-15T11:17:08.745",
+                    "lastUpdated": "2024-08-15T11:17:08.745",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "ENROLLMENT_DATE",
+                    "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+                    "favorite": false,
+                    "id": "uT0LQLqjiVF",
+                    "attributeValues": []
+                }
+            ],
+            "id": "fWteSZrcYjO",
+            "attributeValues": []
+        }, {
+            "name": "jtrain-TotalTraineeMale",
+            "created": "2024-08-08T12:26:26.078",
+            "lastUpdated": "2024-08-15T11:16:13.967",
+            "translations": [],
+            "createdBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "lastUpdatedBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "sharing": {
+                "owner": "UKGTn6ua5jk",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "jtrain-TotalTraineeMale",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "program": {
+                "id": "vtSLYBYufMn"
+            },
+            "expression": "V{enrollment_count}",
+            "filter": "A{gp99rd73agU} == 'Male'",
+            "decimals": 0,
+            "analyticsType": "ENROLLMENT",
+            "analyticsPeriodBoundaries": [{
+                    "created": "2024-08-15T11:16:13.967",
+                    "lastUpdated": "2024-08-15T11:16:13.967",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "ENROLLMENT_DATE",
+                    "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+                    "favorite": false,
+                    "id": "js7F3BW0gOr",
+                    "attributeValues": []
+                }, {
+                    "created": "2024-08-15T11:16:13.968",
+                    "lastUpdated": "2024-08-15T11:16:13.968",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "ENROLLMENT_DATE",
+                    "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+                    "favorite": false,
+                    "id": "OICQ3WseJHq",
+                    "attributeValues": []
+                }
+            ],
+            "id": "zuqccgxi4dF",
+            "attributeValues": []
+        }, {
+            "name": "jtrain-TotalTraineeUnknown",
+            "created": "2024-08-08T10:20:52.917",
+            "lastUpdated": "2024-08-15T11:10:08.638",
+            "translations": [],
+            "createdBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "lastUpdatedBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "sharing": {
+                "owner": "UKGTn6ua5jk",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "jtrain-TotalTraineeUnknown",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "program": {
+                "id": "vtSLYBYufMn"
+            },
+            "expression": "V{enrollment_count}",
+            "filter": "A{gp99rd73agU} == 'Unknown'",
+            "decimals": 0,
+            "analyticsType": "ENROLLMENT",
+            "analyticsPeriodBoundaries": [],
+            "id": "Wyfg7HQa40s",
+            "attributeValues": []
+        }]
+}

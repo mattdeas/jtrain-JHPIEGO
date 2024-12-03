@@ -1,0 +1,964 @@
+{
+    "programStages": [{
+            "name": "Course Details",
+            "created": "2024-06-13T09:25:08.813",
+            "lastUpdated": "2024-06-27T10:15:34.612",
+            "translations": [],
+            "createdBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "lastUpdatedBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "sharing": {
+                "owner": "UKGTn6ua5jk",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "minDaysFromStart": 0,
+            "program": {
+                "id": "Lw1g7haLUd9"
+            },
+            "programStageDataElements": [{
+                    "created": "2024-06-13T17:01:22.113",
+                    "lastUpdated": "2024-06-27T10:15:34.615",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "h9zPG79AmgH"
+                    },
+                    "dataElement": {
+                        "id": "N3rXacKJAjy"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 1,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "favorite": false,
+                    "id": "BdmeGfELJHc",
+                    "attributeValues": []
+                }, {
+                    "created": "2024-06-13T17:01:22.113",
+                    "lastUpdated": "2024-06-27T10:15:34.615",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "h9zPG79AmgH"
+                    },
+                    "dataElement": {
+                        "id": "ODO4HZT4XSg"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 2,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "favorite": false,
+                    "id": "qGTLC5uhBl6",
+                    "attributeValues": []
+                }, {
+                    "created": "2024-06-13T17:01:22.113",
+                    "lastUpdated": "2024-06-27T10:15:34.615",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "h9zPG79AmgH"
+                    },
+                    "dataElement": {
+                        "id": "r6m3Tekr5DO"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 3,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "favorite": false,
+                    "id": "dBOFPwoktkO",
+                    "attributeValues": []
+                }, {
+                    "created": "2024-06-26T11:55:32.857",
+                    "lastUpdated": "2024-06-27T10:15:34.615",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "h9zPG79AmgH"
+                    },
+                    "dataElement": {
+                        "id": "IA7YxfolpEM"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 4,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "favorite": false,
+                    "id": "l251UZlBykc",
+                    "attributeValues": []
+                }, {
+                    "created": "2024-06-27T10:15:34.615",
+                    "lastUpdated": "2024-06-27T10:15:34.615",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "h9zPG79AmgH"
+                    },
+                    "dataElement": {
+                        "id": "Pe5Lkrbvnos"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 5,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "favorite": false,
+                    "id": "pFK7DHJkAXL",
+                    "attributeValues": []
+                }, {
+                    "created": "2024-06-27T10:15:34.616",
+                    "lastUpdated": "2024-06-27T10:15:34.616",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "h9zPG79AmgH"
+                    },
+                    "dataElement": {
+                        "id": "hGGDYuGuVeX"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 6,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "favorite": false,
+                    "id": "OGlLYLH3ROd",
+                    "attributeValues": []
+                }
+            ],
+            "autoGenerateEvent": false,
+            "validationStrategy": "ON_COMPLETE",
+            "displayGenerateEventBox": false,
+            "blockEntryForm": false,
+            "preGenerateUID": false,
+            "remindCompleted": false,
+            "generatedByEnrollmentDate": false,
+            "allowGenerateNextVisit": false,
+            "openAfterEnrollment": false,
+            "sortOrder": 1,
+            "hideDueDate": false,
+            "enableUserAssignment": false,
+            "referral": false,
+            "id": "h9zPG79AmgH",
+            "attributeValues": [],
+            "repeatable": true,
+            "programStageSections": [],
+            "notificationTemplates": []
+        },{
+            "name": "Staff - Registration",
+            "created": "2024-06-27T10:32:27.509",
+            "lastUpdated": "2024-06-27T10:32:27.509",
+            "translations": [],
+            "createdBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "lastUpdatedBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "sharing": {
+                "owner": "UKGTn6ua5jk",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "minDaysFromStart": 0,
+            "program": {
+                "id": "vtSLYBYufMn"
+            },
+            "programStageDataElements": [{
+                    "created": "2024-06-27T10:32:27.510",
+                    "lastUpdated": "2024-06-27T10:32:27.510",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "C6BqK9IAR7I"
+                    },
+                    "dataElement": {
+                        "id": "dTrDnb4e8Ee"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 1,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "favorite": false,
+                    "id": "XIonK470wYl",
+                    "attributeValues": []
+                }, {
+                    "created": "2024-06-27T10:32:27.510",
+                    "lastUpdated": "2024-06-27T10:32:27.510",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "C6BqK9IAR7I"
+                    },
+                    "dataElement": {
+                        "id": "IAphSuyuH15"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 2,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "favorite": false,
+                    "id": "Bto6V2fftdh",
+                    "attributeValues": []
+                }, {
+                    "created": "2024-06-27T10:32:27.510",
+                    "lastUpdated": "2024-06-27T10:32:27.510",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "C6BqK9IAR7I"
+                    },
+                    "dataElement": {
+                        "id": "zvXaKJnl14I"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 3,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "favorite": false,
+                    "id": "r2CtaTK8jBA",
+                    "attributeValues": []
+                }
+            ],
+            "autoGenerateEvent": true,
+            "validationStrategy": "ON_COMPLETE",
+            "displayGenerateEventBox": true,
+            "blockEntryForm": false,
+            "preGenerateUID": false,
+            "remindCompleted": false,
+            "generatedByEnrollmentDate": false,
+            "allowGenerateNextVisit": false,
+            "openAfterEnrollment": false,
+            "sortOrder": 1,
+            "hideDueDate": false,
+            "enableUserAssignment": false,
+            "referral": false,
+            "id": "C6BqK9IAR7I",
+            "attributeValues": [],
+            "repeatable": true,
+            "programStageSections": [],
+            "notificationTemplates": []
+        }
+    ],
+"programs": [{
+            "name": "Training - Course",
+            "created": "2024-06-10T14:28:57.208",
+            "lastUpdated": "2024-09-05T11:01:11.453",
+            "translations": [],
+            "createdBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "lastUpdatedBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "sharing": {
+                "owner": "UKGTn6ua5jk",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Training - Course",
+            "version": 6,
+            "programType": "WITH_REGISTRATION",
+            "displayIncidentDate": false,
+            "ignoreOverdueEvents": false,
+            "onlyEnrollOnce": false,
+            "notificationTemplates": [],
+            "selectEnrollmentDatesInFuture": true,
+            "selectIncidentDatesInFuture": true,
+            "trackedEntityType": {
+                "id": "w47JOP0TBtT"
+            },
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            },
+            "skipOffline": false,
+            "displayFrontPageList": true,
+            "useFirstStageDuringRegistration": false,
+            "expiryDays": 0,
+            "completeEventsExpiryDays": 0,
+            "openDaysAfterCoEndDate": 0,
+            "minAttributesRequiredToSearch": 0,
+            "maxTeiCountToReturn": 0,
+            "accessLevel": "OPEN",
+            "id": "Lw1g7haLUd9",
+            "attributeValues": [],
+            "organisationUnits": [{
+                    "id": "WW21j6yQPla"
+                }
+            ],
+            "programStages": [{
+                    "id": "h9zPG79AmgH"
+                }
+            ],
+            "programSections": [],
+            "programTrackedEntityAttributes": [{
+                    "name": "Training - Course Course Name",
+                    "created": "2024-06-13T09:22:20.468",
+                    "lastUpdated": "2024-07-10T06:06:27.688",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "Lw1g7haLUd9"
+                    },
+                    "displayInList": true,
+                    "sortOrder": 1,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": true,
+                    "valueType": "TEXT",
+                    "displayShortName": "Training - Course Course Name",
+                    "displayName": "Training - Course Course Name",
+                    "favorite": false,
+                    "id": "Krlqy9aebzL",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "Vnm7OVecUi1"
+                    }
+                }
+            ]
+        }, {
+            "name": "Training - Staff",
+            "created": "2024-06-14T10:11:52.685",
+            "lastUpdated": "2024-10-28T10:42:01.319",
+            "translations": [],
+            "createdBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "lastUpdatedBy": {
+                "id": "b9qwdmsZ25U",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "trainingdemo"
+            },
+            "sharing": {
+                "owner": "UKGTn6ua5jk",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Training - Staff",
+            "version": 12,
+            "programType": "WITH_REGISTRATION",
+            "displayIncidentDate": true,
+            "ignoreOverdueEvents": true,
+            "onlyEnrollOnce": true,
+            "notificationTemplates": [],
+            "selectEnrollmentDatesInFuture": true,
+            "selectIncidentDatesInFuture": true,
+            "trackedEntityType": {
+                "id": "AsxfMid3pVW"
+            },
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            },
+            "skipOffline": false,
+            "displayFrontPageList": true,
+            "useFirstStageDuringRegistration": true,
+            "featureType": "NONE",
+            "expiryDays": 0,
+            "completeEventsExpiryDays": 0,
+            "openDaysAfterCoEndDate": 0,
+            "minAttributesRequiredToSearch": 1,
+            "maxTeiCountToReturn": 0,
+            "accessLevel": "OPEN",
+            "id": "vtSLYBYufMn",
+            "attributeValues": [],
+            "organisationUnits": [{
+                    "id": "WW21j6yQPla"
+                }
+            ],
+            "programStages": [{
+                    "id": "C6BqK9IAR7I"
+                }
+            ],
+            "programSections": [],
+            "programTrackedEntityAttributes": [{
+                    "name": "Training - Staff First Name",
+                    "created": "2024-06-27T10:03:59.216",
+                    "lastUpdated": "2024-10-28T10:42:01.320",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "vtSLYBYufMn"
+                    },
+                    "displayInList": true,
+                    "sortOrder": 1,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": true,
+                    "valueType": "TEXT",
+                    "displayShortName": "Training - Staff First Name",
+                    "displayName": "Training - Staff First Name",
+                    "favorite": false,
+                    "id": "SHAYLMIGLVh",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "Lez2r3d0oxb"
+                    }
+                }, {
+                    "name": "Training - Staff Last Name",
+                    "created": "2024-06-27T10:03:59.216",
+                    "lastUpdated": "2024-10-28T10:42:01.320",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "vtSLYBYufMn"
+                    },
+                    "displayInList": true,
+                    "sortOrder": 2,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": true,
+                    "valueType": "TEXT",
+                    "displayShortName": "Training - Staff Last Name",
+                    "displayName": "Training - Staff Last Name",
+                    "favorite": false,
+                    "id": "I7HQbCtDd8f",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "wXRW65yTN1d"
+                    }
+                }, {
+                    "name": "Training - Staff Gender",
+                    "created": "2024-07-22T15:39:04.602",
+                    "lastUpdated": "2024-10-28T10:42:01.320",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "vtSLYBYufMn"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 3,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": true,
+                    "valueType": "TEXT",
+                    "displayShortName": "Training - Staff Gender",
+                    "displayName": "Training - Staff Gender",
+                    "favorite": false,
+                    "id": "kN32xN1MuAX",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "gp99rd73agU"
+                    }
+                }, {
+                    "name": "Training - Staff Designation",
+                    "created": "2024-06-27T10:03:59.216",
+                    "lastUpdated": "2024-10-28T10:42:01.321",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "vtSLYBYufMn"
+                    },
+                    "displayInList": true,
+                    "sortOrder": 4,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": true,
+                    "valueType": "TEXT",
+                    "displayShortName": "Training - Staff Designation",
+                    "displayName": "Training - Staff Designation",
+                    "favorite": false,
+                    "id": "mfImwy94Ozm",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "dvXhBHwjKJP"
+                    }
+                }, {
+                    "name": "Training - Staff Mobile #",
+                    "created": "2024-06-27T10:30:54.208",
+                    "lastUpdated": "2024-10-28T10:42:01.321",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "vtSLYBYufMn"
+                    },
+                    "displayInList": true,
+                    "sortOrder": 5,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": true,
+                    "valueType": "TEXT",
+                    "displayShortName": "Training - Staff Mobile #",
+                    "displayName": "Training - Staff Mobile #",
+                    "favorite": false,
+                    "id": "ODFBXuXM6G6",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "oQOXEo1p0Cd"
+                    }
+                }, {
+                    "name": "Training - Staff Alternate Mobile #",
+                    "created": "2024-07-02T12:11:30.140",
+                    "lastUpdated": "2024-10-28T10:42:01.321",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "vtSLYBYufMn"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 6,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "Training - Staff Alternate Mobile #",
+                    "displayName": "Training - Staff Alternate Mobile #",
+                    "favorite": false,
+                    "id": "GLAMm80Aw0s",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "t0erdI0eAvh"
+                    }
+                }, {
+                    "name": "Training - Staff Assigned Facility",
+                    "created": "2024-10-28T10:29:02.005",
+                    "lastUpdated": "2024-10-28T10:42:01.321",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "vtSLYBYufMn"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 7,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "Training - Staff Assigned Facility",
+                    "displayName": "Training - Staff Assigned Facility",
+                    "favorite": false,
+                    "id": "pH9YKZaHNFS",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "ss2ZPOBNOj3"
+                    }
+                }, {
+                    "name": "Training - Staff Location",
+                    "created": "2024-06-27T10:30:54.208",
+                    "lastUpdated": "2024-10-28T10:42:01.321",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "vtSLYBYufMn"
+                    },
+                    "displayInList": true,
+                    "sortOrder": 8,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "Training - Staff Location",
+                    "displayName": "Training - Staff Location",
+                    "favorite": false,
+                    "id": "kYNPpTAixM7",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "PYHaJIsQyxj"
+                    }
+                }, {
+                    "name": "Training - Staff PIN",
+                    "created": "2024-07-04T13:51:01.554",
+                    "lastUpdated": "2024-10-28T10:42:01.321",
+                    "translations": [],
+                    "externalAccess": false,
+                    "userGroupAccesses": [],
+                    "userAccesses": [],
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "vtSLYBYufMn"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 9,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "Training - Staff PIN",
+                    "displayName": "Training - Staff PIN",
+                    "favorite": false,
+                    "id": "tSlEjukpR2B",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "exxsjX2VQFq"
+                    }
+                }
+            ]
+        }]
+}

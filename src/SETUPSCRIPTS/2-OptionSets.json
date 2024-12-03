@@ -1,0 +1,444 @@
+{
+"optionSets": [
+{
+            "name": "jtrain-thematicarea",
+            "created": "2024-06-10T14:25:46.532",
+            "lastUpdated": "2024-06-10T14:25:58.149",
+            "translations": [],
+            "createdBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "lastUpdatedBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "sharing": {
+                "owner": "UKGTn6ua5jk",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "options": [{
+                    "id": "dssmT0XocdS"
+                }
+            ],
+            "valueType": "TEXT",
+            "version": 1,
+            "id": "AvtckM3AMNR",
+            "attributeValues": []
+        },
+		{
+            "name": "Designation",
+            "created": "2024-06-26T12:18:59.105",
+            "lastUpdated": "2024-07-24T08:47:59.366",
+            "translations": [],
+            "createdBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "lastUpdatedBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "sharing": {
+                "owner": "UKGTn6ua5jk",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "options": [{
+                    "id": "qb5KbnEP0JP"
+                }, {
+                    "id": "ZspsegEPAyz"
+                }, {
+                    "id": "qKPMCz9fX3P"
+                }, {
+                    "id": "Z1XtlncYvbx"
+                }, {
+                    "id": "pxZ45x2HaKi"
+                }, {
+                    "id": "d5kFT1mJxcU"
+                }, {
+                    "id": "XNBdZovkAEX"
+                }, {
+                    "id": "xRkwB9Glfph"
+                }, {
+                    "id": "HuygROEkhqf"
+                }, {
+                    "id": "GLwoap1W1gq"
+                }, {
+                    "id": "V7nJVb0MWgv"
+                }, {
+                    "id": "yGWTm5OLFcg"
+                }, {
+                    "id": "vCEIcyrOomN"
+                }, {
+                    "id": "dBzy5sINhyU"
+                }, {
+                    "id": "WrtzSJgBvrV"
+                }, {
+                    "id": "PAzinU87bOr"
+                }, {
+                    "id": "i5Rww8vwScC"
+                }, {
+                    "id": "p9Ob8WlRZck"
+                }, {
+                    "id": "rWvd931PTaO"
+                }
+            ],
+            "valueType": "TEXT",
+            "version": 20,
+            "id": "b8DWVRpLShT",
+            "attributeValues": []
+        },
+		{
+            "name": "Gender",
+            "created": "2023-08-14T18:05:02.085",
+            "lastUpdated": "2024-07-22T15:37:43.033",
+            "translations": [],
+            "createdBy": {
+                "id": "ly0WSWXD435",
+                "code": null,
+                "name": "Alfred Conteh",
+                "displayName": "Alfred Conteh",
+                "username": "aconteh"
+            },
+            "lastUpdatedBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "sharing": {
+                "owner": "ly0WSWXD435",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "options": [{
+                    "id": "oA0VmwqJbb7"
+                }, {
+                    "id": "Nlc99PHqNzn"
+                }, {
+                    "id": "dKl8lUIPfLL"
+                }
+            ],
+            "valueType": "TEXT",
+            "version": 4,
+            "id": "nlgHRs6CWbE",
+            "attributeValues": []
+        }],
+"options": [{
+            "code": "Default",
+            "name": "Default",
+            "created": "2024-06-10T14:25:57.720",
+            "lastUpdated": "2024-06-10T14:25:57.737",
+            "translations": [],
+            "optionSet": {
+                "id": "AvtckM3AMNR"
+            },
+            "sortOrder": 1,
+            "id": "dssmT0XocdS",
+            "attributeValues": []
+        },{
+            "code": "Select",
+            "name": "Select",
+            "created": "2024-07-03T20:00:08.165",
+            "lastUpdated": "2024-07-03T20:00:08.200",
+            "translations": [],
+            "optionSet": {
+                "id": "b8DWVRpLShT"
+            },
+            "sortOrder": 1,
+            "id": "qb5KbnEP0JP",
+            "attributeValues": []
+        },
+		{
+            "code": "SRN/SCM",
+            "name": "SRN/SCM",
+            "created": "2024-06-26T12:31:49.048",
+            "lastUpdated": "2024-06-26T12:31:49.063",
+            "translations": [],
+            "optionSet": {
+                "id": "b8DWVRpLShT"
+            },
+            "sortOrder": 16,
+            "id": "PAzinU87bOr",
+            "attributeValues": []
+        },
+		{
+            "code": "SCM",
+            "name": "State Certified Midwife",
+            "created": "2024-06-26T12:32:03.226",
+            "lastUpdated": "2024-06-26T12:32:03.240",
+            "translations": [],
+            "optionSet": {
+                "id": "b8DWVRpLShT"
+            },
+            "sortOrder": 17,
+            "id": "i5Rww8vwScC",
+            "attributeValues": []
+        }, {
+            "code": "SECHN",
+            "name": "State Enrolled Community Health Nurse",
+            "created": "2024-06-26T12:32:19.946",
+            "lastUpdated": "2024-06-26T12:32:19.960",
+            "translations": [],
+            "optionSet": {
+                "id": "b8DWVRpLShT"
+            },
+            "sortOrder": 18,
+            "id": "p9Ob8WlRZck",
+            "attributeValues": []
+        }, {
+            "code": "SRN",
+            "name": "State Registered Nurse",
+            "created": "2024-06-26T12:32:43.674",
+            "lastUpdated": "2024-06-26T12:32:43.689",
+            "translations": [],
+            "optionSet": {
+                "id": "b8DWVRpLShT"
+            },
+            "sortOrder": 19,
+            "id": "rWvd931PTaO",
+            "attributeValues": []
+        },
+		{
+            "code": "PHSM",
+            "name": "Public Health Sister Midwife",
+            "created": "2024-06-26T12:31:15.634",
+            "lastUpdated": "2024-06-26T12:31:15.648",
+            "translations": [],
+            "optionSet": {
+                "id": "b8DWVRpLShT"
+            },
+            "sortOrder": 13,
+            "id": "vCEIcyrOomN",
+            "attributeValues": []
+        },
+		{
+            "code": "RH",
+            "name": "RH",
+            "created": "2024-06-26T12:31:26.280",
+            "lastUpdated": "2024-06-26T12:31:26.295",
+            "translations": [],
+            "optionSet": {
+                "id": "b8DWVRpLShT"
+            },
+            "sortOrder": 14,
+            "id": "dBzy5sINhyU",
+            "attributeValues": []
+        },
+		{
+            "code": "SACHO",
+            "name": "SACHO",
+            "created": "2024-06-26T12:31:38.354",
+            "lastUpdated": "2024-06-26T12:31:38.369",
+            "translations": [],
+            "optionSet": {
+                "id": "b8DWVRpLShT"
+            },
+            "sortOrder": 15,
+            "id": "WrtzSJgBvrV",
+            "attributeValues": []
+        },
+		{
+            "code": "AT",
+            "name": "Anesthetic Technician",
+            "created": "2024-06-26T12:27:58.411",
+            "lastUpdated": "2024-06-26T12:27:58.429",
+            "translations": [],
+            "optionSet": {
+                "id": "b8DWVRpLShT"
+            },
+            "sortOrder": 2,
+            "id": "ZspsegEPAyz",
+            "attributeValues": []
+        },
+		{
+            "code": "BSN",
+            "name": "Basic Specialty Nurse",
+            "created": "2024-06-26T12:28:11.995",
+            "lastUpdated": "2024-06-26T12:28:12.013",
+            "translations": [],
+            "optionSet": {
+                "id": "b8DWVRpLShT"
+            },
+            "sortOrder": 3,
+            "id": "qKPMCz9fX3P",
+            "attributeValues": []
+        },
+		{
+            "code": "CA",
+            "name": "Clinic Assistant",
+            "created": "2024-06-26T12:28:23.035",
+            "lastUpdated": "2024-06-26T12:28:23.051",
+            "translations": [],
+            "optionSet": {
+                "id": "b8DWVRpLShT"
+            },
+            "sortOrder": 4,
+            "id": "Z1XtlncYvbx",
+            "attributeValues": []
+        },
+		{
+            "code": "CHA",
+            "name": "Community Health Assistant   ",
+            "created": "2024-06-26T12:28:33.768",
+            "lastUpdated": "2024-06-26T12:28:33.789",
+            "translations": [],
+            "optionSet": {
+                "id": "b8DWVRpLShT"
+            },
+            "sortOrder": 5,
+            "id": "pxZ45x2HaKi",
+            "attributeValues": []
+        },
+		{
+            "code": "CHO",
+            "name": "Community Health Officer",
+            "created": "2024-06-26T12:28:59.332",
+            "lastUpdated": "2024-06-26T12:28:59.347",
+            "translations": [],
+            "optionSet": {
+                "id": "b8DWVRpLShT"
+            },
+            "sortOrder": 6,
+            "id": "d5kFT1mJxcU",
+            "attributeValues": []
+        },
+		{
+            "code": "EDC",
+            "name": "EDC Unit Assistant",
+            "created": "2024-06-26T12:29:18.909",
+            "lastUpdated": "2024-06-26T12:29:18.926",
+            "translations": [],
+            "optionSet": {
+                "id": "b8DWVRpLShT"
+            },
+            "sortOrder": 7,
+            "id": "XNBdZovkAEX",
+            "attributeValues": []
+        },
+		{
+            "code": "MCHA",
+            "name": "Maternal and Child Health Aide",
+            "created": "2024-06-26T12:29:30.639",
+            "lastUpdated": "2024-06-26T12:29:30.654",
+            "translations": [],
+            "optionSet": {
+                "id": "b8DWVRpLShT"
+            },
+            "sortOrder": 8,
+            "id": "xRkwB9Glfph",
+            "attributeValues": []
+        }, {
+            "code": "MCHN",
+            "name": "Maternal and Child Health Nurse",
+            "created": "2024-06-26T12:29:57.436",
+            "lastUpdated": "2024-06-26T12:29:57.455",
+            "translations": [],
+            "optionSet": {
+                "id": "b8DWVRpLShT"
+            },
+            "sortOrder": 9,
+            "id": "HuygROEkhqf",
+            "attributeValues": []
+        },
+		{
+            "code": "Midwife",
+            "name": "Midwife",
+            "created": "2024-07-24T08:47:35.106",
+            "lastUpdated": "2024-07-24T08:48:08.642",
+            "translations": [],
+            "optionSet": {
+                "id": "b8DWVRpLShT"
+            },
+            "sortOrder": 10,
+            "id": "GLwoap1W1gq",
+            "attributeValues": []
+        },
+		{
+            "code": "NA",
+            "name": "Nurse Anesthetist",
+            "created": "2024-06-26T12:30:23.192",
+            "lastUpdated": "2024-06-26T12:30:23.207",
+            "translations": [],
+            "optionSet": {
+                "id": "b8DWVRpLShT"
+            },
+            "sortOrder": 11,
+            "id": "V7nJVb0MWgv",
+            "attributeValues": []
+        },
+		{
+            "code": "NAss",
+            "name": "Nursing Assistant (Aide)",
+            "created": "2024-06-26T12:30:43.979",
+            "lastUpdated": "2024-06-26T12:30:43.994",
+            "translations": [],
+            "optionSet": {
+                "id": "b8DWVRpLShT"
+            },
+            "sortOrder": 12,
+            "id": "yGWTm5OLFcg",
+            "attributeValues": []
+        },
+		{
+            "code": "Female",
+            "name": "Female",
+            "created": "2023-08-14T18:05:41.912",
+            "lastUpdated": "2023-08-14T18:05:41.932",
+            "translations": [],
+            "optionSet": {
+                "id": "nlgHRs6CWbE"
+            },
+            "sortOrder": 2,
+            "id": "Nlc99PHqNzn",
+            "attributeValues": []
+        },
+		{
+            "code": "Male",
+            "name": "Male",
+            "created": "2023-08-14T18:05:27.376",
+            "lastUpdated": "2023-08-14T18:05:27.390",
+            "translations": [],
+            "optionSet": {
+                "id": "nlgHRs6CWbE"
+            },
+            "sortOrder": 1,
+            "id": "oA0VmwqJbb7",
+            "attributeValues": []
+        },
+		{
+            "code": "Unknown",
+            "name": "Unknown",
+            "created": "2024-07-22T15:37:42.557",
+            "lastUpdated": "2024-07-22T15:37:42.578",
+            "translations": [],
+            "optionSet": {
+                "id": "nlgHRs6CWbE"
+            },
+            "sortOrder": 3,
+            "id": "dKl8lUIPfLL",
+            "attributeValues": []
+        }
+		]
+}

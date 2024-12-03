@@ -1,0 +1,351 @@
+{
+    "dataElements": [{
+            "name": "Course End Date",
+            "created": "2024-06-13T09:35:49.043",
+            "lastUpdated": "2024-06-13T09:35:49.043",
+            "translations": [],
+            "createdBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "lastUpdatedBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "sharing": {
+                "owner": "UKGTn6ua5jk",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Course End Date",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "DATE",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "id": "ODO4HZT4XSg",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        }, {
+            "name": "Course - PostScore",
+            "created": "2024-06-27T10:30:16.265",
+            "lastUpdated": "2024-06-27T10:30:16.265",
+            "translations": [],
+            "createdBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "lastUpdatedBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "sharing": {
+                "owner": "UKGTn6ua5jk",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Course - PostScore",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "valueType": "NUMBER",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "id": "zvXaKJnl14I",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        }, {
+            "name": "Course - Prescore",
+            "created": "2024-06-27T10:29:45.311",
+            "lastUpdated": "2024-06-27T10:29:45.311",
+            "translations": [],
+            "createdBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "lastUpdatedBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "sharing": {
+                "owner": "UKGTn6ua5jk",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Course - Prescore",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "valueType": "NUMBER",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "id": "IAphSuyuH15",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        }, {
+            "name": "Course Start Date",
+            "created": "2024-06-13T09:34:28.086",
+            "lastUpdated": "2024-06-13T09:34:28.086",
+            "translations": [],
+            "createdBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "lastUpdatedBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "sharing": {
+                "owner": "UKGTn6ua5jk",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Course Start Date",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "DATE",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "id": "N3rXacKJAjy",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+		{
+            "name": "jtrain_course_eventid",
+            "created": "2024-06-27T10:28:45.442",
+            "lastUpdated": "2024-06-27T10:28:45.442",
+            "translations": [],
+            "createdBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "lastUpdatedBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "sharing": {
+                "owner": "UKGTn6ua5jk",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "jtrain_course_eventid",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "TEXT",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "id": "dTrDnb4e8Ee",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+		{
+            "name": "Location",
+            "created": "2024-06-27T10:02:37.594",
+            "lastUpdated": "2024-06-27T10:02:37.594",
+            "translations": [],
+            "createdBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "lastUpdatedBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "sharing": {
+                "owner": "UKGTn6ua5jk",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Location",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "TEXT",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "id": "Pe5Lkrbvnos",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+		{
+            "name": "Partner",
+            "created": "2024-06-27T10:02:03.143",
+            "lastUpdated": "2024-06-27T10:02:03.143",
+            "translations": [],
+            "createdBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "lastUpdatedBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "sharing": {
+                "owner": "UKGTn6ua5jk",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Partner",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "TEXT",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "id": "hGGDYuGuVeX",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+		{
+            "name": "jtrain_course_attendees",
+            "created": "2024-06-13T09:38:48.797",
+            "lastUpdated": "2024-06-13T09:38:48.797",
+            "translations": [],
+            "createdBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "lastUpdatedBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "sharing": {
+                "owner": "UKGTn6ua5jk",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "jtrain_course_attendees",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "LONG_TEXT",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "id": "r6m3Tekr5DO",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+		{
+            "name": "jtrain_course_attendees_count",
+            "created": "2024-06-13T17:02:31.530",
+            "lastUpdated": "2024-06-13T17:02:31.530",
+            "translations": [],
+            "createdBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "lastUpdatedBy": {
+                "id": "UKGTn6ua5jk",
+                "code": null,
+                "name": "Matthew Deas",
+                "displayName": "Matthew Deas",
+                "username": "mdeas"
+            },
+            "sharing": {
+                "owner": "UKGTn6ua5jk",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "jtrain_course_attendees_count",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "NUMBER",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "id": "IA7YxfolpEM",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        }
+    ]
+}

@@ -174,17 +174,17 @@ export const CourseDetailsStaffView = ({ course }) => {
 
           if(dataElement.displayName === 'Location') {
             // Extract the orgUnitId after the last "/"
-            const fullOrgUnitId = dataElementToValue[dataElement.id];
-            const orgUnitId = fullOrgUnitId.split('/').pop();
+            //const fullOrgUnitId = dataElementToValue[dataElement.id];
+            //const orgUnitId = fullOrgUnitId.split('/').pop();
     
             // Find the orgUnit by the extracted orgUnitId
             {/* const orgUnit = orgUnitsData.orgUnits.organisationUnits.find(orgUnit => orgUnit.id === orgUnitId); */}
 
-            return (
+            {/* return (
                 <TableCell key={dataElement.id}>
-                    {/* {orgUnit ? orgUnit.displayName : orgUnitId} */}
+                    {orgUnit ? orgUnit.displayName : orgUnitId} 
                 </TableCell>
-            );
+            ); */}
 
           }
           else

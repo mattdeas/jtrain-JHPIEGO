@@ -25,6 +25,7 @@ const query = {
         params: ({ ou, program }) => ({
             ou,
             program,
+            fields: '*',
         }),
     },
 }
@@ -51,6 +52,10 @@ export const CourseSearch = () => {
     const defCourseProgramId = utilConfigConstantValueByName('CourseProgram')
     const defThemAreaId = utilConfigConstantValueByName('ThematicAreaOptionset')
 
+    console.log('defCourseOrgUnitId:', defCourseOrgUnitId)
+    console.log('defCourseProgramId:', defCourseProgramId)
+    console.log('defThemAreaId:', defThemAreaId)
+
     const { loading, error, data, refetch } = useDataQuery(query, {
         variables: {
             ou: defCourseOrgUnitId,
@@ -58,6 +63,7 @@ export const CourseSearch = () => {
         },
     })
 
+    console.log('data:', data)
     const thematicAreasQuery = {
         thematicAreas: {
             resource: `optionSets/${defThemAreaId}`,

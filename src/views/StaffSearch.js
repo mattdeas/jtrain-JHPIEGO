@@ -31,6 +31,7 @@ const query = {
                     'trackedEntityInstance',
                     'attributes[displayName,value]',
                     'orgUnits[id,displayName]',
+                    '*',
                 ],
                 page: page,
                 pageSize: pageSize,
@@ -61,6 +62,7 @@ export const StaffSearch = () => {
     const defStaffOrgUnitId = utilConfigConstantValueByName('DefaultStaffOrgUnit');
     const defStaffType = utilConfigConstantValueByName('TEITypeStaff');
     const defStaffProgId = utilConfigConstantValueByName('StaffProgram');
+    
     const [page, setPage] = useState(1); // Current page
     const [pageSize, setPageSize] = useState(50); // Items per page
     const [searchLastName, setLastName] = useState('');
@@ -79,6 +81,7 @@ export const StaffSearch = () => {
         },
     });
 
+    console.log('data', data);
     const handleSearchTermChangeLast = (event) => {
         setLastName(event.target.value);
     };
