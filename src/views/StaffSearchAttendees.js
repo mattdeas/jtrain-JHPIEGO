@@ -60,8 +60,13 @@ const query = {
                 trackedEntityType: trackedEntityType,
                 fields: [
                     'trackedEntityInstance',
-                    'attributes[displayName,value]',
                     'orgUnits[id,displayName]',
+                    'attributes[attribute,code,displayName,value]',
+                    'enrollments[enrollment,program,orgUnit,enrollmentDate,incidentDate,status,attributes[attribute,code,displayName,value]]',
+                    'created',
+                    'lastUpdated',
+                    'orgUnits[id,displayName]',
+                    '*',
                 ],
                 page: page,
                 pageSize: pageSize,
@@ -250,6 +255,19 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
       };
 
       
+    // Caused by DHIS2 API version structure - caters for 2.40.3 and lower
+    const getAttributes = (instance) => {
+        // Check if attributes are at the root level
+        if (instance.attributes && instance.attributes.length > 0) {
+            return instance.attributes;
+        }
+        // Check if attributes are within enrollments
+        if (instance.enrollments && instance.enrollments.length > 0) {
+            return instance.enrollments[0].attributes;
+        }
+        return [];
+    };
+
     const handleAssign = async (trackedEntityInstance) => {
         const dataValues = await fetchEvent(eventID);
 
@@ -293,7 +311,7 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
 
 
    const myMutation = UpdateEvent(defCourseProgramId, defCourseProgramStageId, defStaffOrgUnitId, eventID, dataInputs);
-   const response = await engine.mutate(myMutation);
+   await engine.mutate(myMutation);
 
      const dataStaffDefault = [];
      dataStaffDefault.push({ dataElement: defCourseEventId, value: eventID });
@@ -370,42 +388,42 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
 </TableHead>
 <TableBody>
 {data.instances.trackedEntityInstances
-.filter(item => 
-item.attributes.some(attr => attr.displayName === 'Last Name' && attr.value.toLowerCase().includes('')) &&
-!(tei_id && tei_id.includes(item.trackedEntityInstance)) // Exclude the instances that are in tei_id
-)
-.slice(0, 10)
-.map(
-({ trackedEntityInstance, attributes }) => {
-// Create an object from the attributes array
-const attributesObj = attributes.reduce((obj, item) => {
-    obj[item.displayName] = item.value;
-    return obj;
-}, {});
+    .filter(item => {
+        const attributes = getAttributes(item);
+        return attributes.some(attr => attr.displayName === 'Last Name' && attr.value.toLowerCase().includes('')) &&
+            !(tei_id && tei_id.includes(item.trackedEntityInstance)); // Exclude the instances that are in tei_id
+    })
+    .slice(0, 10)
+    .map(item => {
+        const attributes = getAttributes(item);
+        // Create an object from the attributes array
+        const attributesObj = attributes.reduce((obj, item) => {
+            obj[item.displayName] = item.value;
+            return obj;
+        }, {});
 
-return (
-    <TableRow key={trackedEntityInstance}>
-    {/* <!-- This area needs to be dynamic --> */}
-        <TableCell>{attributesObj['Last Name']}</TableCell>
-        <TableCell>{attributesObj['First Name']}</TableCell>
-        <TableCell>{attributesObj['Mobile #']}</TableCell>
-        <TableCell>{attributesObj['Designation']}</TableCell>
-        <TableCell >
-        <a href={`/staffview/${trackedEntityInstance}`} target="_blank" rel="noopener noreferrer"><IconView24 /></a>
-        
-        </TableCell>
-        {/* <TableCell>{trackedEntityInstance}</TableCell> */}
-           
-        <TableCell align="left">
-            <div onClick={() => {handleAssign(trackedEntityInstance);
-                setAssignedPerson(`${attributesObj['First Name']} ${attributesObj['Last Name']}`);}}>
-            <IconAddCircle24 />
-            </div>
-        </TableCell>
-    </TableRow>
-);
-}
-)}
+        return (
+            <TableRow key={item.trackedEntityInstance}>
+                {/* <!-- This area needs to be dynamic --> */}
+                <TableCell>{attributesObj['Last Name']}</TableCell>
+                <TableCell>{attributesObj['First Name']}</TableCell>
+                <TableCell>{attributesObj['Mobile #']}</TableCell>
+                <TableCell>{attributesObj['Designation']}</TableCell>
+                <TableCell>
+                    <a href={`/staffview/${item.trackedEntityInstance}`} target="_blank" rel="noopener noreferrer"><IconView24 /></a>
+                </TableCell>
+                {/* <TableCell>{item.trackedEntityInstance}</TableCell> */}
+                <TableCell align="left">
+                    <div onClick={() => {
+                        handleAssign(item.trackedEntityInstance);
+                        setAssignedPerson(`${attributesObj['First Name']} ${attributesObj['Last Name']}`);
+                    }}>
+                        <IconAddCircle24 />
+                    </div>
+                </TableCell>
+            </TableRow>
+        );
+    })}
             </TableBody>
 </Table>
 </div>

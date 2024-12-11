@@ -15,16 +15,42 @@ const ORG_UNITS_QUERY = {
     },
 };
 
+// const query = {
+//     instances: {
+//         resource: 'trackedEntityInstances',
+//         params: ({ ou, trackedEntityType, tei_id }) => ({
+//             ou: ou,
+//             trackedEntityType: trackedEntityType,
+//             trackedEntityInstance: tei_id,
+//             paging: false,
+//             pageSize: 1000,
+//         }),
+//     },
+// };
+
 const query = {
     instances: {
         resource: 'trackedEntityInstances',
-        params: ({ ou, trackedEntityType, tei_id }) => ({
-            ou: ou,
-            trackedEntityType: trackedEntityType,
-            trackedEntityInstance: tei_id,
-            paging: false,
-            pageSize: 1000,
-        }),
+        params: ({ ou, trackedEntityType, page, pageSize }) => {
+           
+            return {
+                ou: ou,
+                trackedEntityType: trackedEntityType,
+                fields: [
+                    'trackedEntityInstance',
+                    'orgUnits[id,displayName]',
+                    'attributes[attribute,code,displayName,value]',
+                    'enrollments[enrollment,program,orgUnit,enrollmentDate,incidentDate,status,attributes[attribute,code,displayName,value]]',
+                    'created',
+                    'lastUpdated',
+                    'orgUnits[id,displayName]',
+                    '*',
+                ],
+                paging: false,
+                pageSize: 1000,
+                order: 'wXRW65yTN1d:asc,Lez2r3d0oxb:desc', //LastName , FirstName SL
+            };
+        },
     },
 };
 
@@ -134,6 +160,7 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
             value.toLowerCase().includes(searchQuery.toLowerCase())
         );
     });
+    console.log('filteredInstances', filteredInstances);
 
     const [showCustomFields, setShowCustomFields] = useState({});
 
@@ -144,7 +171,17 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
         }));
     };
 
-    
+    const getAttributes = (instance) => {
+        // Check if attributes are at the root level
+        if (instance.attributes && instance.attributes.length > 0) {
+            return instance.attributes;
+        }
+        // Check if attributes are within enrollments
+        if (instance.enrollments && instance.enrollments.length > 0) {
+            return instance.enrollments[0].attributes;
+        }
+        return [];
+    };
 
     const handleDelete = async (trackedEntityInstance, MaineventID) => {
               
@@ -274,68 +311,68 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
                                 </TableRowHead>
                             </TableHead>
                             <TableBody>
-                                {filteredInstances
-                                    .slice(0, 10000)
-                                    .map(({ trackedEntityInstance, attributes }) => {
-                                        const attributesObj = attributes.reduce((obj, item) => {
-                                            obj[item.displayName] = item.value;
-                                            return obj;
-                                        }, {});
-    
-                                        let matchingEventValue = null;
-                                        if (dataSCD) {
-                                            const matchingEvent = dataSCD.events.events.find(event => event.trackedEntityInstance === trackedEntityInstance);
-                                            if (matchingEvent) {
-                                                matchingEventValue = matchingEvent.event;
-                                            }
-                                        }
-    
-                                        if (delTEIs.includes(trackedEntityInstance)) {
-                                            return null;
-                                        }
-    
-                                        return (
-                                            <TableRow key={trackedEntityInstance}>
-                                                {/* <TableCell>{trackedEntityInstance}</TableCell> */}
-                                                <TableCell>{attributesObj['Last Name']}</TableCell>
-                                                <TableCell>{attributesObj['First Name']}</TableCell>
-                                                <TableCell>{attributesObj['Designation']}</TableCell>
-                                                <TableCell>
-                                                  <Link to={`/staffview/${trackedEntityInstance}`}><IconView24 alt="View Enrollee Details" /></Link>
-                                                </TableCell>
-                                                <TableCell >
-                                                <div>
-                                                {isFileIconVisible ? (
-                <div onClick={() => { 
-                    console.log('IconFileDocument24 clicked');
-                    setIsFileIconVisible(false);
-                    handleShowCustomFields(trackedEntityInstance); 
-                }} style={{ display: 'inline-block', cursor: 'pointer' }}>
-                    <IconFileDocument24 />
-                </div>
-            ) : (
-                <div onClick={() => { 
-                    console.log('IconSubtractCircle16 clicked');
-                    setIsFileIconVisible(true);
-                    handleShowCustomFields(trackedEntityInstance); 
-                }} style={{ display: 'inline-block', cursor: 'pointer' }}>
-                    <IconSubtractCircle16 />
-                </div>
-            )}
+                            {dataQry?.instances?.trackedEntityInstances
+    .slice(0, 10000)
+    .map(instance => {
+        const attributes = getAttributes(instance);
+        const attributesObj = attributes.reduce((obj, item) => {
+            obj[item.displayName] = item.value;
+            return obj;
+        }, {});
 
-            {showCustomFields[trackedEntityInstance] && (
-                <CourseDateAttendeesStaffCustomFields eventID={matchingEventValue} />
-            )}
-            </div>
-            
-                                                 </TableCell>
-                                                 <TableCell>
-                                                     <div onClick={() => handleDelete(trackedEntityInstance, matchingEventValue)}><IconDelete24 /></div>
-                                                 </TableCell>
-                                                {/* Additional cells for Course Information */}
-                                            </TableRow>
-                                        );
-                                    })}
+        let matchingEventValue = null;
+        if (dataSCD) {
+            const matchingEvent = dataSCD.events.events.find(event => event.trackedEntityInstance === instance.trackedEntityInstance);
+            if (matchingEvent) {
+                matchingEventValue = matchingEvent.event;
+            }
+        }
+
+        if (delTEIs.includes(instance.trackedEntityInstance)) {
+            return null;
+        }
+
+        return (
+            <TableRow key={instance.trackedEntityInstance}>
+                {/* <TableCell>{instance.trackedEntityInstance}</TableCell> */}
+                <TableCell>{attributesObj['Last Name']}</TableCell>
+                <TableCell>{attributesObj['First Name']}</TableCell>
+                <TableCell>{attributesObj['Designation']}</TableCell>
+                <TableCell>
+                    <Link to={`/staffview/${instance.trackedEntityInstance}`}><IconView24 alt="View Enrollee Details" /></Link>
+                </TableCell>
+                <TableCell>
+                    <div>
+                        {isFileIconVisible ? (
+                            <div onClick={() => { 
+                                console.log('IconFileDocument24 clicked');
+                                setIsFileIconVisible(false);
+                                handleShowCustomFields(instance.trackedEntityInstance); 
+                            }} style={{ display: 'inline-block', cursor: 'pointer' }}>
+                                <IconFileDocument24 />
+                            </div>
+                        ) : (
+                            <div onClick={() => { 
+                                console.log('IconSubtractCircle16 clicked');
+                                setIsFileIconVisible(true);
+                                handleShowCustomFields(instance.trackedEntityInstance); 
+                            }} style={{ display: 'inline-block', cursor: 'pointer' }}>
+                                <IconSubtractCircle16 />
+                            </div>
+                        )}
+
+                        {showCustomFields[instance.trackedEntityInstance] && (
+                            <CourseDateAttendeesStaffCustomFields eventID={matchingEventValue} />
+                        )}
+                    </div>
+                </TableCell>
+                <TableCell>
+                    <div onClick={() => handleDelete(instance.trackedEntityInstance, matchingEventValue)}><IconDelete24 /></div>
+                </TableCell>
+                {/* Additional cells for Course Information */}
+            </TableRow>
+        );
+    })}
                             </TableBody>
                         </Table>
                     </div>

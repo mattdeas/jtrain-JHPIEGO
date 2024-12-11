@@ -30,7 +30,7 @@ export const NavigationBar = ({ selectedTab, setSelectedTab }) => {
                 onClick={() => handleNavigation('/staffsearch', 'StaffSearch')}
                 className={`${styles.tabButton} ${selectedTab === 'StaffSearch' ? styles.selectedTabButton : ''}`}
             >
-                Staff
+                Trainees
             </div>
             <span className={styles.separator}>|</span>
             <div

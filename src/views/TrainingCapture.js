@@ -34,12 +34,30 @@ window.addEventListener('resize', handleResize);
 const query = {
     instances: {
         resource: 'trackedEntityInstances',
-        params: ({ ou, program }) => ({
-            ou,
-            program,
-        }),
+        params: ({ ou, program }) => {
+            const filters = [];
+            
+            return {
+                ou: ou,
+                program: program,
+                fields: [
+                    'trackedEntityInstance',
+                    'orgUnit',
+                    'attributes[attribute,code,displayName,value]',
+                    'enrollments[enrollment,program,orgUnit,enrollmentDate,incidentDate,status,attributes[attribute,code,displayName,value]]',
+                    'created',
+                    'lastUpdated',
+                    'orgUnits[id,displayName]',
+                    '*',
+                ],
+                page: 1,
+                pageSize: 1000,
+                order: 'Vnm7OVecUi1:asc', // Course Name
+                filter: filters,
+            };
+        },
     },
-}
+};
 
 export const TrainingCapture = () => {
     const constants = useFetchAndStoreConstants();
@@ -78,6 +96,21 @@ export const TrainingCapture = () => {
         setCourseSelectionLabel(' : '); 
     }
 
+    // Caused by DHIS2 API version structure - caters for 2.40.3 and lower
+    const getAttributes = (instance) => {
+        // Check if attributes are at the root level
+        if (instance.attributes && instance.attributes.length > 0) {
+            return instance.attributes;
+        }
+        // Check if attributes are within enrollments
+        if (instance.enrollments && instance.enrollments.length > 0) {
+            return instance.enrollments[0].attributes;
+        }
+        return [];
+    };
+
+    console.log("Data", data);
+
     return (
         <div style={{ position: 'float', top: '20%', width: '95%' }}>
             
@@ -115,36 +148,34 @@ export const TrainingCapture = () => {
                         </TableRowHead>
                     </TableHead>
                     <TableBody>
-                        {data.instances.trackedEntityInstances
-                            .slice(0, 10)
-                            .map(
-                                ({ trackedEntityInstance, attributes }) => {
-                                    const attributesObj = attributes.reduce((obj, item) => {
-                                        obj[item.displayName] = item.value;
-                                        return obj;
-                                    }, {});
+                    
+                    {data.instances.trackedEntityInstances
+    .slice(0, 10)
+    .map(instance => {
+        const attributes = getAttributes(instance);
+        const attributesObj = attributes.reduce((obj, item) => {
+            obj[item.displayName] = item.value;
+            return obj;
+        }, {});
 
-                                    return (
-                                        <TableRow key={trackedEntityInstance}>
-                                            <TableCell>{attributesObj['Course Name']}</TableCell>
-                                            {/* <TableCell>{attributesObj['']}</TableCell> */}
-                                            <TableCell>
-                                            <div onClick={() => {
-                                                setSelectedCourse({
-                                                    trackedEntityInstance: trackedEntityInstance,
-                                                    courseName: attributesObj['Course Name'],
-                                                    startDateVar: defCourseStartDate,
-                                                    endDateVar: defCourseEndDate
-                                                });
-                                                //setSearchTableExpanded(!isSearchTableExpanded);
-                                                setCourseSelectionLabel(' : ' + attributesObj['Course Name'] + " - ");
-                                                setRefreshKey(prevKey => prevKey + 1);
-                                            }}><IconView24 /></div>
-                                            </TableCell>
-                                        </TableRow>
-                                    );
-                                }
-                            )}
+        return (
+            <TableRow key={instance.trackedEntityInstance}>
+                <TableCell>{attributesObj['Course Name']}</TableCell>
+                <TableCell>
+                    <div onClick={() => {
+                        setSelectedCourse({
+                            trackedEntityInstance: instance.trackedEntityInstance,
+                            courseName: attributesObj['Course Name'],
+                            startDateVar: defCourseStartDate,
+                            endDateVar: defCourseEndDate
+                        });
+                        setCourseSelectionLabel(' : ' + attributesObj['Course Name'] + " - ");
+                        setRefreshKey(prevKey => prevKey + 1);
+                    }}><IconView24 /></div>
+                </TableCell>
+            </TableRow>
+        );
+    })}
                     </TableBody>
                     </Table>
                     </>

@@ -77,29 +77,29 @@ const mutation = (id) => ({
 export const Staffview = () => {
 
     const engine = useDataEngine();
-    const constantsQuery = {
-        constants: {
-            resource: "constants",
-            params: {
-                fields: ['id', 'name', 'code']
-            }
-        }
-    };
+    // const constantsQuery = {
+    //     constants: {
+    //         resource: "constants",
+    //         params: {
+    //             fields: ['id', 'name', 'code']
+    //         }
+    //     }
+    // };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await engine.query(constantsQuery);
-                if (response && response.constants && Array.isArray(response.constants.constants)) {
-                    sessionStorage.setItem('constants', JSON.stringify(response.constants.constants));
-                }
-            } catch (error) {
-                console.error('Error running query', error);
-            }
-        };
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             const response = await engine.query(constantsQuery);
+    //             if (response && response.constants && Array.isArray(response.constants.constants)) {
+    //                 sessionStorage.setItem('constants', JSON.stringify(response.constants.constants));
+    //             }
+    //         } catch (error) {
+    //             console.error('Error running query', error);
+    //         }
+    //     };
 
-        fetchData();
-    }, [engine]);
+    //     fetchData();
+    // }, [engine]);
 
 
 
@@ -108,14 +108,14 @@ export const Staffview = () => {
     const [formFields, setFormFields] = useState({});
     const [mutate, { loading, error }] = useDataMutation(mutation(id))
     const [showTree, setShowTree] = useState(false);
-
+    const [isDataLoaded, setIsDataLoaded] = useState(false);
  
     const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
     const defStaffOrgUnitId = utilConfigConstantValueByName('DefaultStaffOrgUnit')
     const defStaffProgId = utilConfigConstantValueByName('StaffProgram')
     const defStaffProgCourseId = utilConfigConstantValueByName('StaffProgramCourse')
     const defLocationTEA = utilConfigConstantValueByName('LocationTEA')
-    console.log('locationTEA', defLocationTEA)
+
     const qryTrackedEntityInstance = {
         trackedEntityInstance: {
             resource: 'trackedEntityInstances',
@@ -129,12 +129,20 @@ export const Staffview = () => {
 
     
 
-    const { loading: loadingEntity, error: errorEntity, data: dataEntity } = useDataQuery(qryTrackedEntityInstance, {
+    const { loading: loadingEntity, error: errorEntity, data: dataEntity, refetch } = useDataQuery(qryTrackedEntityInstance, {
         variables: {
          id,
         },
     });
 
+
+    useEffect(() => {
+        refetch({ id });
+    }, [id, refetch]);
+
+    console.log('id', id);
+    console.log('useparamsID', { id });
+    console.log('dataEntity', dataEntity);
 
     const deleteMutation = {
         resource: 'trackedEntityInstances',
@@ -169,8 +177,10 @@ export const Staffview = () => {
     }
 
 
-    const dataProgramDE  = useDataQuery(qryProgramDataElements);
-
+    const { loading: loadingProgramDE, error: errorProgramDE, data: dataProgramDE } = useDataQuery(qryProgramDataElements);
+ 
+    
+    
     //const { loading: loadingDataElement, error: errorDataElement, data: dataElementData } = useDataQuery(dataElementQuery);
     const [responseMessage, setResponseMessage] = useState('');
     const { loading: loadingEvents, error: errorEvents, data: eventsData } = useDataQuery(eventsQuery(id));
@@ -182,7 +192,6 @@ export const Staffview = () => {
 
     
     
-    console.log('eventsData', eventsData)   
     const attributes = Object.entries(formFields).map(([attribute, value]) => ({ attribute, value }));
 
     const doMutation = async () => {
@@ -248,21 +257,26 @@ export const Staffview = () => {
     const [events, setEvents] = useState([]);
 
     
-    let transposedEvents = [];
+    //let transposedEvents = [];
+    const [transposedEvents, setTransposedEvents] = useState([]);
 
-    if (dataProgramDE && dataProgramDE.data && dataProgramDE.data.qPDE && dataProgramDE.data.qPDE.programStageDataElements) {
-    transposedEvents = events.map(event => {
-        const eventObj = { event: event.event };
-        event.dataValues.forEach(dataValue => {
-            const matchingElement = dataProgramDE.data.qPDE.programStageDataElements.find(element => element.dataElement.id === dataValue.dataElement);
-            if (matchingElement) {
-                eventObj[matchingElement.dataElement.displayName] = dataValue.value;
-            }
-        });
-        return eventObj;
-    });
-    } else {}
-
+    useEffect(() => {
+        if (!loadingProgramDE && !errorProgramDE && dataProgramDE?.qPDE?.programStageDataElements && events.length > 0) {
+            const transposed = events.map((event) => {
+                const eventObj = { event: event.event };
+                event.dataValues.forEach((dataValue) => {
+                    const matchingElement = dataProgramDE.qPDE.programStageDataElements.find(
+                        (element) => element.dataElement.id === dataValue.dataElement
+                    );
+                    if (matchingElement) {
+                        eventObj[matchingElement.dataElement.displayName] = dataValue.value;
+                    }
+                });
+                return eventObj;
+            });
+            setTransposedEvents(transposed);
+        }
+    }, [loadingProgramDE, errorProgramDE, dataProgramDE, events]);
     
  
    
@@ -312,19 +326,32 @@ export const Staffview = () => {
     
         return '';
     };
+
+    // useEffect(() => {
+    //     if ((!loadingProgramDE && !errorProgramDE)) {
+    //         setTimeout(() => {
+    //             setIsDataLoaded(true);
+    //         }, 3000); // 3-second delay
+    //     }
+    // }, [loadingProgramDE, errorProgramDE]);
     
+    useEffect(() => {
+        if ((!loading1 && !error1)) {
+            setTimeout(() => {
+                setIsDataLoaded(true);
+            }, 3000); // 3-second delay
+        }
+    }, [loading1, error1]);
+    
+    
+    if (loadingProgramDE || loading1 || loadingEntity || loadingEvents || !isDataLoaded) return <p>Loading... {isDataLoaded ? 'true' : 'false'}</p>;
+    if (errorProgramDE) return <p>Error loading program data elements: {errorProgramDE.message}</p>;
+    if (errorEntity) return <p>Error loading entity data: {errorEntity.message}</p>;
+    if (errorEvents) return <p>Error loading events data: {errorEvents.message}</p>;
     return (
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
   <div style={{ flex: '0 0 25%' }}>
-    <h1>Staff Details</h1>
-
-    {
-      loading1 && 'Loading...'
-    }
-
-    {
-      error && error.message
-    }
+    <h1>Staff Details {isDataLoaded ? 'true' : 'false'}</h1>
 
     {
     // if there is any data available

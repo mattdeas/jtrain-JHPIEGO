@@ -19,21 +19,54 @@ import { utilConfigConstantValueByName } from '../utils/utils'
 
 
 
+// const query = {
+//     instances: {
+//         resource: 'trackedEntityInstances',
+//         params: ({ ou, program }) => ({
+//             ou,
+//             program,
+//             fields: '*',
+//         }),
+//     },
+// }
+
+
 const query = {
     instances: {
         resource: 'trackedEntityInstances',
-        params: ({ ou, program }) => ({
-            ou,
-            program,
-            fields: '*',
-        }),
+        params: ({ ou, program }) => {
+            const filters = [];
+            
+            return {
+                ou: ou,
+                program: program,
+                fields: [
+                    'trackedEntityInstance',
+                    'orgUnit',
+                    'attributes[attribute,code,displayName,value]',
+                    'enrollments[enrollment,program,orgUnit,enrollmentDate,incidentDate,status,attributes[attribute,code,displayName,value]]',
+                    'created',
+                    'lastUpdated',
+                    'orgUnits[id,displayName]',
+                    '*',
+                ],
+                page: 1,
+                pageSize: 1000,
+                order: 'Vnm7OVecUi1:asc', // Course Name
+                filter: filters,
+            };
+        },
     },
-}
-
+};
 
 
 export const CourseSearch = () => {
 
+    const defCourseOrgUnitId = utilConfigConstantValueByName('DefaultCourseOrgUnit')
+    const defCourseProgramId = utilConfigConstantValueByName('CourseProgram')
+    const defThemAreaId = utilConfigConstantValueByName('ThematicAreaOptionset')
+    
+    
     const [showAddCourse, setShowAddCourse] = useState(false);
     const [message, setMessage] = useState(localStorage.getItem('message') || '');
     const [selectedThematicArea, setSelectedThematicArea] = useState('');
@@ -48,14 +81,6 @@ export const CourseSearch = () => {
         refetch();
     };
 
-    const defCourseOrgUnitId = utilConfigConstantValueByName('DefaultCourseOrgUnit')
-    const defCourseProgramId = utilConfigConstantValueByName('CourseProgram')
-    const defThemAreaId = utilConfigConstantValueByName('ThematicAreaOptionset')
-
-    console.log('defCourseOrgUnitId:', defCourseOrgUnitId)
-    console.log('defCourseProgramId:', defCourseProgramId)
-    console.log('defThemAreaId:', defThemAreaId)
-
     const { loading, error, data, refetch } = useDataQuery(query, {
         variables: {
             ou: defCourseOrgUnitId,
@@ -63,7 +88,6 @@ export const CourseSearch = () => {
         },
     })
 
-    console.log('data:', data)
     const thematicAreasQuery = {
         thematicAreas: {
             resource: `optionSets/${defThemAreaId}`,
@@ -84,6 +108,23 @@ export const CourseSearch = () => {
         setSelectedThematicArea(event.target.value);
     }
 
+    // Caused by DHIS2 API version structure - caters for 2.40.3 and lower
+    const getAttributes = (instance) => {
+        // Check if attributes are at the root level
+        if (instance.attributes && instance.attributes.length > 0) {
+            return instance.attributes;
+        }
+        // Check if attributes are within enrollments
+        if (instance.enrollments && instance.enrollments.length > 0) {
+            return instance.enrollments[0].attributes;
+        }
+        return [];
+    };
+
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p>Error: {error.message}</p>;
+
+    console.log('Data:', data);
     return (
         <div>
             <h1>Search Courses </h1>
@@ -96,6 +137,7 @@ export const CourseSearch = () => {
         </select> */}
 
             <input type="text" value={searchTerm} onChange={handleSearchTermChange} placeholder="Course Name" />
+
 
 
             {loading && 'Loading...'}
@@ -111,29 +153,29 @@ export const CourseSearch = () => {
                     </TableHead>
                     <TableBody>
                     {data.instances.trackedEntityInstances
-                        .filter(item => 
-                        item.attributes.some(attr => attr.displayName === 'Course Name' && attr.value.toLowerCase().includes(searchTerm.toLowerCase())) &&
-                        (selectedThematicArea === '' || item.attributes.some(attr => attr.displayName === 'Course Thematic Area' && attr.value === selectedThematicArea))
-                    )
+                        
+            .filter(instance => {
+                                    const attributes = getAttributes(instance);
+                                    return attributes.some(attr => attr.displayName === 'Course Name' && attr.value.toLowerCase().includes(searchTerm.toLowerCase())) &&
+                                        (selectedThematicArea === '' || attributes.some(attr => attr.displayName === 'Course Thematic Area' && attr.value === selectedThematicArea));
+                                })
                     .slice(0, 10)
-                    .map(
-                        ({ trackedEntityInstance, attributes }) => {
-                            const attributesObj = attributes.reduce((obj, item) => {
-                                obj[item.displayName] = item.value;
-                                return obj;
-                            }, {});
+                    .map(instance => {
+                                    const attributes = getAttributes(instance);
+                                    const attributesObj = attributes.reduce((obj, item) => {
+                                        obj[item.displayName] = item.value;
+                                        return obj;
+                                    }, {});
 
-                            return (
-                                <TableRow key={trackedEntityInstance}>
-                                    {/* <TableCell>{attributesObj['Course Thematic Area']}</TableCell> */}
-                                    <TableCell>{attributesObj['Course Name']}</TableCell>
-                                    <TableCell>
-                                        <Link to={`/courseview/${trackedEntityInstance}`}><IconView24/> </Link>
-                                    </TableCell>
-                                </TableRow>
-                            );
-                        }
-                    )}
+                                    return (
+                                        <TableRow key={instance.trackedEntityInstance}>
+                                            <TableCell>{attributesObj['Course Name']}</TableCell>
+                                            <TableCell>
+                                                <Link to={`/courseview/${instance.trackedEntityInstance}`}><IconView24/></Link>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
                     </TableBody>
                     
                 </Table>

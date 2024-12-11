@@ -13,6 +13,35 @@ import { Link } from 'react-router-dom';
 import { IconView16 } from '@dhis2/ui';
 import { utilConfigConstantValueByName } from '../utils/utils';
 
+// const query = {
+//     instances: {
+//         resource: 'trackedEntityInstances',
+//         params: ({ ou, trackedEntityType, page, pageSize, searchLastName, searchFirstName }) => {
+//             const filters = [];
+//             if (searchLastName) {
+//                 filters.push(`wXRW65yTN1d:like:${searchLastName}`);
+//             }
+//             if (searchFirstName) {
+//                 filters.push(`Lez2r3d0oxb:like:${searchFirstName}`);
+//             }
+//             return {
+//                 ou: ou,
+//                 trackedEntityType: trackedEntityType,
+//                 fields: [
+//                     'trackedEntityInstance',
+//                     'attributes[displayName,value]',
+//                     'orgUnits[id,displayName]',
+//                     '*',
+//                 ],
+//                 page: page,
+//                 pageSize: pageSize,
+//                 order: 'wXRW65yTN1d:asc,Lez2r3d0oxb:desc', //LastName , FirstName SL
+//                 filter: filters,
+//             };
+//         },
+//     },
+// };
+
 const query = {
     instances: {
         resource: 'trackedEntityInstances',
@@ -29,13 +58,17 @@ const query = {
                 trackedEntityType: trackedEntityType,
                 fields: [
                     'trackedEntityInstance',
-                    'attributes[displayName,value]',
+                    'orgUnit',
+                    'attributes[attribute,code,displayName,value]',
+                    'enrollments[enrollment,program,orgUnit,enrollmentDate,incidentDate,status,attributes[attribute,code,displayName,value]]',
+                    'created',
+                    'lastUpdated',
                     'orgUnits[id,displayName]',
                     '*',
                 ],
                 page: page,
                 pageSize: pageSize,
-                order: 'wXRW65yTN1d:asc,Lez2r3d0oxb:desc', //LastName , FirstName SL
+                order: 'wXRW65yTN1d:asc,Lez2r3d0oxb:desc', // LastName, FirstName SL
                 filter: filters,
             };
         },
@@ -53,21 +86,13 @@ const ORG_UNITS_QUERY = {
 
 export const StaffSearch = () => {
 
-    //const constants = useFetchAndStoreConstants();
-
-    //if (!constants) {
-    //    return <div>Loading...</div>;
-    //}
-
     const defStaffOrgUnitId = utilConfigConstantValueByName('DefaultStaffOrgUnit');
     const defStaffType = utilConfigConstantValueByName('TEITypeStaff');
-    const defStaffProgId = utilConfigConstantValueByName('StaffProgram');
-    
+    const pageSize = 50;
+
     const [page, setPage] = useState(1); // Current page
-    const [pageSize, setPageSize] = useState(50); // Items per page
     const [searchLastName, setLastName] = useState('');
     const [searchFirstName, setFirstName] = useState('');
-    const [searchTerm, setSearchTerm] = useState('');
 
     const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
     const { loading, error, data, refetch } = useDataQuery(query, {
@@ -101,11 +126,25 @@ export const StaffSearch = () => {
             searchFirstName: searchFirstName,
         });
     };
+    // Caused by DHIS2 API version structure - caters for 2.40.3 and lower
+    const getAttributes = (instance) => {
+        // Check if attributes are at the root level
+        if (instance.attributes && instance.attributes.length > 0) {
+            return instance.attributes;
+        }
+        // Check if attributes are within enrollments
+        if (instance.enrollments && instance.enrollments.length > 0) {
+            return instance.enrollments[0].attributes;
+        }
+        return [];
+    };
 
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p>Error: {error.message}</p>;
    
     return (
         <div>
-            <h1>Search Staff</h1>
+            <h1>Search Trainees</h1>
             <input type="text" onChange={handleSearchTermChangeLast} placeholder="Last Name" onKeyPress={(e) => { if (e.key === 'Enter') handleSearch(); }} />
             <input type="text" onChange={handleSearchTermChangeFirst} placeholder="First Name"  onKeyPress={(e) => { if (e.key === 'Enter') handleSearch(); }}/>
             <button onClick={handleSearch}>Search</button>
@@ -159,14 +198,15 @@ export const StaffSearch = () => {
                             </TableRowHead>
                         </TableHead>
                             <TableBody>
-                                {data.instances.trackedEntityInstances.slice(0, 50).map(({ trackedEntityInstance, attributes }) => {
+                                {data.instances.trackedEntityInstances.slice(0, 50).map((instance) => {
+                                    const attributes = getAttributes(instance);
                                     const attributesObj = attributes.reduce((obj, item) => {
                                         obj[item.displayName] = item.value;
                                         return obj;
                                     }, {});
 
                                     return (
-                                        <TableRow key={trackedEntityInstance}>
+                                        <TableRow key={instance.trackedEntityInstance}>
                                             <TableCell>{attributesObj['Last Name']}</TableCell>
                                             <TableCell>{attributesObj['First Name']}</TableCell>
                                             <TableCell>{attributesObj['Designation']}</TableCell>
@@ -188,7 +228,7 @@ export const StaffSearch = () => {
                                             </TableCell>
                                             <TableCell>{attributesObj['PIN']}</TableCell>
                                             <TableCell>
-                                                <Link to={`/staffview/${trackedEntityInstance}`}><IconView16 /></Link>
+                                                <Link to={`/staffview/${instance.trackedEntityInstance}`}><IconView16 /></Link>
                                             </TableCell>
                                         </TableRow>
                                     );
