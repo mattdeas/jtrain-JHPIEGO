@@ -351,8 +351,20 @@ const handleInputChangeCourseDateEdit = (name, date) => {
         const defCourseAttendeesId = utilConfigConstantValueByName('CourseAttendees')
         const defCourseAttendeesCountId = utilConfigConstantValueByName('CourseAttendeesCount')
         const defCourseStartDate = utilConfigConstantValueByName('CourseStartDate')
+        const defCourseDEEndDate = utilConfigConstantValueByName('CourseEndDate');
+
         dataValues.push({ dataElement: defCourseAttendeesId, value: '' });
         dataValues.push({ dataElement: defCourseAttendeesCountId, value: '0' });
+
+        // Check if defCourseDEStartDate and defCourseDEEndDate are present, if not, set them to today's date
+        const today = new Date().toISOString().split('T')[0];
+
+        if (!formFieldsCourse[defCourseStartDate]) {
+            formFieldsCourse[defCourseStartDate] = today;
+        }
+        if (!formFieldsCourse[defCourseDEEndDate]) {
+            formFieldsCourse[defCourseDEEndDate] = today;
+        }
 
         const eventDateValue = formFieldsCourse[defCourseStartDate];
         const eventDate = eventDateValue ? eventDateValue : formattedDate; // Use the extracted date or fallback to today's date
@@ -624,6 +636,8 @@ const handleInputChangeCourseDateEdit = (name, date) => {
     
     //const filteredEvents = filterEvents(eventsData.events.events, partnerFilter, filterDate);
     //console.log('filteredEvents',filteredEvents)
+
+
     return (
         <div key={key}  style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex' }}>
@@ -638,6 +652,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
     {
       error && error.message
     }
+
 
     {
     // if there is any data available
