@@ -4,27 +4,6 @@
             "created": "2024-06-13T09:25:08.813",
             "lastUpdated": "2024-06-27T10:15:34.612",
             "translations": [],
-            "createdBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "lastUpdatedBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "sharing": {
-                "owner": "UKGTn6ua5jk",
-                "external": false,
-                "users": {},
-                "userGroups": {},
-                "public": "rw------"
-            },
             "minDaysFromStart": 0,
             "program": {
                 "id": "Lw1g7haLUd9"
@@ -282,27 +261,6 @@
             "created": "2024-06-27T10:32:27.509",
             "lastUpdated": "2024-06-27T10:32:27.509",
             "translations": [],
-            "createdBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "lastUpdatedBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "sharing": {
-                "owner": "UKGTn6ua5jk",
-                "external": false,
-                "users": {},
-                "userGroups": {},
-                "public": "rw------"
-            },
             "minDaysFromStart": 0,
             "program": {
                 "id": "vtSLYBYufMn"
@@ -448,27 +406,6 @@
             "created": "2024-06-10T14:28:57.208",
             "lastUpdated": "2024-09-05T11:01:11.453",
             "translations": [],
-            "createdBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "lastUpdatedBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "sharing": {
-                "owner": "UKGTn6ua5jk",
-                "external": false,
-                "users": {},
-                "userGroups": {},
-                "public": "rw------"
-            },
             "shortName": "Training - Course",
             "version": 6,
             "programType": "WITH_REGISTRATION",
@@ -496,7 +433,7 @@
             "id": "Lw1g7haLUd9",
             "attributeValues": [],
             "organisationUnits": [{
-                    "id": "WW21j6yQPla"
+                    "id": "Plmg8ikyfrK"
                 }
             ],
             "programStages": [{
@@ -550,27 +487,6 @@
             "created": "2024-06-14T10:11:52.685",
             "lastUpdated": "2024-10-28T10:42:01.319",
             "translations": [],
-            "createdBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "lastUpdatedBy": {
-                "id": "b9qwdmsZ25U",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "trainingdemo"
-            },
-            "sharing": {
-                "owner": "UKGTn6ua5jk",
-                "external": false,
-                "users": {},
-                "userGroups": {},
-                "public": "rw------"
-            },
             "shortName": "Training - Staff",
             "version": 12,
             "programType": "WITH_REGISTRATION",
@@ -599,7 +515,7 @@
             "id": "vtSLYBYufMn",
             "attributeValues": [],
             "organisationUnits": [{
-                    "id": "WW21j6yQPla"
+                    "id": "Plmg8ikyfrK"
                 }
             ],
             "programStages": [{

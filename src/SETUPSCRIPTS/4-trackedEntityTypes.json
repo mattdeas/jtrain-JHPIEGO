@@ -1,65 +1,9 @@
 {
     "trackedEntityTypes": [{
-            "name": "Course",
-            "created": "2023-11-06T13:54:06.702",
-            "lastUpdated": "2023-11-06T13:54:06.702",
-            "translations": [],
-            "createdBy": {
-                "id": "Xq3Khx2JHk0",
-                "code": null,
-                "name": "Scott Merritt",
-                "displayName": "Scott Merritt",
-                "username": "smerritt"
-            },
-            "lastUpdatedBy": {
-                "id": "Xq3Khx2JHk0",
-                "code": null,
-                "name": "Scott Merritt",
-                "displayName": "Scott Merritt",
-                "username": "smerritt"
-            },
-            "sharing": {
-                "owner": "Xq3Khx2JHk0",
-                "external": false,
-                "users": {},
-                "userGroups": {},
-                "public": "rw------"
-            },
-            "trackedEntityTypeAttributes": [],
-            "featureType": "NONE",
-            "minAttributesRequiredToSearch": 1,
-            "maxTeiCountToReturn": 0,
-            "allowAuditLog": false,
-            "id": "EcbFeAtWDmP",
-            "attributeValues": []
-        },{
             "name": "Training Course",
             "created": "2024-06-10T13:43:09.637",
             "lastUpdated": "2024-09-05T11:02:07.846",
             "translations": [],
-            "createdBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "lastUpdatedBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "sharing": {
-                "owner": "UKGTn6ua5jk",
-                "external": false,
-                "users": {},
-                "userGroups": {
-                    
-                },
-                "public": "rw------"
-            },
             "trackedEntityTypeAttributes": [{
                     "name": "Training Course Course Name",
                     "created": "2024-07-05T12:59:33.830",
@@ -91,7 +35,7 @@
                     "displayInList": false,
                     "searchable": false,
                     "valueType": "TEXT",
-                    "displayShortName": "null Course Name",
+                    "displayShortName": "Course Name",
                     "displayName": "Training Course Course Name",
                     "favorite": false,
                     "id": "iw3G8s1nBW0",
@@ -110,27 +54,6 @@
             "created": "2024-06-10T12:52:27.376",
             "lastUpdated": "2024-10-25T14:42:40.347",
             "translations": [],
-            "createdBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "lastUpdatedBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "sharing": {
-                "owner": "UKGTn6ua5jk",
-                "external": false,
-                "users": {},
-                "userGroups": {},
-                "public": "rw------"
-            },
             "trackedEntityTypeAttributes": [{
                     "name": "Trainees First Name",
                     "created": "2024-06-26T12:33:30.891",

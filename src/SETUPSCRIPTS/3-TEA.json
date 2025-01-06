@@ -4,27 +4,6 @@
             "created": "2024-06-26T12:14:38.158",
             "lastUpdated": "2024-06-26T12:14:38.158",
             "translations": [],
-            "createdBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "lastUpdatedBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "sharing": {
-                "owner": "UKGTn6ua5jk",
-                "external": false,
-                "users": {},
-                "userGroups": {},
-                "public": "rw------"
-            },
             "shortName": "Location",
             "legendSets": [],
             "aggregationType": "COUNT",
@@ -45,27 +24,6 @@
             "created": "2024-10-25T14:42:15.879",
             "lastUpdated": "2024-10-25T14:42:15.879",
             "translations": [],
-            "createdBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "lastUpdatedBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "sharing": {
-                "owner": "UKGTn6ua5jk",
-                "external": false,
-                "users": {},
-                "userGroups": {},
-                "public": "rw------"
-            },
             "shortName": "Assigned Facility",
             "legendSets": [],
             "aggregationType": "COUNT",
@@ -87,27 +45,6 @@
             "created": "2024-06-10T14:29:55.485",
             "lastUpdated": "2024-06-10T14:29:55.485",
             "translations": [],
-            "createdBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "lastUpdatedBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "sharing": {
-                "owner": "UKGTn6ua5jk",
-                "external": false,
-                "users": {},
-                "userGroups": {},
-                "public": "rw------"
-            },
             "shortName": "Course Name",
             "legendSets": [],
             "aggregationType": "COUNT",
@@ -129,27 +66,6 @@
             "created": "2024-07-02T12:11:04.347",
             "lastUpdated": "2024-07-02T13:07:49.381",
             "translations": [],
-            "createdBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "lastUpdatedBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "sharing": {
-                "owner": "UKGTn6ua5jk",
-                "external": false,
-                "users": {},
-                "userGroups": {},
-                "public": "rw------"
-            },
             "shortName": "Alternate Mobile #",
             "legendSets": [],
             "aggregationType": "NONE",
@@ -171,27 +87,6 @@
             "created": "2024-06-10T14:30:33.280",
             "lastUpdated": "2024-06-10T14:30:33.280",
             "translations": [],
-            "createdBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "lastUpdatedBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "sharing": {
-                "owner": "UKGTn6ua5jk",
-                "external": false,
-                "users": {},
-                "userGroups": {},
-                "public": "rw------"
-            },
             "shortName": "Course Thematic Area",
             "legendSets": [],
             "aggregationType": "COUNT",
@@ -215,27 +110,6 @@
             "created": "2024-06-26T12:36:31.760",
             "lastUpdated": "2024-06-26T12:36:31.760",
             "translations": [],
-            "createdBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "lastUpdatedBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "sharing": {
-                "owner": "UKGTn6ua5jk",
-                "external": false,
-                "users": {},
-                "userGroups": {},
-                "public": "rw------"
-            },
             "shortName": "Designation",
             "legendSets": [],
             "aggregationType": "COUNT",
@@ -259,27 +133,6 @@
             "created": "2024-06-26T12:15:46.366",
             "lastUpdated": "2024-06-26T12:15:46.366",
             "translations": [],
-            "createdBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "lastUpdatedBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "sharing": {
-                "owner": "UKGTn6ua5jk",
-                "external": false,
-                "users": {},
-                "userGroups": {},
-                "public": "rw------"
-            },
             "shortName": "First Name",
             "legendSets": [],
             "aggregationType": "NONE",
@@ -300,27 +153,6 @@
             "created": "2024-07-22T15:38:26.828",
             "lastUpdated": "2024-07-22T15:38:26.828",
             "translations": [],
-            "createdBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "lastUpdatedBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "sharing": {
-                "owner": "UKGTn6ua5jk",
-                "external": false,
-                "users": {},
-                "userGroups": {},
-                "public": "rw------"
-            },
             "shortName": "Gender",
             "legendSets": [],
             "aggregationType": "COUNT",
@@ -345,27 +177,6 @@
             "created": "2024-06-26T12:16:57.913",
             "lastUpdated": "2024-06-26T12:16:57.913",
             "translations": [],
-            "createdBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "lastUpdatedBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "sharing": {
-                "owner": "UKGTn6ua5jk",
-                "external": false,
-                "users": {},
-                "userGroups": {},
-                "public": "rw------"
-            },
             "shortName": "Last Name",
             "legendSets": [],
             "aggregationType": "NONE",
@@ -387,27 +198,6 @@
             "created": "2024-06-27T10:04:54.618",
             "lastUpdated": "2024-07-02T13:07:40.176",
             "translations": [],
-            "createdBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "lastUpdatedBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "sharing": {
-                "owner": "UKGTn6ua5jk",
-                "external": false,
-                "users": {},
-                "userGroups": {},
-                "public": "rw------"
-            },
             "shortName": "Mobile #",
             "legendSets": [],
             "aggregationType": "NONE",
@@ -429,27 +219,6 @@
             "created": "2024-07-04T13:50:01.869",
             "lastUpdated": "2024-07-04T13:50:01.869",
             "translations": [],
-            "createdBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "lastUpdatedBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "sharing": {
-                "owner": "UKGTn6ua5jk",
-                "external": false,
-                "users": {},
-                "userGroups": {},
-                "public": "rw------"
-            },
             "shortName": "PIN",
             "legendSets": [],
             "aggregationType": "NONE",

@@ -5,27 +5,6 @@
             "created": "2024-06-10T14:25:46.532",
             "lastUpdated": "2024-06-10T14:25:58.149",
             "translations": [],
-            "createdBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "lastUpdatedBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "sharing": {
-                "owner": "UKGTn6ua5jk",
-                "external": false,
-                "users": {},
-                "userGroups": {},
-                "public": "rw------"
-            },
             "options": [{
                     "id": "dssmT0XocdS"
                 }
@@ -40,27 +19,6 @@
             "created": "2024-06-26T12:18:59.105",
             "lastUpdated": "2024-07-24T08:47:59.366",
             "translations": [],
-            "createdBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "lastUpdatedBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "sharing": {
-                "owner": "UKGTn6ua5jk",
-                "external": false,
-                "users": {},
-                "userGroups": {},
-                "public": "rw------"
-            },
             "options": [{
                     "id": "qb5KbnEP0JP"
                 }, {
@@ -111,27 +69,6 @@
             "created": "2023-08-14T18:05:02.085",
             "lastUpdated": "2024-07-22T15:37:43.033",
             "translations": [],
-            "createdBy": {
-                "id": "ly0WSWXD435",
-                "code": null,
-                "name": "Alfred Conteh",
-                "displayName": "Alfred Conteh",
-                "username": "aconteh"
-            },
-            "lastUpdatedBy": {
-                "id": "UKGTn6ua5jk",
-                "code": null,
-                "name": "Matthew Deas",
-                "displayName": "Matthew Deas",
-                "username": "mdeas"
-            },
-            "sharing": {
-                "owner": "ly0WSWXD435",
-                "external": false,
-                "users": {},
-                "userGroups": {},
-                "public": "rw------"
-            },
             "options": [{
                     "id": "oA0VmwqJbb7"
                 }, {
