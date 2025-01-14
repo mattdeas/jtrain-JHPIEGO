@@ -31,26 +31,24 @@ const ORG_UNITS_QUERY = {
 const query = {
     instances: {
         resource: 'trackedEntityInstances',
-        params: ({ ou, trackedEntityType, page, pageSize }) => {
-           
-            return {
-                ou: ou,
-                trackedEntityType: trackedEntityType,
-                fields: [
-                    'trackedEntityInstance',
-                    'orgUnits[id,displayName]',
-                    'attributes[attribute,code,displayName,value]',
-                    'enrollments[enrollment,program,orgUnit,enrollmentDate,incidentDate,status,attributes[attribute,code,displayName,value]]',
-                    'created',
-                    'lastUpdated',
-                    'orgUnits[id,displayName]',
-                    '*',
-                ],
-                paging: false,
-                pageSize: 1000,
-                order: 'wXRW65yTN1d:asc,Lez2r3d0oxb:desc', //LastName , FirstName SL
-            };
-        },
+        params: ({ ou, trackedEntityType, tei_id }) => ({
+            ou: ou,
+            trackedEntityType: trackedEntityType,
+            trackedEntityInstance: tei_id,
+            fields: [
+                'trackedEntityInstance',
+                'orgUnits[id,displayName]',
+                'attributes[attribute,code,displayName,value]',
+                'enrollments[enrollment,program,orgUnit,enrollmentDate,incidentDate,status,attributes[attribute,code,displayName,value]]',
+                'created',
+                'lastUpdated',
+                'orgUnits[id,displayName]',
+                '*',
+            ],
+            paging: false,
+            pageSize: 1000,
+            order: 'wXRW65yTN1d:asc,Lez2r3d0oxb:desc', // LastName, FirstName SL
+        }),
     },
 };
 
@@ -82,23 +80,52 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
     const [refreshKey, setRefreshKey] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
     const [isFileIconVisible, setIsFileIconVisible] = useState(true);
+    const [dataQry, setDataQry] = useState(null);
+    const [loadingQry, setLoadingQry] = useState(false);
+    const [errorQry, setErrorQry] = useState(null);
 
     const defStaffEntityType = utilConfigConstantValueByName('TEITypeStaff');
     const defStaffOrgUnit = utilConfigConstantValueByName('DefaultStaffOrgUnit');
     const defCourseOrgUnitId = utilConfigConstantValueByName('DefaultCourseOrgUnit');
     const defCourseEventId = utilConfigConstantValueByName('CourseEventId');
     const defStaffProgram = utilConfigConstantValueByName('StaffProgram');
-    console.log('defStaffProgram', defStaffProgram);
-    const { loading: loadingQry, error: errorQry, data: dataQry, refetch: refetchQry } = useDataQuery(query, {
-        variables: {
-            ou: defStaffOrgUnit,
-            trackedEntityType: defStaffEntityType,
-            tei_id: tei_id,
-            refreshKey,
-            lazy: true,
-            
-        },
-    });
+    
+    const fetchData = async () => {
+        setLoadingQry(true);
+        setErrorQry(null);
+        try {
+            const teiIds = tei_id.slice(0, -1).split(';');
+            const results = await Promise.all(
+                teiIds.map(id =>
+                    engine.query(query, {
+                        variables: {
+                            ou: defStaffOrgUnit,
+                            trackedEntityType: defStaffEntityType,
+                            tei_id: id,
+                            refreshKey,
+                        },
+                    })
+                )
+            );
+            const combinedData = results.reduce((acc, result) => {
+                if (result.instances.trackedEntityInstances) {
+                    acc.instances.trackedEntityInstances.push(...result.instances.trackedEntityInstances);
+                }
+                return acc;
+            }, { instances: { trackedEntityInstances: [] } });
+            setDataQry(combinedData);
+            console.log('combinedData', combinedData);
+        } catch (error) {
+            setErrorQry(error);
+        } finally {
+            setLoadingQry(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, [refreshKey, reload, refreshCount]);
+    
 
     const { loading: loadingSCD, error: errorSCD, data: dataSCD, refetch: refetchSCD } = useDataQuery(qryStaffCourseDetails, {
         variables: {
@@ -110,18 +137,17 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
         },
     });
 
-    const handleDivClick = (trackedEntityInstance) => {
-        if (!showCustomFields[trackedEntityInstance]) {
-            handleShowCustomFields(trackedEntityInstance);
-        }
-    };
-    const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
+    // const handleDivClick = (trackedEntityInstance) => {
+    //     if (!showCustomFields[trackedEntityInstance]) {
+    //         handleShowCustomFields(trackedEntityInstance);
+    //     }
+    // };
+    // const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
 
     useEffect(() => {
         setRefreshKey(prevKey => prevKey + 1);
-        refetchQry();
         refetchSCD();
-    }, [dataQry, dataSCD, refetchQry, refetchSCD, reload, refreshCount]);
+    }, [dataSCD, refetchSCD, reload, refreshCount]);
 
     useEffect(() => {
         if (dataSCD) {
@@ -141,7 +167,6 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
 
     useEffect(() => {
         setRefreshKey(prevKey => prevKey + 1);
-        refetchQry();
         refetchSCD();
         refetchEvent();
     }, [refreshCount]);
@@ -160,7 +185,7 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
             value.toLowerCase().includes(searchQuery.toLowerCase())
         );
     });
-    console.log('filteredInstances', filteredInstances);
+    // console.log('filteredInstances', filteredInstances);
 
     const [showCustomFields, setShowCustomFields] = useState({});
 
@@ -293,7 +318,6 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
                             />
                         </div>
                         <div className="right-div">
-                            {/* Add content for the right div here */}
                             Total # Attendees {dataQry?.instances?.trackedEntityInstances.length}
                         </div>
                     </div>
@@ -301,7 +325,6 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
                         <Table>
                             <TableHead className="sticky-header">
                                 <TableRowHead>
-                                    {/* <TableCellHead>ID</TableCellHead> */}
                                     <TableCellHead>Last Name</TableCellHead>
                                     <TableCellHead>First Name</TableCellHead>
                                     <TableCellHead>Designation</TableCellHead>
@@ -311,68 +334,66 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
                                 </TableRowHead>
                             </TableHead>
                             <TableBody>
-                            {dataQry?.instances?.trackedEntityInstances
-    .slice(0, 10000)
-    .map(instance => {
-        const attributes = getAttributes(instance);
-        const attributesObj = attributes.reduce((obj, item) => {
-            obj[item.displayName] = item.value;
-            return obj;
-        }, {});
+                                {dataQry?.instances?.trackedEntityInstances
+                                    .slice(0, 10000)
+                                    .map(instance => {
+                                        const attributes = getAttributes(instance);
+                                        const attributesObj = attributes.reduce((obj, item) => {
+                                            obj[item.displayName] = item.value;
+                                            return obj;
+                                        }, {});
 
-        let matchingEventValue = null;
-        if (dataSCD) {
-            const matchingEvent = dataSCD.events.events.find(event => event.trackedEntityInstance === instance.trackedEntityInstance);
-            if (matchingEvent) {
-                matchingEventValue = matchingEvent.event;
-            }
-        }
+                                        let matchingEventValue = null;
+                                        if (dataSCD) {
+                                            const matchingEvent = dataSCD.events.events.find(event => event.trackedEntityInstance === instance.trackedEntityInstance);
+                                            if (matchingEvent) {
+                                                matchingEventValue = matchingEvent.event;
+                                            }
+                                        }
 
-        if (delTEIs.includes(instance.trackedEntityInstance)) {
-            return null;
-        }
+                                        if (delTEIs.includes(instance.trackedEntityInstance)) {
+                                            return null;
+                                        }
 
-        return (
-            <TableRow key={instance.trackedEntityInstance}>
-                {/* <TableCell>{instance.trackedEntityInstance}</TableCell> */}
-                <TableCell>{attributesObj['Last Name']}</TableCell>
-                <TableCell>{attributesObj['First Name']}</TableCell>
-                <TableCell>{attributesObj['Designation']}</TableCell>
-                <TableCell>
-                    <Link to={`/staffview/${instance.trackedEntityInstance}`}><IconView24 alt="View Enrollee Details" /></Link>
-                </TableCell>
-                <TableCell>
-                    <div>
-                        {isFileIconVisible ? (
-                            <div onClick={() => { 
-                                console.log('IconFileDocument24 clicked');
-                                setIsFileIconVisible(false);
-                                handleShowCustomFields(instance.trackedEntityInstance); 
-                            }} style={{ display: 'inline-block', cursor: 'pointer' }}>
-                                <IconFileDocument24 />
-                            </div>
-                        ) : (
-                            <div onClick={() => { 
-                                console.log('IconSubtractCircle16 clicked');
-                                setIsFileIconVisible(true);
-                                handleShowCustomFields(instance.trackedEntityInstance); 
-                            }} style={{ display: 'inline-block', cursor: 'pointer' }}>
-                                <IconSubtractCircle16 />
-                            </div>
-                        )}
+                                        return (
+                                            <TableRow key={instance.trackedEntityInstance}>
+                                                <TableCell>{attributesObj['Last Name']}</TableCell>
+                                                <TableCell>{attributesObj['First Name']}</TableCell>
+                                                <TableCell>{attributesObj['Designation']}</TableCell>
+                                                <TableCell>
+                                                    <Link to={`/staffview/${instance.trackedEntityInstance}`}><IconView24 alt="View Enrollee Details" /></Link>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div>
+                                                        {isFileIconVisible ? (
+                                                            <div onClick={() => {
+                                                                console.log('IconFileDocument24 clicked');
+                                                                setIsFileIconVisible(false);
+                                                                handleShowCustomFields(instance.trackedEntityInstance);
+                                                            }} style={{ display: 'inline-block', cursor: 'pointer' }}>
+                                                                <IconFileDocument24 />
+                                                            </div>
+                                                        ) : (
+                                                            <div onClick={() => {
+                                                                console.log('IconSubtractCircle16 clicked');
+                                                                setIsFileIconVisible(true);
+                                                                handleShowCustomFields(instance.trackedEntityInstance);
+                                                            }} style={{ display: 'inline-block', cursor: 'pointer' }}>
+                                                                <IconSubtractCircle16 />
+                                                            </div>
+                                                        )}
 
-                        {showCustomFields[instance.trackedEntityInstance] && (
-                            <CourseDateAttendeesStaffCustomFields eventID={matchingEventValue} />
-                        )}
-                    </div>
-                </TableCell>
-                <TableCell>
-                    <div onClick={() => handleDelete(instance.trackedEntityInstance, matchingEventValue)}><IconDelete24 /></div>
-                </TableCell>
-                {/* Additional cells for Course Information */}
-            </TableRow>
-        );
-    })}
+                                                        {showCustomFields[instance.trackedEntityInstance] && (
+                                                            <CourseDateAttendeesStaffCustomFields eventID={matchingEventValue} />
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div onClick={() => handleDelete(instance.trackedEntityInstance, matchingEventValue)}><IconDelete24 /></div>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })}
                             </TableBody>
                         </Table>
                     </div>
