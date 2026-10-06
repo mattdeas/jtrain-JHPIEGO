@@ -4,6 +4,7 @@ import { CalendarInput } from '@dhis2-ui/calendar'
 import {
     Table,
     TableBody,
+    CircularLoader,
     TableCell,
     TableCellHead,
     TableHead,
@@ -124,7 +125,12 @@ export const CourseSearch = () => {
         return [];
     };
 
-    if (loading) return <p>Loading...</p>;
+    if (loading) return (
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <CircularLoader small />
+            <p>Loading...</p>
+        </div>
+    );
     if (error) return <p>Error: {error.message}</p>;
 
     console.log('Data:', data);
@@ -143,7 +149,12 @@ export const CourseSearch = () => {
 
 
 
-            {loading && 'Loading...'}
+            {loading && (
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                    <CircularLoader small />
+                    <span>Loading...</span>
+                </div>
+            )}
             {error && error.message}
             {data?.instances?.trackedEntityInstances && (
                 <Table>

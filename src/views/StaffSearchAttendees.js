@@ -317,6 +317,14 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
      dataStaffDefault.push({ dataElement: defCourseEventId, value: eventID });
      dataStaffDefault.push({ dataElement: defCoursePreScore, value: 0 });
      dataStaffDefault.push({ dataElement: defCoursePostScore, value: 0 });
+
+     console.log('=== ENROLLMENT LOG ===');
+     console.log('defStaffProgramId:', defStaffProgramId);
+     console.log('defStaffProgramCourseId:', defStaffProgramCourseId);
+     console.log('defStaffOrgUnitId:', defStaffOrgUnitId);
+     console.log('dataStaffDefault:', dataStaffDefault);
+     console.log('trackedEntityInstance:', trackedEntityInstance);
+     console.log('=== END ENROLLMENT LOG ===');
      const myStaffUpdate = CreateEvent(defStaffProgramId, defStaffProgramCourseId, defStaffOrgUnitId, dataStaffDefault, trackedEntityInstance);
      try {
             const response2 = await engine.mutate(myStaffUpdate);
@@ -338,7 +346,7 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
     return (
         
         <div> 
-         {isLoading ? <CircularLoader large /> : <div>
+         {isLoading ? <CircularLoader small /> : <div>
             <h3>Search Trainee to Enroll </h3>
 
 {/* <input type="text" onChange={handleSearchTermChange} /> */}
@@ -346,7 +354,12 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
 {
     // display that the data is being loaded
     // when loading is true
-    loading && 'Loading...'
+    loading && (
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <CircularLoader small />
+            <span>Loading...</span>
+        </div>
+    )
 }
 
 {
@@ -380,8 +393,8 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
 <TableRowHead>
 <TableCellHead>Last Name</TableCellHead>
 <TableCellHead>First Name</TableCellHead>
+<TableCellHead>Cadre</TableCellHead>
 <TableCellHead>Mobile #</TableCellHead>
-<TableCellHead>Designation</TableCellHead>
 <TableCellHead>Open</TableCellHead>
 <TableCellHead>Enroll</TableCellHead>
 </TableRowHead>
@@ -407,8 +420,8 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
                 {/* <!-- This area needs to be dynamic --> */}
                 <TableCell>{attributesObj['Last Name']}</TableCell>
                 <TableCell>{attributesObj['First Name']}</TableCell>
+                <TableCell>{attributesObj['Cadre']}</TableCell>
                 <TableCell>{attributesObj['Mobile #']}</TableCell>
-                <TableCell>{attributesObj['Designation']}</TableCell>
                 <TableCell>
                     <a href={`/staffview/${item.trackedEntityInstance}`} target="_blank" rel="noopener noreferrer"><IconView24 /></a>
                 </TableCell>

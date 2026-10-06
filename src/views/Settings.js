@@ -1,5 +1,6 @@
 import React from 'react';
 import { useDataQuery } from '@dhis2/app-runtime';
+import { CircularLoader } from '@dhis2/ui';
 
 const constantsQuery = {
   constants: {
@@ -25,7 +26,12 @@ const deQuery = {
     const { loading: loadingConstants, error: errorConstants, data: dataConstants } = useDataQuery(constantsQuery);
     const { loading: loadingDE, error: errorDE, data: dataDE } = useDataQuery(deQuery);
   
-    if (loadingConstants || loadingDE) return <span>Loading...</span>;
+    if (loadingConstants || loadingDE) return (
+      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+        <CircularLoader small />
+        <span>Loading...</span>
+      </div>
+    );
     if (errorConstants) return <span>Error: {errorConstants.message}</span>;
     if (errorDE) return <span>Error: {errorDE.message}</span>;
   

@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} 
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import React, {useState, useEffect} from 'react'
 import { utilConfigConstantValueByName } from '../utils/utils';
-import { IconAdd16, IconDelete16, IconCross16, IconSave16, IconView16, IconEdit16 , IconArrowLeftMulti24} from '@dhis2/ui';
+import { IconAdd16, IconDelete16, IconCross16, IconSave16, IconView16, IconEdit16 , IconArrowLeftMulti24, CircularLoader} from '@dhis2/ui';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { OrganisationUnitTree } from '@dhis2/ui';
@@ -160,7 +160,7 @@ export const Courseview = () => {
     };
 
 
-  const { loading: loading2, error2, data: dataProgramDE } = useDataQuery(qryProgramDataElements);
+    const { loading: loading2, error: error2, data: dataProgramDE } = useDataQuery(qryProgramDataElements);
   
   const engine = useDataEngine();
 //Possibly hold off on this - functionality via jTRAIN.
@@ -468,6 +468,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
                             console.error('Error:', error);
                         } else {
                             setResponseMessage('Data uploaded successfully!');
+                            setEditCourseShow(false);
                             console.log(response);
                         }
                     } catch (error) {
@@ -482,8 +483,26 @@ const handleInputChangeCourseDateEdit = (name, date) => {
         doMutation();
     };
 
+    const handleStartEditCourse = () => {
+        setResponseMessage('');
+        setEditCourseShow(true);
+    };
+
+    const handleCancelEditCourse = () => {
+        const resetFields = trackedEntityInstance
+            ? trackedEntityInstance.reduce((fields, attr) => ({
+                ...fields,
+                [attr.attribute]: attr.value,
+            }), {})
+            : {};
+
+        setFormFields(resetFields);
+        setResponseMessage('');
+        setEditCourseShow(false);
+    };
+
     
-    const { loading: loading1, error1, data } = useDataQuery(qryProgramFields, {
+        const { loading: loading1, error: error1, data } = useDataQuery(qryProgramFields, {
         variables: {
           id:  defCourseProgramId, // Use the ID of the program you want to fetch
         },
@@ -491,6 +510,10 @@ const handleInputChangeCourseDateEdit = (name, date) => {
 
     
     const [events, setEvents] = useState([]);
+    const isCourseLoading = loading1 || loadingEntity;
+    const courseError = error1 || errorEntity;
+    const isEventsLoading = loading2 || loadingEvents || orgUnitsLoading;
+    const eventsError = error2 || errorEvents || orgUnitsError;
 
     useEffect(() => {
         if (!loadingEntity && !errorEntity && dataEntity?.trackedEntityInstance?.attributes) {
@@ -611,18 +634,17 @@ const handleInputChangeCourseDateEdit = (name, date) => {
   
     <h1>Course Details</h1>
 
-    {
-      loading1 && 'Loading...'
-    }
+        {isCourseLoading && (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                <CircularLoader small />
+                <span>Loading...</span>
+            </div>
+        )}
 
-    {
-      error && error.message
-    }
+        {courseError && <div>{courseError.message || 'An error occurred while loading course details.'}</div>}
 
 
-    {
-    // if there is any data available
-    data?.program?.programTrackedEntityAttributes && (
+    {!isCourseLoading && !courseError && data?.program?.programTrackedEntityAttributes && (
             
         <form onSubmit={handleFormSubmit}>
             <table>
@@ -643,6 +665,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
                                         <select 
                                         name={trackedEntityAttribute.id} 
                                         onChange={handleInputChangeSelect}
+                                        disabled={!editCourseShow}
                                         value={findAttributeValue(trackedEntityAttribute.id)}>
                                             {trackedEntityAttribute.optionSet.options.map(option => (
                                                 <option key={option.id} value={option.code}>
@@ -651,12 +674,12 @@ const handleInputChangeCourseDateEdit = (name, date) => {
                                             ))}
                                         </select>
                                     ) : (
-                                        <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)} onChange={handleInputChange}  />
+                                        <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)} onChange={handleInputChange} disabled={!editCourseShow} />
                                     )
                                 ) : trackedEntityAttribute.valueType === 'DATE' ? (
-                                    <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)}  onChange={handleInputChange}/>
+                                    <input type="date" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)}  onChange={handleInputChange} disabled={!editCourseShow}/>
                                 ) : trackedEntityAttribute.valueType === 'NUMBER' ? (
-                                    <input type="text" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)} onChange={handleInputChange}/>
+                                    <input type="number" name={trackedEntityAttribute.id} value={findAttributeValue(trackedEntityAttribute.id)} onChange={handleInputChange} disabled={!editCourseShow}/>
                                 ) : (
                                     trackedEntityAttribute.valueType
                                 )}
@@ -669,7 +692,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
             <div>
                 {!editCourseShow && (
                     <div>
-                        {/* <button type="button" >Edit Course Details</button> */}
+                        <button type="button" onClick={handleStartEditCourse}><IconEdit16 /> Edit Course Details</button>
                         <Link to="/coursesearch">
                         <button type="button" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <IconArrowLeftMulti24 style={{ marginRight: '8px' }} /> Return to Search
@@ -680,9 +703,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
                 {editCourseShow && (
                     <div>                   
                         <button type="submit"><IconSave16 /> Save</button>
-                        <Link to="/coursesearch">
-                            <button type="button"><IconCross16/> Close / Cancel </button>
-                        </Link>
+                        <button type="button" onClick={handleCancelEditCourse}><IconCross16/> Cancel</button>
                         <button type="button" onClick={handleDelete}><IconDelete16 /> Delete</button>
                     </div>
                 )}
@@ -696,8 +717,11 @@ const handleInputChangeCourseDateEdit = (name, date) => {
         </form>
 
         
-    )
-}
+    )}
+
+    {!isCourseLoading && !courseError && !data?.program?.programTrackedEntityAttributes && (
+        <div>No course data available.</div>
+    )}
 {selectedEvent &&  (
     <div style={{ display: 'flex', flexDirection: 'column', width: '100vw', margin: 0, padding: 0 }}>
     <CourseDateStaffShow key={selectedEvent} tei_id={id} eventID={selectedEvent} />
@@ -712,38 +736,19 @@ const handleInputChangeCourseDateEdit = (name, date) => {
                 <div style={{ width: '100%', height: '70%', overflow: 'auto' }}>
                 {!isViewClicked && (
                     <div>
-                    {/* <div>
-                                        <label>
-                                            Date:
-                                            <DatePicker
-                                                selected={filterDate}
-                                                onChange={(date) => handleFilterCourseDate(date)}
-                                                dateFormat="yyyy-MM-dd"
-                                                placeholderText='YYYY-MM-DD'
-                                            />
-                                        </label>
-                                        <label>
-                                            Partner:
-                                            <input
-                                                type="text"
-                                                name="partner"
-                                                value={values.partner}
-                                                onChange={handleTextChange}
-                                            />
-                                        </label>
-                                        <label>
-                                            Location:
-                                            <input
-                                                type="text"
-                                                name="location"
-                                                value={values.location}
-                                                onChange={handleTextChange}
-                                            />
-                                        </label>
-                                    </div> */}
+                    
                     <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
                     
-    {
+    {isEventsLoading && (
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <CircularLoader small />
+            <span>Loading events...</span>
+        </div>
+    )}
+
+    {eventsError && <div>{eventsError.message || 'An error occurred while loading course events.'}</div>}
+
+    {!isEventsLoading && !eventsError && (
         eventsData?.events?.events?.length > 0 ? (
             <table style={{ border: '1px solid lightgray', borderCollapse: 'collapse' }}>
                 <tbody>
@@ -778,7 +783,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
         ) : (
             <p>No events listed</p>
         )
-    }
+    )}
 </div>
 
 </div>
@@ -857,11 +862,6 @@ const handleInputChangeCourseDateEdit = (name, date) => {
                                         <td>
                                         {item.dataElement.displayName === 'Location' ? (
                                             <div>
-                                            {/* <input type="text" value={selectedEditEventDE[item.dataElement.id] + '-' + defCourseOrgUnit || ''} />\
-                                            <input 
-        type="text" 
-        value={selected || selectedEditEventDE[item.dataElement.id] || ''} 
-    /> */}
 <p>{selectedLocationName}</p>
 
     <button onClick={() => setShowTree(!showTree)}>

@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Link, Routes, useLocation, useParams } 
 import React, { useState, useEffect } from 'react';
 import { useDataEngine } from '@dhis2/app-runtime';
 import {  utilConfigConstantValueByName } from '../utils/utils';
-import { IconCross16, IconSave16 } from '@dhis2/ui';
+import { IconCross16, IconSave16, CircularLoader } from '@dhis2/ui';
 
     const qryConstants = {
         // One query object in the whole query
@@ -134,7 +134,12 @@ import { IconCross16, IconSave16 } from '@dhis2/ui';
             <div>
                 <h1>New Course Details</h1>
 
-                {loading1 && 'Loading...'}
+                {loading1 && (
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                        <CircularLoader small />
+                        <span>Loading...</span>
+                    </div>
+                )}
 
                 {error1 && error1.message}
 

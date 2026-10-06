@@ -2,6 +2,7 @@ import { useDataQuery } from '@dhis2/app-runtime'
 import {
     Table,
     TableBody,
+    CircularLoader,
     TableCell,
     TableCellHead,
     TableHead,
@@ -115,7 +116,12 @@ export const TrainingCapture = () => {
         <div style={{ position: 'float', top: '20%', width: '95%' }}>
             
 
-            {loading && 'Loading...'}
+            {loading && (
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                    <CircularLoader small />
+                    <span>Loading...</span>
+                </div>
+            )}
             {error && error.message}
             {data?.instances?.trackedEntityInstances && (
                 

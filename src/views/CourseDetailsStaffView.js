@@ -3,6 +3,7 @@ import { useDataQuery, useDataEngine } from '@dhis2/app-runtime';
 import {
     Table,
     TableBody,
+  CircularLoader,
     TableCell,
     TableCellHead,
     TableHead,
@@ -117,7 +118,12 @@ export const CourseDetailsStaffView = ({ course }) => {
           <tr>
             <td>
               <div style={{ width: '100%' }}>
-                  {loading && 'Loading...'}
+                  {loading && (
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                      <CircularLoader small />
+                      <span>Loading...</span>
+                    </div>
+                  )}
                   {error && error.message}
                   {data?.programStages && (
               <Table>

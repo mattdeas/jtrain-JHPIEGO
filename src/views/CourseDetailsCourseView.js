@@ -2,6 +2,7 @@ import { useDataQuery } from '@dhis2/app-runtime';
 import {
     Table,
     TableBody,
+  CircularLoader,
     TableCell,
     TableCellHead,
     TableHead,
@@ -51,7 +52,12 @@ export const CourseDetailsCourseView = ({ id }) => {
     const { loading: eventLoading, error: eventError, data: eventData } = useDataQuery(eventQuery, {
         variables: { id: id },
       });
-      if (eventLoading) return 'Loading event data...';
+      if (eventLoading) return (
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+          <CircularLoader small />
+          <span>Loading event data...</span>
+        </div>
+      );
         if (eventError) return `Error: ${eventError.message}`;
     
     return (
@@ -60,7 +66,12 @@ export const CourseDetailsCourseView = ({ id }) => {
             <tr>
               <td>
                 <div style={{ width: '100%' }}>
-                  {loading && 'Loading...'}
+                  {loading && (
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                      <CircularLoader small />
+                      <span>Loading...</span>
+                    </div>
+                  )}
                   {error && error.message}
                   {data?.programStages && (
               <Table>
@@ -72,6 +83,10 @@ export const CourseDetailsCourseView = ({ id }) => {
                       // Skip rendering if displayName is 'jtrain_course_attendees'
                       if (dataElement.displayName === 'jtrain_course_attendees') {
                         return null;
+                  }
+
+                  if (dataElement.displayName === 'jtrain_course_eventid') {
+                    return null;
                   }
 
               // Change displayName if it's 'jtrain_course_attendees_count'
@@ -92,8 +107,7 @@ export const CourseDetailsCourseView = ({ id }) => {
     {data.programStages.programStageDataElements
   .sort((a, b) => a.sortOrder - b.sortOrder)
   .map(({ dataElement }) => {
-    // Skip rendering if displayName starts with 'jtrain' but is not 'jtrain_course_attendees_count'
-    if (dataElement.displayName.startsWith('jtrain') && dataElement.displayName !== 'jtrain_course_attendees_count') {
+    if (dataElement.displayName === 'jtrain_course_eventid') {
       return null;
     }
 
@@ -102,6 +116,11 @@ export const CourseDetailsCourseView = ({ id }) => {
       map[dataElement] = value;
       return map;
     }, {});
+
+    // Skip rendering if displayName starts with 'jtrain' but is not 'jtrain_course_attendees_count'
+    if (dataElement.displayName.startsWith('jtrain') && dataElement.displayName !== 'jtrain_course_attendees_count') {
+      return null;
+    }
 
     if (dataElement.displayName === 'Location') {
       return <TableCell key={dataElement.id}>

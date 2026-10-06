@@ -28,23 +28,24 @@ export const CourseDateAttendees = ({ eventID, dElements, onDelete }) => {
 
 
     const handleReload = () => {
-      setLoading(true); // Start loading
+      setLoading(true);
       console.log('REFRESHES-START')
-      setReload(!reload);
-      setRefreshCount(prevKey => prevKey + 1); 
+      setReload(prevReload => !prevReload);
+      setRefreshCount(prevKey => prevKey + 1);
       refetchEvent().finally(() => {
-          // When refetchEvent is done, stop loading
           setLoading(false);
       });
-      setReload(!reload);
-      setRefreshCount(prevKey => prevKey + 1); 
-      setReload(!reload);
     };
 
 
   const { loading: loadingEvent, error: errorEvent, data: dataEvent, refetch: refetchEvent } = useDataQuery(eventQuery(eventID), [reload]);
 
-  if (loadingEvent) return <span>Loading...</span>;
+  if (loadingEvent) return (
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+      <CircularLoader small />
+      <span>Loading...</span>
+    </div>
+  );
   if (errorEvent) return <span>Error1: {errorEvent.message}</span>;
 
   const dataElementObject = dataEvent.events.dataValues.find(
@@ -59,8 +60,9 @@ export const CourseDateAttendees = ({ eventID, dElements, onDelete }) => {
   const attendeeCount = parseInt(attendeeCountObj.value)
     return (
       <div>
+      <div style={{ height: '40vh', overflowY: 'auto' }}>
       <h3>Course Attendees </h3>
-      {loading ? <CircularLoader /> : ( // Show the loader if loading is true
+      {loading ? <CircularLoader small /> : ( // Show the loader if loading is true
           <table>
               <tbody>
               {dataElementObject ? (
@@ -71,6 +73,7 @@ export const CourseDateAttendees = ({ eventID, dElements, onDelete }) => {
               </tbody>
             </table>
       )}
+      </div>
 
       {/* <StaffSearchAttendees eventID={eventID} dataEvent={dataEvent} tei_id={dataElementObject && dataElementObject.value ? dataElementObject.value : ""} tei_count={attendeeCount} dElements={dElements} onAssign={handleReload} refreshCount={refreshCount} reload={reload} key={refreshCount}/> */}
       {dElements && (
@@ -83,7 +86,6 @@ export const CourseDateAttendees = ({ eventID, dElements, onDelete }) => {
             onAssign={handleReload} 
             refreshCount={refreshCount} 
             reload={reload} 
-            key={refreshCount}
           />
         )}
   </div>

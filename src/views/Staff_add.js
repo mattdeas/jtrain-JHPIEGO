@@ -2,6 +2,7 @@ import { useDataQuery, useDataMutation } from '@dhis2/app-runtime'
 import {
     Table,
     TableBody,
+    CircularLoader,
     TableCell,
     TableCellHead,
     TableHead,
@@ -159,7 +160,14 @@ const DataElement = ({ dataElementId, value }) => {
 
     const { loading, error, data } = useDataQuery(dataElementQuery);
 
-    if (loading) return <td>Loading...</td>;
+    if (loading) return (
+        <td>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                <CircularLoader small />
+                <span>Loading...</span>
+            </div>
+        </td>
+    );
     if (error) return <td>Error: {error.message}</td>;
 
     return (
@@ -345,7 +353,12 @@ export const Staff_add = () => {
     {
       // display that the data is being loaded
       // when loading is true
-      loading1 && 'Loading...'
+            loading1 && (
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                    <CircularLoader small />
+                    <span>Loading...</span>
+                </div>
+            )
     }
 
     {

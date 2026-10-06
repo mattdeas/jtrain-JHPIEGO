@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDataEngine } from '@dhis2/app-runtime';
+import { CircularLoader } from '@dhis2/ui';
 import { ReportOverview } from './ReportOverview';
 import { utilConfigConstantValueByName } from '../utils/utils';
 import { utilConfigConstantValueByName2 } from '../utils/utils';
@@ -46,7 +47,7 @@ export const Home = () => {
     //         "CourseEndDate": "ODO4HZT4XSg",
     //         "CourseStartDate": "N3rXacKJAjy",
     //         "DefaultStaffOrgUnit": "Esaneu7V7rq",
-    //         "TEITypeCourse": "EcbFeAtWDmP",
+    //         "TEITypeCourse": "w47JOP0TBtT",
     //         "TEITypeStaff": "AsxfMid3pVW",
     //         "CourseAttendees": "r6m3Tekr5DO",
     //         "CourseAttendeesCount": "IA7YxfolpEM",
@@ -89,7 +90,10 @@ export const Home = () => {
                     <ReportOverview />
                 </>
             ) : (
-                <p>Loading configuration...</p>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                    <CircularLoader small />
+                    <p>Loading configuration...</p>
+                </div>
             )}
         </div>
     );

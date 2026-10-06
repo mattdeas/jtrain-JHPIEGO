@@ -1,7 +1,7 @@
 module.exports = {
     type: 'app',
-    name: 'jTrain',
-    title: 'jTrain',
+    name: 'jTrain-MW',
+    title: 'jTrain-MW',
 
     entryPoints: {
         app: './src/App.js',

@@ -62,7 +62,7 @@ const MainContent = () => {
     //         "CourseEndDate": "ODO4HZT4XSg",
     //         "CourseStartDate": "N3rXacKJAjy",
     //         "DefaultStaffOrgUnit": "Esaneu7V7rq",
-    //         "TEITypeCourse": "EcbFeAtWDmP",
+    //         "TEITypeCourse": "w47JOP0TBtT",
     //         "TEITypeStaff": "AsxfMid3pVW",
     //         "CourseAttendees": "r6m3Tekr5DO",
     //         "CourseAttendeesCount": "IA7YxfolpEM",
@@ -99,7 +99,7 @@ const MainContent = () => {
             try {
                 const { settings } = await engine.query({
                     settings: {
-                        resource: 'dataStore/jtrain-EJ/appSettings'
+                        resource: 'dataStore/jtrain-MW/appSettings'
                     }
                 });
                 console.log('Fetched settings:', settings);
@@ -116,7 +116,7 @@ const MainContent = () => {
 
     // https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-240/data-store.html#webapi_data_store_create_values
     // THIS IS THE COMMAND CALL TO SET THE DATASTORE
-    // curl "https://dhis2.sl.jhpiego.org/api/dataStore/jtrain/appSettings" -X POST -H "Content-Type: application/json" -d "{\"CourseEndDate\": \"ODO4HZT4XSg\", \"CourseStartDate\": \"N3rXacKJAjy\", \"DefaultStaffOrgUnit\": \"Esaneu7V7rq\", \"TEITypeCourse\": \"EcbFeAtWDmP\", \"TEITypeStaff\": \"AsxfMid3pVW\", \"CourseAttendees\": \"r6m3Tekr5DO\", \"CourseAttendeesCount\": \"IA7YxfolpEM\", \"CourseEventId\": \"dTrDnb4e8Ee\", \"CoursePostTestScore\": \"zvXaKJnl14I\", \"CoursePreTestScore\": \"IAphSuyuH15\", \"CourseProgram\": \"Lw1g7haLUd9\", \"CourseProgramStageId\": \"h9zPG79AmgH\", \"CourseProgramAttributeCourseName\": \"Vnm7OVecUi1\", \"CourseDEPartner\": \"hGGDYuGuVeX\", \"DefaultCourseOrgUnit\": \"Esaneu7V7rq\", \"Location\": \"Esaneu7V7rq\", \"LocationDE\": \"Pe5Lkrbvnos\", \"LocationTEA\": \"PYHaJIsQyxj\", \"StaffProgram\": \"vtSLYBYufMn\", \"StaffProgramCourse\": \"C6BqK9IAR7I\", \"ThematicAreaOptionset\": \"AvtckM3AMNR\", \"IndicatorTotalFemaleTrainee\": \"fWteSZrcYjO\", \"IndicatorTotalMaleTrainee\": \"zuqccgxi4dF\", \"IndicatorTotalUnknownTrainee\": \"Wyfg7HQa40s\"}" -u trainingdemo:Jhpiego1!
+    // curl "https://dhis2.sl.jhpiego.org/api/dataStore/jtrain/appSettings" -X POST -H "Content-Type: application/json" -d "{\"CourseEndDate\": \"ODO4HZT4XSg\", \"CourseStartDate\": \"N3rXacKJAjy\", \"DefaultStaffOrgUnit\": \"Esaneu7V7rq\", \"TEITypeCourse\": \"w47JOP0TBtT\", \"TEITypeStaff\": \"AsxfMid3pVW\", \"CourseAttendees\": \"r6m3Tekr5DO\", \"CourseAttendeesCount\": \"IA7YxfolpEM\", \"CourseEventId\": \"dTrDnb4e8Ee\", \"CoursePostTestScore\": \"zvXaKJnl14I\", \"CoursePreTestScore\": \"IAphSuyuH15\", \"CourseProgram\": \"Lw1g7haLUd9\", \"CourseProgramStageId\": \"h9zPG79AmgH\", \"CourseProgramAttributeCourseName\": \"Vnm7OVecUi1\", \"CourseDEPartner\": \"hGGDYuGuVeX\", \"DefaultCourseOrgUnit\": \"Esaneu7V7rq\", \"Location\": \"Esaneu7V7rq\", \"LocationDE\": \"Pe5Lkrbvnos\", \"LocationTEA\": \"PYHaJIsQyxj\", \"StaffProgram\": \"vtSLYBYufMn\", \"StaffProgramCourse\": \"C6BqK9IAR7I\", \"ThematicAreaOptionset\": \"AvtckM3AMNR\", \"IndicatorTotalFemaleTrainee\": \"fWteSZrcYjO\", \"IndicatorTotalMaleTrainee\": \"zuqccgxi4dF\", \"IndicatorTotalUnknownTrainee\": \"Wyfg7HQa40s\"}" -u trainingdemo:Jhpiego1!
     //curl "https://play.dhis2.org/demo/api/33/dataStore/foo/key_1" -X PUT -d "[1, 2, 3]"
     //-H "Content-Type: application/json" -u admin:district
 

@@ -215,7 +215,12 @@ export const CourseDateStaffShow = ({tei_id, eventID, reload, refreshCount}) => 
             {
                 // display that the data is being loaded
                 // when loading is true
-                loading && 'Loading...'
+                loading && (
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                        <CircularLoader small />
+                        <span>Loading...</span>
+                    </div>
+                )
             }
 
             {
@@ -240,66 +245,7 @@ export const CourseDateStaffShow = ({tei_id, eventID, reload, refreshCount}) => 
        <TableRow>
             {/* <button onClick={() => refetch()}>Edit Course Information</button> */}
        </TableRow>
-      {/* <TableBody>
-      {data.instances.trackedEntityInstances
-    .slice(0, 1000)
-    .map(
-        ({ trackedEntityInstance, attributes }) => {
-            // Create an object from the attributes array
-            const attributesObj = attributes.reduce((obj, item) => {
-                obj[item.displayName] = item.value;
-                return obj;
-            }, {});
-
-            let matchingEventValue = null;
-            if (dataSCD) {
-                const matchingEvent = dataSCD.events.events.find(event => event.trackedEntityInstance === trackedEntityInstance);
-                console.log('matchingEvent', matchingEvent)
-                if (matchingEvent) {
-                    matchingEventValue = matchingEvent.event; // Store the event value in the variable
-                } else {
-                }
-            }
-
-            if(matchingEventValue != null)
-            {
-            return (
-
-                <TableRow key={trackedEntityInstance}>
-                    <TableCell>{attributesObj['Last Name']}</TableCell>
-                    <TableCell>{attributesObj['First Name']}</TableCell>
-                    <TableCell>{attributesObj['Designation']}</TableCell>
-                    <TableCell>{
-                        (attributesObj['Location'])                    
-
-            .toString()
-            .split('/')
-            .slice(2)
-            .map(id => {
-                const orgUnit = orgUnitsData.orgUnits.organisationUnits.find(orgUnit => orgUnit.id === id);
-                return orgUnit ? orgUnit.displayName : id;
-            })
-            .join(' - ')
-
-                        
-                        }</TableCell>
-                    <TableCell >
-                        <Link to={`/staffview/${trackedEntityInstance}`}><IconView24 alt="View Staff Details"/></Link>
-                    </TableCell>
-                    <TableCell>
-                        
-                        <CourseDateAttendeesStaffCustomFields eventID={matchingEventValue}/>
-                        
-                    </TableCell>
-                    <TableCell>
-                        <div title="Delete Attendee from this course?" onClick={() => handleDelete(trackedEntityInstance)} ><IconDelete24 /></div>
-                    </TableCell>
-                </TableRow>
-            );
-            }
-        }
-    )}
-                        </TableBody> */}
+      
     </Table>
                 )
             }

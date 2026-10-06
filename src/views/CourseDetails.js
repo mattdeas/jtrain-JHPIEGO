@@ -2,6 +2,7 @@ import { useDataQuery } from '@dhis2/app-runtime';
 import {
     Table,
     TableBody,
+    CircularLoader,
     TableCell,
     TableCellHead,
     TableHead,
@@ -96,7 +97,12 @@ export const CourseDetails = ({ course, updateHeadings }) => {
         setFilterDate(date);
     };
 
-    if (dProgramDE.loading || loading) return 'Loading...';
+    if (dProgramDE.loading || loading) return (
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <CircularLoader small />
+            <span>Loading...</span>
+        </div>
+    );
     if (error) return error.message;
     if (!data || !data.events) return 'No data';
 
@@ -166,7 +172,7 @@ export const CourseDetails = ({ course, updateHeadings }) => {
                                                 placeholderText='YYYY-MM-DD'
                                             />
                                         </label>
-                                        <br />
+                                        {/* <br />
                                         <label>
                                             Partner:
                                             <input
@@ -175,10 +181,15 @@ export const CourseDetails = ({ course, updateHeadings }) => {
                                                 value={values.partner}
                                                 onChange={handleTextChange}
                                             />
-                                        </label>
+                                        </label> */}
                                         
                                     </div>
-                                    {loading && 'Loading...'}
+                                    {loading && (
+                                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                                            <CircularLoader small />
+                                            <span>Loading...</span>
+                                        </div>
+                                    )}
                                     {error && error.message}
                                     {showTable && data?.events && (
                                         <Table>

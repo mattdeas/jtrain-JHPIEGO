@@ -1,7 +1,7 @@
 {
-  "name": "jTrain-EJHN",
+  "name": "jTrain-MW",
   "version": "1.0.3",
-  "description": "jTrain-EJHN",
+  "description": "jTrain-MW",
   "license": "BSD-3-Clause",
   "private": true,
   "scripts": {
@@ -11,7 +11,8 @@
     "deploy": "d2-app-scripts deploy"
   },
   "devDependencies": {
-    "@dhis2/cli-app-scripts": "^11.1.0"
+    "@dhis2/cli-app-scripts": "^11.1.0",
+    "baseline-browser-mapping": "^2.10.38"
   },
   "dependencies": {
     "@dhis2/app-runtime": "^3.9.4",
@@ -22,6 +23,5 @@
     "react-router-dom": "^6.20.0",
     "yarn": "^1.22.22"
   },
-  "author":"JHPIEGO"
-
+  "author": "JHPIEGO"
 }

@@ -97,7 +97,14 @@ import { Table, TableHead, TableRow, TableCell, TableBody, InputField, IconCheck
             setUpdateStatus('error')
         }
     };
-    if (eventLoading) return <div><span><CircularLoader /> Loading ...</span></div>;
+    if (eventLoading) return (
+        <div>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                <CircularLoader small />
+                <span>Loading...</span>
+            </span>
+        </div>
+    );
     const sortedDataElements = programStageData?.programStageDataElements?.sort((a, b) => a.sortOrder - b.sortOrder);
 
     return (
@@ -139,7 +146,7 @@ import { Table, TableHead, TableRow, TableCell, TableBody, InputField, IconCheck
                             );
                         })}
                         <TableCell>
-                            {updateStatus === 'loading' && <CircularLoader />}
+                            {updateStatus === 'loading' && <CircularLoader small />}
                             {updateStatus === 'success' && <IconCheckmark24 color='green' />}
                             {updateStatus === 'error' && <IconCross24 color='red' />}
                         </TableCell>

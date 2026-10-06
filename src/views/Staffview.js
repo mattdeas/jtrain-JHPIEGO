@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} 
 import React, {useState, useEffect} from 'react'
 import { OrganisationUnitTree } from '@dhis2/ui';
 import { CourseDateAttendeesStaffCustomFields } from './CourseDateAttendees-Staff-CustomFields';
-import { IconSave16, IconCross16, IconDelete16 } from '@dhis2/ui';
+import { IconSave16, IconCross16, IconDelete16, CircularLoader } from '@dhis2/ui';
 import { useNavigate } from "react-router-dom";
 import { utilConfigConstantValueByName } from '../utils/utils';
 
@@ -185,9 +185,19 @@ export const Staffview = () => {
     const [responseMessage, setResponseMessage] = useState('');
     const { loading: loadingEvents, error: errorEvents, data: eventsData } = useDataQuery(eventsQuery(id));
     useEffect(() => {
-    if (!loadingEvents && !errorEvents && eventsData?.events) {
-        setEvents(eventsData.events.events);
-        }   
+    if (!loadingEvents) {
+        console.log('eventsQuery raw response:', eventsData);
+        console.log('eventsQuery events array:', eventsData?.events);
+    }
+    const eventsList = Array.isArray(eventsData?.events?.events)
+        ? eventsData.events.events
+        : Array.isArray(eventsData?.events)
+            ? eventsData.events
+            : [];
+
+    if (!loadingEvents && !errorEvents) {
+        setEvents(eventsList);
+        }
         }, [eventsData, loadingEvents, errorEvents]);
 
     
@@ -253,6 +263,10 @@ export const Staffview = () => {
         },
     });
 
+    useEffect(() => {
+        console.log('programTrackedEntityAttributes:', data?.program?.programTrackedEntityAttributes);
+    }, [data?.program?.programTrackedEntityAttributes]);
+
     
     const [events, setEvents] = useState([]);
 
@@ -264,7 +278,7 @@ export const Staffview = () => {
         if (!loadingProgramDE && !errorProgramDE && dataProgramDE?.qPDE?.programStageDataElements && events.length > 0) {
             const transposed = events.map((event) => {
                 const eventObj = { event: event.event };
-                event.dataValues.forEach((dataValue) => {
+                (event.dataValues || []).forEach((dataValue) => {
                     const matchingElement = dataProgramDE.qPDE.programStageDataElements.find(
                         (element) => element.dataElement.id === dataValue.dataElement
                     );
@@ -275,6 +289,8 @@ export const Staffview = () => {
                 return eventObj;
             });
             setTransposedEvents(transposed);
+        } else if (!events.length) {
+            setTransposedEvents([]);
         }
     }, [loadingProgramDE, errorProgramDE, dataProgramDE, events]);
     
@@ -344,7 +360,12 @@ export const Staffview = () => {
     }, [loading1, error1]);
     
     
-    if (loadingProgramDE || loading1 || loadingEntity || loadingEvents || !isDataLoaded) return <p>Loading... {isDataLoaded ? 'true' : 'false'}</p>;
+    if (loadingProgramDE || loading1 || loadingEntity || loadingEvents || !isDataLoaded) return (
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <CircularLoader small />
+            <p>Loading... {isDataLoaded ? 'true' : 'false'}</p>
+        </div>
+    );
     if (errorProgramDE) return <p>Error loading program data elements: {errorProgramDE.message}</p>;
     if (errorEntity) return <p>Error loading entity data: {errorEntity.message}</p>;
     if (errorEvents) return <p>Error loading events data: {errorEvents.message}</p>;
@@ -471,7 +492,7 @@ export const Staffview = () => {
     <tr key={eventObj.event}>
 
         <td>
-        {dataProgramDE?.data?.qPDE?.programStageDataElements.map(({ dataElement }, cellIndex) => (
+        {dataProgramDE?.qPDE?.programStageDataElements.map(({ dataElement }, cellIndex) => (
         <div>
             <div key={dataElement.id} style={{ textAlign: 'center' }}>
                 {!dataElement.displayName.startsWith('jTrain') && (cellIndex === 0 ? <CourseDetailsStaffView course={eventObj[dataElement.displayName]} /> : '' )}
@@ -480,7 +501,7 @@ export const Staffview = () => {
         
       ))}
       
-      { dataProgramDE?.data?.qPDE?.programStageDataElements.map(({ dataElement }, cellIndex) => (
+      { dataProgramDE?.qPDE?.programStageDataElements.map(({ dataElement }, cellIndex) => (
     <div>
         <div key={dataElement.id} style={{ textAlign: 'center' }}>
             {!dataElement.displayName.startsWith('jTrain') && (cellIndex === 0 ? <CourseDateAttendeesStaffCustomFields eventID={eventObj.event} /> : '')}
