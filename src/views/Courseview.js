@@ -6,10 +6,7 @@ import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams} 
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import React, {useState, useEffect} from 'react'
 import { utilConfigConstantValueByName } from '../utils/utils';
-import { CourseEditEvent} from './CourseEditEvent'
-import { Calendar } from '@dhis2-ui/calendar'
 import { IconAdd16, IconDelete16, IconCross16, IconSave16, IconView16, IconEdit16 , IconArrowLeftMulti24} from '@dhis2/ui';
-import { CalendarInput } from '@dhis2/ui';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { OrganisationUnitTree } from '@dhis2/ui';
@@ -35,11 +32,8 @@ const today = new Date();
 const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
 const defCourseOrgUnitId = utilConfigConstantValueByName('DefaultCourseOrgUnit')
-    const defCourseProgramId = utilConfigConstantValueByName('CourseProgram')
-    const defCourseProgStageId = utilConfigConstantValueByName('CourseProgramStageId')
-
-
-
+const defCourseProgramId = utilConfigConstantValueByName('CourseProgram')
+const defCourseProgStageId = utilConfigConstantValueByName('CourseProgramStageId')
 
 const qryTrackedEntityInstance = {
     trackedEntityInstance: {
@@ -74,8 +68,6 @@ const mutation = {
         attributes,
     }),
 }
-
-
 
 
 const mutationCourseEvent = (program, programStage, orgUnit, trackedEntityInstance, idataValues, eventDate) => ({
@@ -609,33 +601,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
             [dataElementId]: value,
         }));
     };
-    // const filterEvents = (events, partnerFilter, filterDate) => {
-    //     return events.filter(event => {
-    //         const dataValues = event.dataValues.reduce((acc, dataValue) => {
-    //             acc[dataValue.dataElement] = dataValue.value;
-    //             return acc;
-    //         }, {});
     
-    //         const partnerMatch = dataValues['hGGDYuGuVeX'] ? dataValues['hGGDYuGuVeX'].toLowerCase().includes(partnerFilter.toLowerCase()) : false;
-    
-    //         const startDate = new Date(dataValues['N3rXacKJAjy']);
-    //         const endDate = new Date(dataValues['ODO4HZT4XSg']);
-    //         const filterDateParsed = filterDate ? new Date(filterDate) : null;
-    
-    //         const dateMatch = filterDateParsed ? (filterDateParsed >= startDate && filterDateParsed <= endDate) : false;
-    
-    //         if (!partnerFilter && filterDateParsed) {
-    //             return dateMatch;
-    //         } else if (partnerFilter && !filterDateParsed) {
-    //             return partnerMatch;
-    //         } else {
-    //             return partnerMatch || dateMatch;
-    //         }
-    //     });
-    // };
-    
-    //const filteredEvents = filterEvents(eventsData.events.events, partnerFilter, filterDate);
-    //console.log('filteredEvents',filteredEvents)
 
 
     return (

@@ -67,6 +67,7 @@ export const CourseSearch = () => {
     const defThemAreaId = utilConfigConstantValueByName('ThematicAreaOptionset')
     
     
+    
     const [showAddCourse, setShowAddCourse] = useState(false);
     const [message, setMessage] = useState(localStorage.getItem('message') || '');
     const [selectedThematicArea, setSelectedThematicArea] = useState('');
@@ -81,6 +82,8 @@ export const CourseSearch = () => {
         refetch();
     };
 
+    console.log('OU:', defCourseOrgUnitId);
+    console.log('PROGRAM:', defCourseProgramId);
     const { loading, error, data, refetch } = useDataQuery(query, {
         variables: {
             ou: defCourseOrgUnitId,

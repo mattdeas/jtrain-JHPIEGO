@@ -351,7 +351,7 @@ export const Staffview = () => {
     return (
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
   <div style={{ flex: '0 0 25%' }}>
-    <h1>Staff Details {isDataLoaded ? 'true' : 'false'}</h1>
+    <h1>Trainee Details </h1>
 
     {
     // if there is any data available

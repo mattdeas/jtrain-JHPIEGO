@@ -403,7 +403,7 @@ if (dataProgramDE && dataProgramDE.data && dataProgramDE.data.qPDE && dataProgra
     return (
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
   <div style={{ flex: '0 0 50%' }}>
-    <h1>Staff Details</h1>
+    <h1>Trainee Details</h1>
 
     {
       loading1 && 'Loading...'

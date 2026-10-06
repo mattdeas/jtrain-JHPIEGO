@@ -1,7 +1,7 @@
 {
-  "name": "jTrain-DEMO",
-  "version": "1.0.1",
-  "description": "JHPIEGO",
+  "name": "jTrain-EJHN",
+  "version": "1.0.3",
+  "description": "jTrain-EJHN",
   "license": "BSD-3-Clause",
   "private": true,
   "scripts": {
@@ -23,4 +23,5 @@
     "yarn": "^1.22.22"
   },
   "author":"JHPIEGO"
+
 }

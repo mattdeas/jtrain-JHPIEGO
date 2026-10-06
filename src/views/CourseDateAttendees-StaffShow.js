@@ -2,7 +2,7 @@ import { useDataQuery,useDataMutation, useDataEngine } from '@dhis2/app-runtime'
 import React, { useState, useEffect } from 'react'
 import { CourseDateAttendeesStaffCustomFields } from './CourseDateAttendees-Staff-CustomFields';
 import { utilConfigConstantValueByName } from '../utils/utils';
-import { Table, TableBody, TableCell, TableCellHead, TableHead, TableRow, TableRowHead, IconView24, IconDelete24 } from '@dhis2/ui';
+import { Table, TableBody, TableCell, TableCellHead, TableHead, TableRow, TableRowHead, IconView24, IconDelete24, CircularLoader } from '@dhis2/ui';
 import { Link } from 'react-router-dom';
 import { IconFileDocument24, IconSubtractCircle16 } from '@dhis2/ui';
 
@@ -46,7 +46,7 @@ const query = {
                 '*',
             ],
             paging: false,
-            pageSize: 1000,
+            pageSize: 100,
             order: 'wXRW65yTN1d:asc,Lez2r3d0oxb:desc', // LastName, FirstName SL
         }),
     },
@@ -137,13 +137,6 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
         },
     });
 
-    // const handleDivClick = (trackedEntityInstance) => {
-    //     if (!showCustomFields[trackedEntityInstance]) {
-    //         handleShowCustomFields(trackedEntityInstance);
-    //     }
-    // };
-    // const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
-
     useEffect(() => {
         setRefreshKey(prevKey => prevKey + 1);
         refetchSCD();
@@ -175,27 +168,6 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
         setSearchQuery(event.target.value);
     };
 
-    const filteredInstances = dataQry?.instances?.trackedEntityInstances.filter(({ attributes }) => {
-        const attributesObj = attributes.reduce((obj, item) => {
-            obj[item.displayName] = item.value;
-            return obj;
-        }, {});
-
-        return Object.values(attributesObj).some(value =>
-            value.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-    });
-    // console.log('filteredInstances', filteredInstances);
-
-    const [showCustomFields, setShowCustomFields] = useState({});
-
-    const handleShowCustomFields = (trackedEntityInstance) => {
-        setShowCustomFields(prevState => ({
-            ...prevState,
-            [trackedEntityInstance]: !prevState[trackedEntityInstance]
-        }));
-    };
-
     const getAttributes = (instance) => {
         // Check if attributes are at the root level
         if (instance.attributes && instance.attributes.length > 0) {
@@ -206,6 +178,26 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
             return instance.enrollments[0].attributes;
         }
         return [];
+    };
+
+    const filteredInstances = dataQry?.instances?.trackedEntityInstances.filter((instance) => {
+        const attributesObj = getAttributes(instance).reduce((obj, item) => {
+            obj[item.displayName] = item.value || '';
+            return obj;
+        }, {});
+
+        return Object.values(attributesObj).some((value) =>
+            String(value).toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    });
+
+    const [showCustomFields, setShowCustomFields] = useState({});
+
+    const handleShowCustomFields = (trackedEntityInstance) => {
+        setShowCustomFields(prevState => ({
+            ...prevState,
+            [trackedEntityInstance]: !prevState[trackedEntityInstance]
+        }));
     };
 
     const handleDelete = async (trackedEntityInstance, MaineventID) => {
@@ -304,7 +296,11 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
                 }
                 `}
             </style>
-            {loadingQry && 'Loading...'}
+            {loadingQry && (
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                    <CircularLoader small /><span>Loading...</span>
+                </div>
+            )}
             {errorQry && error.message}
             {dataQry?.instances?.trackedEntityInstances && (
                 <div>
@@ -318,7 +314,7 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
                             />
                         </div>
                         <div className="right-div">
-                            Total # Attendees {dataQry?.instances?.trackedEntityInstances.length}
+                            Total # Attendees {filteredInstances?.length || 0}
                         </div>
                     </div>
                     <div className="table-container">
@@ -327,16 +323,34 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
                                 <TableRowHead>
                                     <TableCellHead>Last Name</TableCellHead>
                                     <TableCellHead>First Name</TableCellHead>
-                                    <TableCellHead>Designation</TableCellHead>
+                                    <TableCellHead>Cadre</TableCellHead>
                                     <TableCellHead>View Enrollee</TableCellHead>
                                     <TableCellHead>View Details</TableCellHead>
                                     <TableCellHead colSpan='3' style={{ textAlign: 'center' }}>Delete</TableCellHead>
                                 </TableRowHead>
                             </TableHead>
                             <TableBody>
-                                {dataQry?.instances?.trackedEntityInstances
-                                    .slice(0, 10000)
-                                    .map(instance => {
+                                {filteredInstances
+                                ?.sort((a, b) => {
+                                    const getAttr = (tei, name) =>
+                                        getAttributes(tei)
+                                            .find(attr => attr.displayName === name)?.value?.toLowerCase() || '';
+
+                                    const lastA = getAttr(a, 'Last Name');
+                                    const lastB = getAttr(b, 'Last Name');
+
+                                    const firstA = getAttr(a, 'First Name');
+                                    const firstB = getAttr(b, 'First Name');
+
+                                    // Last Name ASC
+                                    const lastCompare = lastA.localeCompare(lastB);
+                                    if (lastCompare !== 0) return lastCompare;
+
+                                    // First Name DESC
+                                    return firstB.localeCompare(firstA);
+                                })
+                                .slice(0, 10000)
+                                .map(instance => {
                                         const attributes = getAttributes(instance);
                                         const attributesObj = attributes.reduce((obj, item) => {
                                             obj[item.displayName] = item.value;
@@ -359,7 +373,7 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
                                             <TableRow key={instance.trackedEntityInstance}>
                                                 <TableCell>{attributesObj['Last Name']}</TableCell>
                                                 <TableCell>{attributesObj['First Name']}</TableCell>
-                                                <TableCell>{attributesObj['Designation']}</TableCell>
+                                                <TableCell>{attributesObj['Cadre']}</TableCell>
                                                 <TableCell>
                                                     <Link to={`/staffview/${instance.trackedEntityInstance}`}><IconView24 alt="View Enrollee Details" /></Link>
                                                 </TableCell>

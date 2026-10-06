@@ -60,7 +60,6 @@ export const CourseDateAttendees = ({ eventID, dElements, onDelete }) => {
     return (
       <div>
       <h3>Course Attendees </h3>
-      
       {loading ? <CircularLoader /> : ( // Show the loader if loading is true
           <table>
               <tbody>

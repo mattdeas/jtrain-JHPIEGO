@@ -153,7 +153,7 @@ export const Staffadd = () => {
         data: enrollmentData,
     });
 
-    setMessage('Saved successfully');
+    setMessage('Saved successfully.... Transferring back to search page....');
     //props.onSaved();
         //redirct to the staffview page with the id 
         setTimeout(() => {
@@ -247,7 +247,7 @@ export const Staffadd = () => {
     
     return (
   <div>
-    <h1>Staff Details</h1>
+    <h1>Trainee Details</h1>
 
     
 

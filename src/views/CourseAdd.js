@@ -46,7 +46,6 @@ import { IconCross16, IconSave16 } from '@dhis2/ui';
         const [date, setDate] = useState('');
 
         const handleInputChange = (event) => {
-            console.log('is this working')
             const { name, value } = event.target;
             setFormFields(prevFields => ({
                 ...prevFields,

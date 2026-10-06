@@ -340,7 +340,7 @@ export const Staff_add = () => {
     
     return (
   <div>
-    <h1>Staff Details</h1>
+    <h1>Trainee Details</h1>
 
     {
       // display that the data is being loaded

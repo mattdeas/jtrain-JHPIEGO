@@ -119,6 +119,11 @@ export const CourseDetails = ({ course, updateHeadings }) => {
 
 
     const filteredRows = rows.filter(row => {
+        // If no filters are applied, show all rows
+        if (!partnerFilter && !filterDate) {
+            return true;
+        }
+
         const partnerMatch = row[defCourseDEPartner] ? row[defCourseDEPartner].toLowerCase().includes(partnerFilter.toLowerCase()) : false;
     
         // Parse the dates
@@ -247,6 +252,7 @@ export const CourseDetails = ({ course, updateHeadings }) => {
                                 </div>
                             )}
                         </td>
+                        
                         <td rowSpan={1}>
                             <div>
                                 {selectedCourseDate.event && <CourseDateAttendees key={refreshKey} eventID={selectedCourseDate.event} dElements={dataElements} onDelete={handleDelete} />}

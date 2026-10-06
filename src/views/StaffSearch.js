@@ -193,7 +193,6 @@ export const StaffSearch = () => {
                                 <TableCellHead>Designation</TableCellHead>
                                 <TableCellHead>Mobile #</TableCellHead>
                                 <TableCellHead>Location</TableCellHead>
-                                <TableCellHead>PIN</TableCellHead>
                                 <TableCellHead>View</TableCellHead>
                             </TableRowHead>
                         </TableHead>
@@ -238,7 +237,7 @@ export const StaffSearch = () => {
                     </div>
                     <br />
                     <Link to="/staffadd">
-                        <button>Add New Staff</button>
+                        <button>Add New Trainee</button>
                     </Link>
                 </div>
             )}

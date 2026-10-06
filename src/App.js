@@ -99,7 +99,7 @@ const MainContent = () => {
             try {
                 const { settings } = await engine.query({
                     settings: {
-                        resource: 'dataStore/jtrain/appSettings'
+                        resource: 'dataStore/jtrain-EJ/appSettings'
                     }
                 });
                 console.log('Fetched settings:', settings);
@@ -174,7 +174,6 @@ const MyApp = () => {
                         </div>
                         <div style={{ flexGrow: 1, overflowY: 'auto' }}>
                             <div style={{ paddingLeft: '25px' }}>
-                                {/* Your content here */}
                             </div>
                         </div>
                     </div>
