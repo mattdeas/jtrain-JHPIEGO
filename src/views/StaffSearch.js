@@ -16,6 +16,13 @@ import { utilConfigConstantValueByName } from '../utils/utils';
 
 
 
+/**
+ * StaffSearch (/staffsearch - "Trainees" tab)
+ * Search trainees by last/first name and open their record, or add a new trainee.
+ */
+
+// Trainee TEIs, optionally filtered by name.
+// wXRW65yTN1d = Last Name, Lez2r3d0oxb = First Name (hardcoded attribute IDs).
 const query = {
     instances: {
         resource: 'trackedEntityInstances',
@@ -49,6 +56,7 @@ const query = {
     },
 };
 
+// All org units - used to turn Location paths into readable names
 const ORG_UNITS_QUERY = {
     orgUnits: {
         resource: 'organisationUnits',
@@ -89,6 +97,7 @@ export const StaffSearch = () => {
         setFirstName(event.target.value);
     };
 
+    // Run the search with the current name inputs (Search button or Enter)
     const handleSearch = () => {
         setPage(1); // Reset to the first page
         refetch({
@@ -121,6 +130,7 @@ export const StaffSearch = () => {
     );
     if (error) return <p>Error: {error.message}</p>;
 
+    // Only show the Location column if at least one trainee has a location
     const hasLocationColumn = data?.instances?.trackedEntityInstances?.some((instance) => {
         const attributes = getAttributes(instance);
         return attributes.some((attribute) => attribute.displayName === 'Location' && attribute.value);
@@ -203,6 +213,7 @@ export const StaffSearch = () => {
                                             <TableCell>{attributesObj['Mobile #']}</TableCell>
                                             {hasLocationColumn && (
                                                 <TableCell>
+                                                {/* Location is an org unit path (/root/level1/...): drop the root and show the remaining levels as names */}
                                                 {attributesObj['Location']
                                                 ? attributesObj['Location']
                                                     .split('/')

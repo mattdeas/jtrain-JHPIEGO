@@ -5,6 +5,12 @@ import { ReportOverview } from './ReportOverview';
 import { utilConfigConstantValueByName } from '../utils/utils';
 import { utilConfigConstantValueByName2 } from '../utils/utils';
 
+/**
+ * Home (/)
+ * Landing page - shows the ReportOverview dashboard once app settings are available.
+ * Note: App.js already loads settings before any route renders, so the fallback fetch
+ * below (from the older 'jtrain' namespace) normally won't run.
+ */
 export const Home = () => {
     const engine = useDataEngine();
     const [config, setConfig] = useState(null);

@@ -1,3 +1,9 @@
+/**
+ * UploadDataToDHIS2 (test component)
+ * Experiment for creating a tracked entity instance via the API, plus a CalendarInput demo.
+ * WARNING: creates a hardcoded TEI as soon as it mounts. Not routed - only the default export
+ * exists, so views/index.js re-exports nothing from this file.
+ */
 import React, { useEffect } from 'react';
 import { useDataMutation } from '@dhis2/app-runtime';
 import { CalendarInput } from '@dhis2/ui'

@@ -15,6 +15,14 @@ import { utilConfigConstantValueByName } from '../utils/utils';
 
 
 
+/**
+ * CourseDetailsStaffView
+ * Shown on a trainee's page (Staffview) for each course they attended: one row with the
+ * course name plus that course date's details (non-jtrain data elements).
+ * Props: course - the course event ID (from the trainee event's CourseEventId value).
+ */
+
+// The course event, including which course TEI it belongs to
 const eventQuery = {
     events: {
       resource: 'events',
@@ -26,6 +34,7 @@ const eventQuery = {
   };
   
 
+  // Unused (shadowed by the version inside the component, which is also unused)
   const trackedEntityInstanceQuery = {
     trackedEntityInstance: {
       resource: 'trackedEntityInstances',
@@ -47,6 +56,7 @@ const eventQuery = {
     },
 };
 
+// Course TEI attributes - used to get the course name
 const teiQuery = {
   trackedEntityInstance: {
     resource: 'trackedEntityInstances',
@@ -60,6 +70,7 @@ const teiQuery = {
 export const CourseDetailsStaffView = ({ course }) => {
   console.log('course', course)
   // const defCourseProgramId =  utilConfigConstantValueByName('CourseProgramStageId')
+  // NOTE: hardcoded course program stage ID (Sierra Leone instance) - should come from config
   const defCourseProgramId =  "h9zPG79AmgH";
   const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
   const { loading, error, data } = useDataQuery({
@@ -89,6 +100,8 @@ export const CourseDetailsStaffView = ({ course }) => {
     },
   };
 
+  // Once the event loads, fetch its course TEI and use the first attribute as the course name
+  // (assumes Course Name is the first attribute returned)
   useEffect(() => {
     const fetchTEIName = async () => {
       if (eventData?.events.trackedEntityInstance) {
@@ -178,6 +191,7 @@ export const CourseDetailsStaffView = ({ course }) => {
               }, {});
           }
 
+          // Location is currently skipped (renders no cell) - the org unit lookup below is commented out
           if(dataElement.displayName === 'Location') {
             // Extract the orgUnitId after the last "/"
             //const fullOrgUnitId = dataElementToValue[dataElement.id];

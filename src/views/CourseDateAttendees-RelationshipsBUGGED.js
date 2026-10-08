@@ -1,3 +1,8 @@
+/**
+ * SHELVED: original CourseDateAttendees built on DHIS2 event->TEI relationships.
+ * Disabled because of a relationships bug in DHIS2; replaced by CourseDateAttendees.js,
+ * which stores attendees as data values on the course event. Kept for reference.
+ */
 // import React from 'react';
 // import { useDataQuery, useDataMutation } from '@dhis2/app-runtime';
 // import { StaffSearchAttendees } from './StaffSearchAttendees';

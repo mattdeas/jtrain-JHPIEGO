@@ -1,7 +1,13 @@
+/**
+ * Settings (/settings)
+ * Admin view of the DHIS2 system constants and the 'jtrain*' data elements.
+ * Read-only in practice: "Update" only logs to the console.
+ */
 import React from 'react';
 import { useDataQuery } from '@dhis2/app-runtime';
 import { CircularLoader } from '@dhis2/ui';
 
+// All system constants (legacy config mechanism)
 const constantsQuery = {
   constants: {
     resource: 'constants',
@@ -11,6 +17,7 @@ const constantsQuery = {
     },
   },
 };
+// Data elements created by the jTrain setup scripts (named jtrain_*)
 const deQuery = {
     dataElements: {
       resource: 'dataElements',
@@ -35,6 +42,7 @@ const deQuery = {
     if (errorConstants) return <span>Error: {errorConstants.message}</span>;
     if (errorDE) return <span>Error: {errorDE.message}</span>;
   
+    // Placeholder - doesn't persist anything yet
     const handleUpdate = (id, code, value) => {
       console.log(`Update constant with id ${id}, code ${code}, and value ${value}`);
     };

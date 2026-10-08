@@ -3,6 +3,13 @@ import { useParams } from 'react-router-dom';
 import { useDataQuery, useDataEngine } from '@dhis2/app-runtime';
 import { Table, TableHead, TableRow, TableCell, TableBody, InputField, IconCheckmark24, CircularLoader, IconCross24 } from '@dhis2/ui';
 
+/**
+ * CourseDateAttendeesStaffCustomFields
+ * Inline editor for a trainee's own course-attendance event (Staff program event) -
+ * e.g. pre/post test scores. One input per non-jtrain data element on that event's stage.
+ * Every change is saved straight to DHIS2; the cell turns green/red on success/failure.
+ * Props: eventID - the trainee's Staff program event (not the course event).
+ */
 //export const CourseDateAttendeesStaffCustomFields = ({event}) => {
     export const CourseDateAttendeesStaffCustomFields = ({eventID}) => {
     //const { id } = useParams();
@@ -24,6 +31,7 @@ import { Table, TableHead, TableRow, TableCell, TableBody, InputField, IconCheck
         },
     });
 
+    // Copy the event into local state, tagging each value with a save status for colouring
     useEffect(() => {
         if (initialEventData) {
             setEventData({
@@ -36,6 +44,8 @@ import { Table, TableHead, TableRow, TableCell, TableBody, InputField, IconCheck
         }
     }, [initialEventData]);
 
+    // Load the stage's data elements (the columns) once we know which stage the event belongs to.
+    // Note: depends on eventData, so this re-runs after every edit.
     useEffect(() => {
         if (eventData?.event?.programStage) {
             engine.query({
@@ -49,6 +59,7 @@ import { Table, TableHead, TableRow, TableCell, TableBody, InputField, IconCheck
         }
     }, [engine, eventData]);
 
+    // Look up each visible data element's valueType so NUMBER fields get a numeric input
     useEffect(() => {
         if (programStageData?.programStageDataElements) {
             programStageData.programStageDataElements.forEach(dataElement => {
@@ -66,6 +77,8 @@ import { Table, TableHead, TableRow, TableCell, TableBody, InputField, IconCheck
         }
     }, [engine, programStageData]);
 
+    // Optimistically update the value, PUT the whole event, then mark the cell success/error.
+    // Saves on every keystroke. Only updates values that already exist on the event.
     const handleInputChange = async (dataElementId, newValue) => {
         setUpdateStatus('loading');
         const updatedDataValues = eventData.event.dataValues.map(dv => dv.dataElement === dataElementId ? { ...dv, value: newValue, status: 'loading' } : dv);

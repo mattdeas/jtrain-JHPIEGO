@@ -2,9 +2,16 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from '../App.module.css'; // Adjust the import based on your actual CSS file location
 
+/**
+ * NavigationBar
+ * Top tab bar for the app (Home | Course | Trainees | Training Capture).
+ * The selected tab is owned by App's MainContent, which also re-derives it from the URL,
+ * so deep links and back/forward keep the highlight in sync.
+ */
 export const NavigationBar = ({ selectedTab, setSelectedTab }) => {
     const navigate = useNavigate();
 
+    // Highlight the tab immediately, then route to its page
     const handleNavigation = (path, tab) => {
         setSelectedTab(tab);
         navigate(path);

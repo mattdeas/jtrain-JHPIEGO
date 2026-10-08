@@ -1,3 +1,7 @@
+/**
+ * Attributes (template example)
+ * Lists all DHIS2 attributes - from the DHIS2 app tutorial. Not routed in jTrain.
+ */
 import { useDataQuery } from '@dhis2/app-runtime'
 import {
     Table,

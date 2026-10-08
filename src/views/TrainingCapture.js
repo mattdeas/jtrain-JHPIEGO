@@ -27,11 +27,13 @@ function debounce(func, wait) {
     };
 };
 
+// No-op debounced resize handler (placeholder)
 const handleResize = debounce(() => {
 }, 200);
 
 window.addEventListener('resize', handleResize);
 
+// All course TEIs in the Course program, sorted by Course Name (Vnm7OVecUi1)
 const query = {
     instances: {
         resource: 'trackedEntityInstances',
@@ -60,6 +62,14 @@ const query = {
     },
 };
 
+/**
+ * TrainingCapture (/trainingcapture)
+ * Workflow for recording who attended a training:
+ *   1. Pick a course (collapsible "Course Selection" section)
+ *   2. Pick one of its dates (CourseDetails)
+ *   3. View / enrol attendees for that date (CourseDateAttendees)
+ * The header bar summarises the selections and collapses the course list once a date is chosen.
+ */
 export const TrainingCapture = () => {
     const constants = useFetchAndStoreConstants();
 
@@ -82,17 +92,21 @@ export const TrainingCapture = () => {
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
+    // Note: searchTerm is captured but not yet applied to the course list
     const handleSearchTermChange = (event) => {
         setSearchTerm(event.target.value);
     }
 
+    // Bumped on each course selection to re-mount CourseDetails fresh
     const [refreshKey, setRefreshKey] = useState(0);
 
+    // Called by CourseDetails when a date is picked: add its details to the header and collapse the course list
     const updateHeadings = (xString) => {
         // Concatenate xString to courseSelectionLabel
         setCourseSelectionLabel(prevLabel => `${prevLabel} ${xString} `);
         setSearchTableExpanded(false);
     };
+    // Unused - resets the header label
     const updateHeadingsParent = () => {
         setCourseSelectionLabel(' : '); 
     }
@@ -127,20 +141,29 @@ export const TrainingCapture = () => {
                 
                 <div>
                 
-                <p onClick={() => setSearchTableExpanded(!isSearchTableExpanded)} style={{ backgroundColor: isSearchTableExpanded ? 'lightblue' : 'lightgrey', width: '100%', height: '40px' }}>
-        
-        <span style={{ float: 'left', border: 'none' }}>
-        <div style={{ display: 'flex', alignItems: 'center', paddingTop: '5px' }}>
-    <div style={{ width: '20px', textAlign: 'center' }}>
-        <strong>{isSearchTableExpanded ? <IconSubtractCircle24 /> : <IconAddCircle24 />}</strong>
-    </div>
-    <strong style={{ paddingLeft: '10px' }}>
-        Course Selection                 
-        {isSearchTableExpanded ? '' : courseSelectionLabel}
-    </strong>
-</div>
-        </span>
-    </p>          
+                {/* Header grows with the selected course label instead of overflowing a fixed height */}
+                <div
+                    onClick={() => setSearchTableExpanded(!isSearchTableExpanded)}
+                    style={{
+                        backgroundColor: isSearchTableExpanded ? 'lightblue' : 'lightgrey',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        minHeight: '40px',
+                        padding: '6px 10px',
+                        margin: '16px 0',
+                        boxSizing: 'border-box',
+                        cursor: 'pointer',
+                    }}
+                >
+                    <div style={{ flexShrink: 0, display: 'flex' }}>
+                        {isSearchTableExpanded ? <IconSubtractCircle24 /> : <IconAddCircle24 />}
+                    </div>
+                    <strong style={{ flex: 1, minWidth: 0, overflowWrap: 'anywhere', lineHeight: 1.4 }}>
+                        Course Selection
+                        {isSearchTableExpanded ? '' : courseSelectionLabel}
+                    </strong>
+                </div>
                 {isSearchTableExpanded && data?.instances?.trackedEntityInstances && (
                     <>
                     <h3>Select Subject Area </h3>
@@ -155,6 +178,7 @@ export const TrainingCapture = () => {
                     </TableHead>
                     <TableBody>
                     
+                    {/* Shows the first 10 courses only */}
                     {data.instances.trackedEntityInstances
     .slice(0, 10)
     .map(instance => {
@@ -168,6 +192,7 @@ export const TrainingCapture = () => {
             <TableRow key={instance.trackedEntityInstance}>
                 <TableCell>{attributesObj['Course Name']}</TableCell>
                 <TableCell>
+                    {/* Select course: load its dates below and start the header label */}
                     <div onClick={() => {
                         setSelectedCourse({
                             trackedEntityInstance: instance.trackedEntityInstance,

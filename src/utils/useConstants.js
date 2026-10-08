@@ -1,3 +1,11 @@
+/**
+ * useConstants
+ * Loads all DHIS2 system constants and caches them in sessionStorage under 'constants'
+ * (only if not already cached). Returns nothing - consumers read the cache via the
+ * helpers in utils.js.
+ *
+ * Note: not currently imported anywhere; useFetchAndStoreConstants in utils.js does the same job.
+ */
 import { useEffect } from 'react';
 import { useDataQuery } from '@dhis2/app-runtime';
 

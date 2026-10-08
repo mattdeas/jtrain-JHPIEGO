@@ -1,3 +1,9 @@
+/**
+ * CourseEditEvent (unfinished)
+ * Intended to edit a course date (event) using the course program stage's data elements.
+ * The handlers are empty stubs, and useDataQuery / utilConfigConstantValueByName are not
+ * imported, so it would fail if rendered. Not currently used anywhere.
+ */
 import React, { useEffect, useState } from 'react';
 
 export const CourseEditEvent = ({ eventID }) => {

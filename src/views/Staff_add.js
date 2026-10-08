@@ -14,6 +14,12 @@ import React, {useState, useEffect} from 'react'
 
 
 
+/**
+ * Staff_add (legacy)
+ * Earlier version of the add/edit trainee page. Not routed - /staffadd uses Staffadd.js.
+ * Kept for reference.
+ */
+
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {

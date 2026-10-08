@@ -6,6 +6,20 @@ import { Table, TableBody, TableCell, TableCellHead, TableHead, TableRow, TableR
 import { Link } from 'react-router-dom';
 import { IconFileDocument24, IconSubtractCircle16 } from '@dhis2/ui';
 
+/**
+ * StaffShow
+ * The "Course Attendees" list for a course date: one row per enrolled trainee with links
+ * to their record, an inline editor for their attendance details (scores etc.), and a
+ * remove button. Includes a free-text filter across all trainee attributes.
+ *
+ * Props:
+ *  - tei_id       : ';'-separated attendee TEI IDs from the course event (e.g. "abc;def;")
+ *  - eventID      : course date event ID
+ *  - reload / refreshCount : change to force a refetch
+ *  - onRemove()   : called after an attendee is removed so the parent can refresh
+ */
+
+// All org units (unused here)
 const ORG_UNITS_QUERY = {
     orgUnits: {
         resource: 'organisationUnits',
@@ -28,6 +42,7 @@ const ORG_UNITS_QUERY = {
 //     },
 // };
 
+// A single trainee TEI by ID (run once per attendee)
 const query = {
     instances: {
         resource: 'trackedEntityInstances',
@@ -52,6 +67,8 @@ const query = {
     },
 };
 
+// Trainee (Staff program) events linked to this course date - used to find each
+// attendee's own event for the inline details editor
 const qryStaffCourseDetails = {
     events: {
         resource: 'events',
@@ -90,6 +107,7 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
     const defCourseEventId = utilConfigConstantValueByName('CourseEventId');
     const defStaffProgram = utilConfigConstantValueByName('StaffProgram');
     
+    // Fetch every attendee TEI in parallel (tei_id has a trailing ';', hence slice) and merge the results
     const fetchData = async () => {
         setLoadingQry(true);
         setErrorQry(null);
@@ -137,6 +155,8 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
         },
     });
 
+    // Note: this depends on dataSCD and also refetches it, so every response can trigger another
+    // refetch (and another fetchData via refreshKey). Worth checking the network tab for a loop.
     useEffect(() => {
         setRefreshKey(prevKey => prevKey + 1);
         refetchSCD();
@@ -168,6 +188,7 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
         setSearchQuery(event.target.value);
     };
 
+    // Caused by DHIS2 API version structure - caters for 2.40.3 and lower
     const getAttributes = (instance) => {
         // Check if attributes are at the root level
         if (instance.attributes && instance.attributes.length > 0) {
@@ -180,6 +201,7 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
         return [];
     };
 
+    // Free-text filter: keep attendees where any attribute value contains the search text
     const filteredInstances = dataQry?.instances?.trackedEntityInstances.filter((instance) => {
         const attributesObj = getAttributes(instance).reduce((obj, item) => {
             obj[item.displayName] = item.value || '';
@@ -193,6 +215,7 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
 
     const [showCustomFields, setShowCustomFields] = useState({});
 
+    // Toggle the inline details editor for one attendee
     const handleShowCustomFields = (trackedEntityInstance) => {
         setShowCustomFields(prevState => ({
             ...prevState,
@@ -200,6 +223,9 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
         }));
     };
 
+    // Remove an attendee from the course date: take their TEI out of the attendee list and
+    // decrement the count on the course event. Note: the trainee's own Staff program event
+    // (MaineventID) is left in place.
     const handleDelete = async (trackedEntityInstance, MaineventID) => {
               
 
@@ -268,9 +294,10 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
         {/* <IconFileDocument24 onClick={handleToggleTestSection} /> */}
             <style>
                 {`
-                .table-container {
-                    max-height: 400px; /* Adjust the height as needed */
-                    overflow-y: auto;
+                /* Grows with the attendee count, capped relative to the screen height (min 300px) */
+                .attendee-table-container {
+                    max-height: max(300px, calc(100vh - 320px));
+                    overflow: auto;
                 }
     
                 .sticky-header th {
@@ -301,6 +328,7 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
                     <CircularLoader small /><span>Loading...</span>
                 </div>
             )}
+            {/* Note: should be errorQry.message - `error` isn't defined here */}
             {errorQry && error.message}
             {dataQry?.instances?.trackedEntityInstances && (
                 <div>
@@ -317,7 +345,7 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
                             Total # Attendees {filteredInstances?.length || 0}
                         </div>
                     </div>
-                    <div className="table-container">
+                    <div className="attendee-table-container">
                         <Table>
                             <TableHead className="sticky-header">
                                 <TableRowHead>
@@ -330,6 +358,7 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
                                 </TableRowHead>
                             </TableHead>
                             <TableBody>
+                                {/* Sorted by Last Name A-Z, then First Name Z-A (matches the API order used elsewhere) */}
                                 {filteredInstances
                                 ?.sort((a, b) => {
                                     const getAttr = (tei, name) =>
@@ -357,6 +386,7 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
                                             return obj;
                                         }, {});
 
+                                        // This attendee's own Staff program event for this course date
                                         let matchingEventValue = null;
                                         if (dataSCD) {
                                             const matchingEvent = dataSCD.events.events.find(event => event.trackedEntityInstance === instance.trackedEntityInstance);
@@ -379,6 +409,7 @@ export const StaffShow = ({ tei_id, eventID, reload, refreshCount, onRemove }) =
                                                 </TableCell>
                                                 <TableCell>
                                                     <div>
+                                                        {/* Note: isFileIconVisible is shared by all rows, so the icon flips on every row at once */}
                                                         {isFileIconVisible ? (
                                                             <div onClick={() => {
                                                                 console.log('IconFileDocument24 clicked');

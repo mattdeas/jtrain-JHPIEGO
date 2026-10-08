@@ -1,3 +1,8 @@
+/**
+ * MyComponent (test page at /testtree)
+ * Sandbox for the OrganisationUnitTree and CalendarInput components. Also caches
+ * DHIS2 constants into sessionStorage on mount.
+ */
 import { useDataQuery, useDataEngine } from '@dhis2/app-runtime'
 import { OrganisationUnitTree , CalendarInput} from '@dhis2/ui';
 import React, {useState, useEffect} from 'react'
@@ -25,6 +30,8 @@ const MyComponent = () => {
     };
 
     const engine = useDataEngine();
+    // Cache constants once per session.
+    // Note: engine.query resolves to the data itself, so `data` here is undefined and nothing is stored.
     useEffect(() => {
         const fetchData = async () => {
             try {

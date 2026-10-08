@@ -5,6 +5,14 @@ import { useDataEngine } from '@dhis2/app-runtime';
 import {  utilConfigConstantValueByName } from '../utils/utils';
 import { IconCross16, IconSave16, CircularLoader } from '@dhis2/ui';
 
+/**
+ * CourseAdd
+ * "New Course" form shown on the Course Search page. Builds a field for each tracked entity
+ * attribute on the Course program, then creates the course TEI and enrols it in the program.
+ * Props: onSaved() - called after a successful save; onCancel() - close the form.
+ */
+
+    // Unused - legacy constants query
     const qryConstants = {
         // One query object in the whole query
         attributes: {
@@ -19,6 +27,7 @@ import { IconCross16, IconSave16, CircularLoader } from '@dhis2/ui';
         },
     };
 
+    // Course program's attributes (the form fields), including option sets for dropdowns
     const qryProgramFields = {
         program: {
             resource: 'programs',
@@ -29,6 +38,7 @@ import { IconCross16, IconSave16, CircularLoader } from '@dhis2/ui';
         },
     };
 
+    // Unused - handleFormSubmit calls engine.mutate directly
     const mutation = {
         resource: 'trackedEntityInstances',
         type: 'create',
@@ -62,6 +72,7 @@ import { IconCross16, IconSave16, CircularLoader } from '@dhis2/ui';
         const defCourseType = utilConfigConstantValueByName('TEITypeCourse');
         const defCourseProgramId = utilConfigConstantValueByName('CourseProgram');
 
+        // Save: create the course TEI with the entered attributes, then enrol it in the Course program
         const handleFormSubmit = async (event) => {
             event.preventDefault();
             console.log('event', event);
@@ -93,6 +104,7 @@ import { IconCross16, IconSave16, CircularLoader } from '@dhis2/ui';
                 data: newEntity,
             });
         
+            // ID of the newly created TEI
             const teiId = createResponse.response.importSummaries[0].reference;
         
             const enrollmentData = {
@@ -122,6 +134,8 @@ import { IconCross16, IconSave16, CircularLoader } from '@dhis2/ui';
             },
         });
 
+        // Note: trackedEntityInstance is never set in this form, so this always returns ''.
+        // DATE and NUMBER inputs below use it as their value, so they can't currently be typed into.
         const findAttributeValue = (attributeId) => {
             if (trackedEntityInstance) {
                 const attribute = trackedEntityInstance.find(attr => attr.attribute === attributeId);

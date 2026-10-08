@@ -1,3 +1,7 @@
+/**
+ * Form (template example)
+ * React Final Form demo from the DHIS2 app tutorial. Not routed in jTrain.
+ */
 import {
     Button,
     InputFieldFF,

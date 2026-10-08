@@ -23,6 +23,7 @@ function debounce(func, wait) {
     };
 };
 
+// No-op debounced resize handler (placeholder)
 const handleResize = debounce(() => {
 }, 200);
 
@@ -31,24 +32,10 @@ window.addEventListener('resize', handleResize);
 const today = new Date();
 const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-const defCourseOrgUnitId = utilConfigConstantValueByName('DefaultCourseOrgUnit')
-const defCourseProgramId = utilConfigConstantValueByName('CourseProgram')
-const defCourseProgStageId = utilConfigConstantValueByName('CourseProgramStageId')
-
-const qryTrackedEntityInstance = {
-    trackedEntityInstance: {
-        resource: 'trackedEntityInstances',
-        id: ({ id }) => id,
-        params: {
-            fields: ['attributes[attribute,value]'],
-            program: defCourseProgramId
-        },
-    },
-};
 
 
 
-
+// All course date events for a course TEI
 const eventsQuery = (id) => ({
     events: {
         resource: 'events',
@@ -59,6 +46,7 @@ const eventsQuery = (id) => ({
     },
 });
 
+// Update the course TEI's attributes
 const mutation = {
     resource: 'trackedEntityInstances',
     id: ({ id }) => id,
@@ -70,6 +58,7 @@ const mutation = {
 }
 
 
+// Mutation builder: create a new course date event
 const mutationCourseEvent = (program, programStage, orgUnit, trackedEntityInstance, idataValues, eventDate) => ({
     resource: 'events',
     type: 'create',
@@ -87,6 +76,7 @@ const mutationCourseEvent = (program, programStage, orgUnit, trackedEntityInstan
       ],
     }),
   });
+  // All org units - used to show Location paths as names
   const ORG_UNITS_QUERY = {
     orgUnits: {
         resource: 'organisationUnits',
@@ -96,8 +86,32 @@ const mutationCourseEvent = (program, programStage, orgUnit, trackedEntityInstan
     },
 };
 
+/**
+ * Courseview (/courseview/:id)
+ * A single course. Left: the course's attributes (read-only until "Edit Course Details"),
+ * with Save / Cancel / Delete. Right: the course's dates (events) with view / edit / delete
+ * per date, and a form to add new dates. Viewing a date shows its details and attendee list
+ * (read-only - enrolment happens on the Training Capture page).
+ */
 export const Courseview = () => {
     const { id } = useParams();
+
+    // Read config inside the component so it's picked up after App has loaded it into sessionStorage
+    const defCourseOrgUnitId = utilConfigConstantValueByName('DefaultCourseOrgUnit')
+    const defCourseProgramId = utilConfigConstantValueByName('CourseProgram')
+    const defCourseProgStageId = utilConfigConstantValueByName('CourseProgramStageId')
+
+    const qryTrackedEntityInstance = {
+        trackedEntityInstance: {
+            resource: 'trackedEntityInstances',
+            id: ({ id }) => id,
+            params: {
+                fields: ['attributes[attribute,value]'],
+                program: defCourseProgramId
+            },
+        },
+    };
+
     const [refreshKey, setRefreshKey] = useState(0);
     const [trackedEntityInstance, setTrackedEntityInstance] = useState(null);
     const [formFields, setFormFields] = useState({});
@@ -125,6 +139,7 @@ export const Courseview = () => {
         },
     });
 
+    // Course program attributes (the course form fields), including option sets
     const qryProgramFields = {
         program: {
           resource: 'programs',
@@ -137,6 +152,7 @@ export const Courseview = () => {
 
     
 
+    // Course stage data elements - the fields on each course date
     const qryProgramDataElements = {
         "qPDE": {
             resource: 'programStages',
@@ -164,6 +180,7 @@ export const Courseview = () => {
   
   const engine = useDataEngine();
 //Possibly hold off on this - functionality via jTRAIN.
+  // Delete the whole course TEI after confirmation. Note: stays on this page afterwards.
   const handleDelete = async () => {
       if (window.confirm('Are you sure you want to delete this course? NOTE - THIS WILL REMOVE ALL TRAINEE DATA FOR THIS COURSE')) {
           try {
@@ -175,6 +192,7 @@ export const Courseview = () => {
       }
   };
 
+  // Delete one course date event and refresh the list
   const deleteEvent = async (eventToDelete) => {
     try {
         const mutation = {
@@ -207,6 +225,7 @@ export const Courseview = () => {
 };
 
 
+// Unused placeholder (its button is commented out) - currently just a copy of handleDeleteEvent
 const handleAddTrainees = (eventToDelete) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this event?");
     if (confirmDelete) {
@@ -214,6 +233,7 @@ const handleAddTrainees = (eventToDelete) => {
         deleteEvent(eventToDelete);
     }
 };
+  // Open the edit form for a course date, pre-filled with its values and Location name
   const handleEditEvent = (event) => {
     const dataValuesObject = event.dataValues.reduce((acc, { dataElement, value }) => {
         acc[dataElement] = value;
@@ -260,6 +280,7 @@ const handleAddTrainees = (eventToDelete) => {
     console.log('formfields', formFields)
     };
     
+    // New course date form: text field changed
     const handleInputChangeCourse = (name, value) => {
         console.log(name, value)
 
@@ -274,6 +295,7 @@ const handleAddTrainees = (eventToDelete) => {
 }
 const [selected, setSelected] = useState([]);
 
+// Location picked in the tree (new date form / edit form): store the org unit path
 const onTreeChange = ({ selected }) => {
     setSelected(selected);
 
@@ -292,6 +314,7 @@ const onTreeChangeEdit = ({ selected }) => {
     }));
 }
 
+// Date picked (new date form / edit form): store as YYYY-MM-DD
 const handleInputChangeCourseDate = (name, date) => {
     if (date) {
         const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
@@ -336,6 +359,9 @@ const handleInputChangeCourseDateEdit = (name, date) => {
     
     const [createEvent, { dataEvent, loadingEvent, errorEvent }] = useDataMutation(mutationCourseEvent);
 
+      // Create a new course date. Attendee list starts empty with a count of 0.
+      // Note: the start/end date defaults below are applied after dataValues is built, so they only
+      // affect the event date, not the saved start/end values.
       const handleSave = async () => {
         const dataValues = Object.entries(formFieldsCourse).map(([dataElement, value]) => ({ dataElement, value }));
         
@@ -378,6 +404,8 @@ const handleInputChangeCourseDateEdit = (name, date) => {
         }
       };
 
+      // Save edits to a course date (the form was seeded with all the event's values, so attendee
+      // fields are preserved). Note: resets the event date to today.
       const handleSaveEdit = async () => {
         const dataValues = Object.entries(formFieldsEdit).map(([dataElement, value]) => ({ dataElement, value }));
     console.log('selectedEditEvent',selectedEditEvent.event)
@@ -419,6 +447,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
         setIsEditing(false);
     };
     
+    // Stray JSX expression - has no effect (and handleAssign isn't defined here)
     <button onClick={() => handleAssign(trackedEntityInstance)}>
                                 Assign
                             </button>
@@ -432,6 +461,8 @@ const handleInputChangeCourseDateEdit = (name, date) => {
     const [responseMessage, setResponseMessage] = useState('');
     const { loading: loadingEvents, error: errorEvents, data: eventsData, refetch: refetchEvent } = useDataQuery(eventsQuery(id));
 
+    // Sort course dates newest first by end date.
+    // Note: the next effect runs straight after and replaces this with the unsorted list.
     useEffect(() => {
         if (!loadingEvents && !errorEvents && eventsData?.events) {
             console.log('eventsDataevents', eventsData);
@@ -455,8 +486,10 @@ const handleInputChangeCourseDateEdit = (name, date) => {
         }   
         }, [eventsData, loadingEvents, errorEvents]);
 
+    // Form fields as the [{ attribute, value }] list the API expects
     const attributes = Object.entries(formFields).map(([attribute, value]) => ({ attribute, value }));
 
+    // Save the course attributes
     const doMutation = async () => {
         try {
                         // Pass the mutation object to the mutate function
@@ -488,6 +521,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
         setEditCourseShow(true);
     };
 
+    // Discard edits: reset the form to the loaded values
     const handleCancelEditCourse = () => {
         const resetFields = trackedEntityInstance
             ? trackedEntityInstance.reduce((fields, attr) => ({
@@ -515,6 +549,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
     const isEventsLoading = loading2 || loadingEvents || orgUnitsLoading;
     const eventsError = error2 || errorEvents || orgUnitsError;
 
+    // Load the course's attributes, then seed the form with them
     useEffect(() => {
         if (!loadingEntity && !errorEntity && dataEntity?.trackedEntityInstance?.attributes) {
             setTrackedEntityInstance(dataEntity.trackedEntityInstance.attributes);
@@ -537,6 +572,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
     }, [trackedEntityInstance]);
 
 
+    // Unused - and defLocationTEA isn't defined in this file, so it would throw if called
     const findAttributeValueEdit = (attributeId) => {
         
         //Location return as array
@@ -562,6 +598,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
         return '';
     };
 
+    // Current value for a course field: edited value first, else the loaded value
     const findAttributeValue = (attributeId) => {
         // If the attribute value exists in formFields, return it
         if (formFields[attributeId]) {
@@ -580,6 +617,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [selectedEditEvent, setSelectedEditEvent] = useState(null);
 
+    // Show / hide the selected course date's details and attendees
     const handleViewClick = (event) => {
         setSelectedEvent(event);
         setisViewClicked(true)
@@ -597,6 +635,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
     const [partnerFilter, setPartnerFilter] = useState('');
     const [values, setValues] = useState({ location: '', partner: '' });
 
+    // Location/partner/date filters - state only, not applied to the list on this page
     const handleTextChange = (event) => {
         const { name, value } = event.target;
         setValues({
@@ -618,6 +657,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
     };
     const [formFieldsEdit, setFormFieldsEdit] = useState(selectedEditEventDE || {});
 
+    // Edit course date form: text field changed
     const handleInputChangeCourseEdit = (dataElementId, value) => {
         setFormFieldsEdit(prevFields => ({
             ...prevFields,
@@ -644,6 +684,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
         {courseError && <div>{courseError.message || 'An error occurred while loading course details.'}</div>}
 
 
+    {/* Course attributes form - inputs are disabled until Edit Course Details is clicked */}
     {!isCourseLoading && !courseError && data?.program?.programTrackedEntityAttributes && (
             
         <form onSubmit={handleFormSubmit}>
@@ -722,6 +763,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
     {!isCourseLoading && !courseError && !data?.program?.programTrackedEntityAttributes && (
         <div>No course data available.</div>
     )}
+{/* Selected course date: details + read-only attendee list (dElements={null} hides the enrol panel) */}
 {selectedEvent &&  (
     <div style={{ display: 'flex', flexDirection: 'column', width: '100vw', margin: 0, padding: 0 }}>
     <CourseDateStaffShow key={selectedEvent} tei_id={id} eventID={selectedEvent} />
@@ -748,6 +790,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
 
     {eventsError && <div>{eventsError.message || 'An error occurred while loading course events.'}</div>}
 
+    {/* One row per course date: summary, then view / edit / delete */}
     {!isEventsLoading && !eventsError && (
         eventsData?.events?.events?.length > 0 ? (
             <table style={{ border: '1px solid lightgray', borderCollapse: 'collapse' }}>
@@ -792,6 +835,7 @@ const handleInputChangeCourseDateEdit = (name, date) => {
                         {!showSection && !isViewClicked && !isEditing && <button  onClick={handleButtonClick}><IconAdd16/> New Course Dates</button>}
                     </div>
                     <div>
+                        {/* New course date form (jtrain_* fields are managed by the app and hidden) */}
                         {showSection && dataProgramDE && (
                             <>
                             <table>

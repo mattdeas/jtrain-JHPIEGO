@@ -20,6 +20,14 @@ function debounce(func, wait) {
     };
 };
 
+/**
+ * Staffview (/staffview/:id)
+ * A trainee's record. Left: editable profile (Staff program attributes, with an org unit
+ * tree for Location) plus Save / Close / Delete. Right: every course they've attended, each
+ * with the course date details and their editable attendance fields (scores etc.).
+ */
+
+// No-op debounced resize handler (placeholder)
 const handleResize = debounce(() => {
 }, 200);
 
@@ -29,6 +37,7 @@ const today = new Date();
 const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
 
+  // Staff program attributes (the profile form fields), including option sets for dropdowns
   const qryProgramFields = {
     program: {
       resource: 'programs',
@@ -40,6 +49,7 @@ const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).pad
 };
 
 
+// All org units - used to show the Location path as names
 const ORG_UNITS_QUERY = {
     orgUnits: {
         resource: 'organisationUnits',
@@ -50,6 +60,7 @@ const ORG_UNITS_QUERY = {
 };
 
 
+// The trainee's events - one Staff program event per course date attended
 const eventsQuery = (id) => ({
     events: {
         resource: 'events',
@@ -62,6 +73,7 @@ const eventsQuery = (id) => ({
 
 
 
+// Update the trainee TEI's attributes
 const mutation = (id) => ({
     resource: 'trackedEntityInstances',
     id: id,
@@ -136,6 +148,7 @@ export const Staffview = () => {
     });
 
 
+    // Reload when navigating between trainees (same component, new :id)
     useEffect(() => {
         refetch({ id });
     }, [id, refetch]);
@@ -152,6 +165,8 @@ export const Staffview = () => {
 
     const navigate = useNavigate();
 
+  // Delete the trainee TEI after confirmation, then return to search.
+  // Note: their course enrolments on course events (attendee lists/counts) are not updated.
   const handleDelete = async () => {
       if (window.confirm('Are you sure you want to delete this Staff Member?')) {
           try {
@@ -165,6 +180,7 @@ export const Staffview = () => {
   };
 
 
+     // Data elements on the trainee course stage - used to label each event's values
      const qryProgramDataElements = {
          "qPDE": {
              resource: 'programStages',
@@ -184,6 +200,7 @@ export const Staffview = () => {
     //const { loading: loadingDataElement, error: errorDataElement, data: dataElementData } = useDataQuery(dataElementQuery);
     const [responseMessage, setResponseMessage] = useState('');
     const { loading: loadingEvents, error: errorEvents, data: eventsData } = useDataQuery(eventsQuery(id));
+    // Normalise the events response - shape differs by DHIS2 version ({events: {events: []}} vs {events: []})
     useEffect(() => {
     if (!loadingEvents) {
         console.log('eventsQuery raw response:', eventsData);
@@ -202,8 +219,10 @@ export const Staffview = () => {
 
     
     
+    // Form fields as the [{ attribute, value }] list the API expects
     const attributes = Object.entries(formFields).map(([attribute, value]) => ({ attribute, value }));
 
+    // Save the profile
     const doMutation = async () => {
         try {
                         const response = await mutate({ orgUnit: defStaffOrgUnitId, attributes });
@@ -246,6 +265,7 @@ export const Staffview = () => {
     const [selected, setSelected] = useState([]);
 
     
+    // Location picked in the tree: store the org unit path as the Location attribute value
     const onTreeChange = ({ selected }) => {
         setSelected(selected);
         console.log('selected:' , selected)
@@ -274,6 +294,7 @@ export const Staffview = () => {
     //let transposedEvents = [];
     const [transposedEvents, setTransposedEvents] = useState([]);
 
+    // Turn each event into { event, [data element display name]: value } for the Courses list
     useEffect(() => {
         if (!loadingProgramDE && !errorProgramDE && dataProgramDE?.qPDE?.programStageDataElements && events.length > 0) {
             const transposed = events.map((event) => {
@@ -296,6 +317,7 @@ export const Staffview = () => {
     
  
    
+    // Load the trainee's attributes, then seed the form with them
     useEffect(() => {
         if (!loadingEntity && !errorEntity && dataEntity?.trackedEntityInstance?.attributes) {
             setTrackedEntityInstance(dataEntity.trackedEntityInstance.attributes);
@@ -318,8 +340,10 @@ export const Staffview = () => {
 
     
 
+    // Current value for a field: edited value first, else the loaded value.
+    // Location is returned as an array because the OrganisationUnitTree expects one.
     const findAttributeValue = (attributeId) => {
-        
+
         //Location return as array
         if(attributeId === defLocationTEA) {
             if(formFields[attributeId] !== undefined && formFields[attributeId] !== null && formFields[attributeId] !== '') {
@@ -351,6 +375,7 @@ export const Staffview = () => {
     //     }
     // }, [loadingProgramDE, errorProgramDE]);
     
+    // Fixed 3-second delay after the form fields load before rendering (keeps the loader up while other data settles)
     useEffect(() => {
         if ((!loading1 && !error1)) {
             setTimeout(() => {
@@ -392,6 +417,7 @@ export const Staffview = () => {
                             {trackedEntityAttribute.valueType === 'TEXT' ? (
                                     trackedEntityAttribute.id === defLocationTEA ? (
                                         <div>
+                                        {/* Location path shown as names (root level dropped), with a toggleable tree to change it */}
                                         {
     findAttributeValue(trackedEntityAttribute.id)
         ? findAttributeValue(trackedEntityAttribute.id)
@@ -487,6 +513,9 @@ export const Staffview = () => {
 </tr>
 </thead>
 <tbody>
+{/* One row per course attended. Assumes the stage's first data element is the course event ID:
+    it's passed to CourseDetailsStaffView, and the trainee event itself to the attendance editor.
+    Note: the 'jTrain' check is case-sensitive, so it doesn't match the jtrain_* data elements. */}
 {transposedEvents.length > 0 ? (
   transposedEvents.map((eventObj, index) => (
     <tr key={eventObj.event}>

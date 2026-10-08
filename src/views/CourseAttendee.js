@@ -10,6 +10,11 @@ import {
 } from '@dhis2/ui';
 import React, { useState } from 'react';
 
+/**
+ * CourseAttendee (legacy - relationships approach)
+ * One attendee row with a Delete button that removes the event->TEI relationship and reloads the page.
+ * Only used by the shelved CourseDateAttendees-RelationshipsBUGGED; enrolment now uses data values instead.
+ */
 export const CourseAttendee = ({ relationshipId, trackedEntityInstanceId, eventID }) => {
     const mutationDelRelationship = {
         resource: 'relationships',

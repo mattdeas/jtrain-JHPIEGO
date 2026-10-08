@@ -1,3 +1,14 @@
+/**
+ * Shared helpers.
+ *
+ * Two kinds of cached configuration live in sessionStorage:
+ *  - 'config'    : the jTrain app settings (UIDs for programs, stages, data elements, etc.)
+ *                  loaded by App.js from the dataStore. Read with utilConfigConstantValueByName.
+ *  - 'constants' : DHIS2 system constants (legacy approach, before the dataStore config).
+ *                  Codes are stored as "<Name>-<value>"; the helpers strip the "<Name>-" prefix.
+ */
+
+// DHIS2 system constants - used by useFetchAndStoreConstants
 const constantsQuery = {
     constants: {
         resource: "constants",
@@ -10,6 +21,7 @@ const constantsQuery = {
 import { useState, useEffect } from 'react';
 import { useDataEngine } from '@dhis2/app-runtime';
 
+// Hook: returns DHIS2 constants, fetching and caching them in sessionStorage on first use
 export const useFetchAndStoreConstants = () => {
     const engine = useDataEngine();
     const [constants, setConstants] = useState(null);
@@ -38,12 +50,15 @@ export const useFetchAndStoreConstants = () => {
     return constants;
 };
 
+// Look up an app setting (e.g. 'CourseProgram') from the cached dataStore config.
+// Returns null if config hasn't loaded yet or the key is missing - call during render, not at module load.
 export const utilConfigConstantValueByName = (name) => {
     const config = JSON.parse(sessionStorage.getItem('config'));
     if (!config) return null;
     return config[name] || null;
 };
 
+// Legacy: value of a DHIS2 constant by name (code with the "<Name>-" prefix removed); logs if constants aren't cached
 export const utilGetConstantValueByName = (name) => {
     const sessionStorageConstants = sessionStorage.getItem('constants');
     if (!sessionStorageConstants) {
@@ -61,6 +76,7 @@ export const utilGetConstantValueByName = (name) => {
     return null;
 };
 
+// Legacy: same as utilGetConstantValueByName, without the missing-cache check
 export const utilgetCodeByName = (name) => {
     const sessionStorageConstants = sessionStorage.getItem('constants');
     const constants = JSON.parse(sessionStorageConstants);
@@ -74,6 +90,7 @@ export const utilgetCodeByName = (name) => {
     return null;
 };
 
+// Legacy: expects the cache in the { constants: [...] } shape and matches on displayName
 export const utilGetConstantValueByNameSession = (name) => {
     console.log('constantvalues - ', sessionStorage.getItem('constants'))
     const sysConstants = JSON.parse(sessionStorage.getItem('constants'));
@@ -91,6 +108,7 @@ export const utilGetConstantValueByNameSession = (name) => {
     return null;
 }
 
+// Returns a wrapper that only calls func once calls have stopped for `wait` ms
 export const debounce = (func, wait) => {
     let timeout;
     return function executedFunction(...args) {
@@ -102,6 +120,8 @@ export const debounce = (func, wait) => {
         timeout = setTimeout(later, wait);
     };
 };
+
+// Reusable queries for all DHIS2 constants (unpaged)
 export const utilConstantsQuery2 = {
     constants: {
       resource: 'constants',

@@ -1,4 +1,13 @@
+/**
+ * jTrain - DHIS2 training management app.
+ *
+ * App root: sets up routing, the top navigation bar, and loads the app settings
+ * (program / stage / data element UIDs) from the DHIS2 dataStore into sessionStorage.
+ * Every view reads those settings via utilConfigConstantValueByName, so routes are
+ * only rendered once the settings are available.
+ */
 import {  useDataEngine } from "@dhis2/app-runtime";
+import { CircularLoader } from '@dhis2/ui';
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Link, Routes, useLocation , useParams, useNavigate} from 'react-router-dom';
 import { TabBar, Tab } from '@dhis2-ui/tab';
@@ -14,13 +23,14 @@ import { Courseview } from './views/Courseview';
 import MyComponent from "./views/TestTree";
 
 
+// Forces the body to 50% width whenever it resizes (appears to be leftover layout experimentation)
 const ro = new ResizeObserver((entries, observer) => {
 // Changing the body size inside of the observer
 // will cause a resize loop and the next observation will be skipped
 document.body.style.width = '50%';
 });
 
-// Listen for errors
+// Listen for errors - currently swallows all global errors silently
 //window.addEventListener('error', e => console.log(e.message));
 window.addEventListener('error', e => {});
 
@@ -42,6 +52,7 @@ function debounce(func, wait) {
     };
 };
 
+// No-op debounced resize handler (placeholder)
 const handleResize = debounce(() => {
 }, 200);
 
@@ -51,11 +62,20 @@ window.addEventListener('resize', handleResize);
 
 
 //yarn start --proxy https://dhis2.sl.jhpiego.org --proxyPort 8082
+
+/**
+ * MainContent
+ * Loads app settings (cached in sessionStorage, else fetched from dataStore jtrain-MW/appSettings),
+ * keeps the highlighted nav tab in sync with the URL, and renders the routes.
+ */
 const MainContent = () => {
     const engine = useDataEngine();
     const [selectedTab, setSelectedTab] = useState('');
     const location = useLocation();
-    const [config, setConfig] = useState(null);
+    const [config, setConfig] = useState(() => {
+        const storedConfig = sessionStorage.getItem('config');
+        return storedConfig ? JSON.parse(storedConfig) : null;
+    });
 
     // useEffect(() => {
     //     const config = {
@@ -94,6 +114,9 @@ const MainContent = () => {
 
 
     useEffect(() => {
+        // Only fetch if the settings aren't already cached in sessionStorage
+        if (config) return;
+
         const fetchSettings = async () => {
             console.log('Fetching settings...');
             try {
@@ -112,7 +135,7 @@ const MainContent = () => {
         };
 
         fetchSettings();
-    }, [engine]);
+    }, [config, engine]);
 
     // https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-240/data-store.html#webapi_data_store_create_values
     // THIS IS THE COMMAND CALL TO SET THE DATASTORE
@@ -122,6 +145,7 @@ const MainContent = () => {
 
 
 
+    // Derive the active nav tab from the current URL
     useEffect(() => {
         const currentPath = location.pathname;
         if (currentPath.includes('staffsearch')) {
@@ -135,6 +159,11 @@ const MainContent = () => {
         }
     }, [location, setSelectedTab]);
 
+    // Views read config from sessionStorage during render, so wait until it's available
+    if (!config) {
+        return <CircularLoader />;
+    }
+
     return (
         <div>
             <NavigationBar selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
@@ -146,6 +175,7 @@ const MainContent = () => {
                 <Route path="/trainingcapture" element={<TrainingCapture />} />
                 <Route path="/staffadd" element={<Staffadd />} />
                 <Route path="/courseview/:id" element={<Courseview />} />
+                {/* Development / test routes */}
                 <Route path="/testcomponent/:id" element={<CourseDetailsStaffView />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/testtree" element={<MyComponent/>} />
@@ -155,10 +185,12 @@ const MainContent = () => {
 };
 
 
+// Root component: logo + router wrapper around MainContent
 const MyApp = () => {
     const [selectedTab, setSelectedTab] = useState('Home');
-    
 
+
+    // Unused - `navigate` isn't defined in this scope, so this would throw if called
     const handleNavigation = (path, tab) => {
         setSelectedTab(tab);
         navigate(path);

@@ -10,6 +10,7 @@ import {
     IconAddCircle24,
     IconView24,
     CircularLoader,
+    Pagination,
 } from '@dhis2/ui'
 import React, { useState, useEffect } from 'react'
 import { Link, BrowserRouter, Switch, Route } from 'react-router-dom'
@@ -27,12 +28,13 @@ function debounce(func, wait) {
     };
 };
 
+// No-op debounced resize handler (placeholder)
 const handleResize = debounce(() => {
 }, 200);
 
 window.addEventListener('resize', handleResize);
 
-const itemsPerPage = 10;
+const itemsPerPage = 10; // unused
 
 // const query = {
 //     instances: {
@@ -44,6 +46,7 @@ const itemsPerPage = 10;
 //     },
 // }
 
+// Paged trainee search. wXRW65yTN1d = Last Name, Lez2r3d0oxb = First Name (hardcoded attribute IDs).
 const query = {
     instances: {
         resource: 'trackedEntityInstances',
@@ -70,6 +73,7 @@ const query = {
                 ],
                 page: page,
                 pageSize: pageSize,
+                totalPages: true, // Return pager info for the Pagination control
                 order: 'wXRW65yTN1d:asc,Lez2r3d0oxb:desc', //LastName , FirstName SL
                 filter: filters,
             };
@@ -95,6 +99,24 @@ const query = {
         
 //     }),
 // };
+/**
+ * StaffSearchAttendees
+ * "Search Trainee to Enroll" panel on a course date: type-ahead name search with paging,
+ * and an add button that enrols the trainee.
+ *
+ * Enrolling a trainee:
+ *  1. Appends their TEI ID to the course event's attendee list and increments the count
+ *  2. Creates a Staff program event for the trainee linking back to the course event
+ *     (CourseEventId) with pre/post scores initialised to 0
+ *
+ * Props:
+ *  - eventID      : course date event ID
+ *  - tei_id       : current ';'-separated attendee list (used to mark already-enrolled trainees)
+ *  - tei_count    : current attendee count
+ *  - onAssign()   : called after enrolling so the parent refreshes
+ *  - refreshCount : change to force a refetch
+ *  - dataEvent, dElements : passed in but not used here
+ */
 export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dElements, onAssign, refreshCount}) => {
 
     const [isLoading, setIsLoading] = useState(false);
@@ -109,59 +131,54 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
     const defCoursePreScore = utilConfigConstantValueByName('CoursePreTestScore');
     const defCoursePostScore = utilConfigConstantValueByName('CoursePostTestScore');
     const defCourseProgramId = utilConfigConstantValueByName('CourseProgram');
+    // Note: the settings key is 'CourseProgramStageId', so this is null and the course event update sends no programStage
     const defCourseProgramStageId = utilConfigConstantValueByName('CourseProgramStage');
 
     const [page, setPage] = useState(1); // Current page
-    const [pageSize, setPageSize] = useState(50); // Items per page
+    const [pageSize, setPageSize] = useState(10); // Items per page
+    // What's typed in the boxes vs. the debounced values actually sent to the API
+    const [lastNameInput, setLastNameInput] = useState('');
+    const [firstNameInput, setFirstNameInput] = useState('');
     const [searchLastName, setLastName] = useState('');
     const [searchFirstName, setFirstName] = useState('');
     const [assignedPerson, setAssignedPerson] = useState(null);
 
-    const { loading, error, data, refetch } = useDataQuery(query, {
-        variables: {
-            ou: defStaffOrgUnitId,
-            trackedEntityType: defStaffTEIType,
-            page: page,
-            pageSize: pageSize,
-            searchLastName: searchLastName,
-            searchFirstName: searchFirstName,
-        },
-    });
+    const { loading, error, data, refetch } = useDataQuery(query, { lazy: true });
 
-
-    
+    // Auto-search: wait for a pause in typing, and only search once 2+ characters are entered (or the box is cleared)
+    const MIN_SEARCH_CHARS = 2;
     useEffect(() => {
-        refetch();
-        // This code will run whenever refreshCount changes
+        const timer = setTimeout(() => {
+            const last = lastNameInput.trim();
+            const first = firstNameInput.trim();
+            if (last.length > 0 && last.length < MIN_SEARCH_CHARS) return;
+            if (first.length > 0 && first.length < MIN_SEARCH_CHARS) return;
+            setLastName(last);
+            setFirstName(first);
+            setPage(1);
+        }, 400);
+        return () => clearTimeout(timer);
+    }, [lastNameInput, firstNameInput]);
 
-        // Fetch data or perform other side effects here
-
-    }, [refreshCount]); // Pass refreshCount as a dependency to useEffect
-
-
-    const handleSearchTermChangeLast = (event) => {
-        setLastName(event.target.value);
-    };
-
-    const handleSearchTermChangeFirst = (event) => {
-        setFirstName(event.target.value);
-    };
-
-    const handleSearch = () => {
-        setPage(1); // Reset to the first page
+    // Fetch whenever the search, page or page size changes, or the parent asks for a refresh
+    useEffect(() => {
         refetch({
             ou: defStaffOrgUnitId,
             trackedEntityType: defStaffTEIType,
-            page: 1,
-            pageSize: pageSize,
-            searchLastName: searchLastName,
-            searchFirstName: searchFirstName,
+            page,
+            pageSize,
+            searchLastName,
+            searchFirstName,
         });
-    };
+    }, [page, pageSize, searchLastName, searchFirstName, refreshCount]);
 
+    const pager = data?.instances?.pager;
+
+    // Today as YYYY-MM-DD - used as the trainee event date
     const today = new Date();
         const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
+    // Unused - superseded by CreateEvent below (handleAssign uses engine.mutate)
     const mutation = {
         resource: 'events',
         type: 'create',
@@ -200,6 +217,7 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
 
     //const [mutateRelationships, { loading: mutationRelationshipsLoading, error: mutationRelationshipsError }] = useDataMutation(mutationRelationships);
 
+    // Mutation builder: update the course event's data values
     const UpdateEvent = (program, programStage, orgUnit, event, dataValues, trackedEntityInstance) => ({
         resource: 'events',
         type: 'update',
@@ -214,6 +232,7 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
         },
       });
 
+    // Mutation builder: create the trainee's (completed) Staff program event for this course
     const CreateEvent = (program, programStage, orgUnit, dataValues, trackedEntityInstance) => ({
         resource: 'events',
         type: 'create',
@@ -233,6 +252,7 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
 
       const engine = useDataEngine();
 
+      // Current data values of the course event (so the update doesn't drop other fields)
       const fetchEvent = async (eventID) => {
         const query = {
           events: {
@@ -268,6 +288,7 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
         return [];
     };
 
+    // Enrol a trainee on this course date (see component header for the two writes involved)
     const handleAssign = async (trackedEntityInstance) => {
         const dataValues = await fetchEvent(eventID);
 
@@ -282,6 +303,7 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
             
         // }
 
+        // Copy the course event's values, appending this TEI to the attendee list and bumping the count
         const dataInputs = [];
         dataValues.forEach(item => {
             let value;
@@ -302,6 +324,7 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
             
         });
 
+        // First attendee: the event has no attendee list value yet, so add one
         const HasAttendees = dataInputs.some(item => item.dataElement === defCourseAttendeesDE);
         if (!HasAttendees) {
             dataInputs.push({ dataElement: defCourseAttendeesDE, value: (tei_id || '') + trackedEntityInstance + ';' });
@@ -313,6 +336,7 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
    const myMutation = UpdateEvent(defCourseProgramId, defCourseProgramStageId, defStaffOrgUnitId, eventID, dataInputs);
    await engine.mutate(myMutation);
 
+     // Trainee event values: link to the course event, scores start at 0
      const dataStaffDefault = [];
      dataStaffDefault.push({ dataElement: defCourseEventId, value: eventID });
      dataStaffDefault.push({ dataElement: defCoursePreScore, value: 0 });
@@ -330,7 +354,7 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
             const response2 = await engine.mutate(myStaffUpdate);
             console.log('Mutation completed', response2);
             
-            // Add a delay before calling onAssign and refetch
+            // Add a delay before calling onAssign and refetch (gives DHIS2 time to index the new data)
             setTimeout(() => {
                 console.log('Calling onAssign');
                 onAssign(); // Ensure this is called
@@ -349,45 +373,35 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
          {isLoading ? <CircularLoader small /> : <div>
             <h3>Search Trainee to Enroll </h3>
 
-{/* <input type="text" onChange={handleSearchTermChange} /> */}
-
-{
-    // display that the data is being loaded
-    // when loading is true
-    loading && (
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+{/* Inputs stay mounted while results load so typing isn't interrupted */}
+<div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+    <input
+        type="text"
+        onChange={(e) => setLastNameInput(e.target.value)}
+        value={lastNameInput}
+        placeholder="Last Name"
+    />
+    <input
+        type="text"
+        value={firstNameInput}
+        onChange={(e) => setFirstNameInput(e.target.value)}
+        placeholder="First Name"
+    />
+    {loading && (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
             <CircularLoader small />
-            <span>Loading...</span>
-        </div>
-    )
-}
+            <span>Searching...</span>
+        </span>
+    )}
+</div>
+{assignedPerson && <p>{assignedPerson} was added.</p>}
 
-{
-    // display the error message
-    // is an error occurred
-    error && error.message
-    
-}
+{error && error.message}
 
 {
     // if there is any data available
     data?.instances?.trackedEntityInstances && (
         <div>
-        <input 
-        type="text" 
-        onChange={handleSearchTermChangeLast} 
-        value={searchLastName}
-        placeholder="Last Name" 
-        onKeyPress={(e) => { if (e.key === 'Enter') handleSearch(); }}
-        />
-        <input 
-        type="text" 
-        value={searchFirstName}
-        onChange={handleSearchTermChangeFirst} 
-        placeholder="First Name" 
-        onKeyPress={(e) => { if (e.key === 'Enter') handleSearch(); }}
-        />
-<button onClick={handleSearch}>Search</button>{assignedPerson && <p>{assignedPerson} was added.</p>}
         <Table>
 <TableHead>
 <TableRowHead>
@@ -400,15 +414,16 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
 </TableRowHead>
 </TableHead>
 <TableBody>
+{data.instances.trackedEntityInstances.length === 0 && (
+    <TableRow>
+        <TableCell colSpan="6">No trainees found</TableCell>
+    </TableRow>
+)}
 {data.instances.trackedEntityInstances
-    .filter(item => {
-        const attributes = getAttributes(item);
-        return attributes.some(attr => attr.displayName === 'Last Name' && attr.value.toLowerCase().includes('')) &&
-            !(tei_id && tei_id.includes(item.trackedEntityInstance)); // Exclude the instances that are in tei_id
-    })
-    .slice(0, 10)
     .map(item => {
         const attributes = getAttributes(item);
+        // Already-enrolled trainees are shown (not filtered out) so server-side pages stay a consistent size
+        const isEnrolled = !!(tei_id && tei_id.includes(item.trackedEntityInstance));
         // Create an object from the attributes array
         const attributesObj = attributes.reduce((obj, item) => {
             obj[item.displayName] = item.value;
@@ -427,18 +442,33 @@ export const StaffSearchAttendees = ({eventID, dataEvent, tei_id, tei_count, dEl
                 </TableCell>
                 {/* <TableCell>{item.trackedEntityInstance}</TableCell> */}
                 <TableCell align="left">
-                    <div onClick={() => {
-                        handleAssign(item.trackedEntityInstance);
-                        setAssignedPerson(`${attributesObj['First Name']} ${attributesObj['Last Name']}`);
-                    }}>
-                        <IconAddCircle24 />
-                    </div>
+                    {isEnrolled ? (
+                        <span>Enrolled</span>
+                    ) : (
+                        <div style={{ cursor: 'pointer' }} onClick={() => {
+                            handleAssign(item.trackedEntityInstance);
+                            setAssignedPerson(`${attributesObj['First Name']} ${attributesObj['Last Name']}`);
+                        }}>
+                            <IconAddCircle24 />
+                        </div>
+                    )}
                 </TableCell>
             </TableRow>
         );
     })}
             </TableBody>
 </Table>
+{pager && pager.pageCount > 0 && (
+    <Pagination
+        page={pager.page}
+        pageCount={pager.pageCount}
+        pageSize={pager.pageSize}
+        total={pager.total}
+        pageSizes={['10', '25', '50']}
+        onPageChange={setPage}
+        onPageSizeChange={(size) => { setPageSize(Number(size)); setPage(1); }}
+    />
+)}
 </div>
     )
 }

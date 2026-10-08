@@ -4,9 +4,20 @@ import { utilConfigConstantValueByName } from '../utils/utils';
 import { Chart } from "react-google-charts";
 import { Legend, CircularLoader } from '@dhis2/ui';
 
+/**
+ * ReportOverview
+ * Home page dashboard: headline totals (trainees enrolled, courses held, trainees attending)
+ * and charts for enrolment by sex, trainings per year, trainees per cadre, trainings per
+ * partner/year and trainings per district (overall and per year).
+ *
+ * Each fetch* function loads one dataset via the DHIS2 analytics or events API and stores it
+ * with the setter it's given; failures fall back to 0 / [] and the chart is simply hidden.
+ * NOTE: several queries still use hardcoded Sierra Leone IDs and fixed years (2014-2024).
+ */
 export const ReportOverview = () => {
     const engine = useDataEngine();
     
+    // Shared flag - cleared by whichever fetch finishes first, so later charts may still be filling in
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [TotalTrainingEvents, setTotalTrainingEvents] = useState(0);
@@ -24,6 +35,7 @@ export const ReportOverview = () => {
     const defCourseProgramCourseName = utilConfigConstantValueByName('CourseProgramAttributeCourseName');
     const defCourseProgram = utilConfigConstantValueByName('CourseProgram');
 
+    // TEIs of a given type in an org unit (IDs only) - used for counts
     const qryTEI = {
         instances: {
             resource: 'trackedEntityInstances',
@@ -37,6 +49,7 @@ export const ReportOverview = () => {
         },
     };
 
+    // Events for a program in an org unit
     const qryEvents = {
         events: {
             resource: 'events',
@@ -47,6 +60,7 @@ export const ReportOverview = () => {
         },
     };
 
+    // All trainees (drives "Total Trainees Enrolled")
     const { loading: loading1, error: error1, data: dataStaff } = useDataQuery(qryTEI, {
         variables: {
             ou: defStaffOrgUnitId,
@@ -54,6 +68,7 @@ export const ReportOverview = () => {
         },
     });
 
+    // All courses (loaded but not displayed)
     const { loading: loading2, error: error2, data: dataCourses } = useDataQuery(qryTEI, {
         variables: {
             ou: defCourseOrgUnitId,
@@ -61,6 +76,7 @@ export const ReportOverview = () => {
         },
     });
 
+    // Trainee events (loaded but not displayed)
     const { loading: loading3, error: error3, data: dataEvents } = useDataQuery(qryEvents, {
         variables: {
             ou: defStaffOrgUnitId,
@@ -73,6 +89,7 @@ export const ReportOverview = () => {
     const [TrainingTotal, setTrainingTotal] = useState(0);
     const [TrainingTotalDesignation, setTrainingTotalDesignation] = useState(null);
 
+    // Single analytics value for an indicator (dimension 'dx:<id>') in 2024 - used for enrolees by sex
     const fetchAnalyticsData = async (dimension, setVariable) => {
         const query = {
             analytics: {
@@ -100,6 +117,7 @@ export const ReportOverview = () => {
 
     //https://dhis2.sl.jhpiego.org/api/29/analytics/events/aggregate/vtSLYBYufMn.json?dimension=ou:Esaneu7V7rq&dimension=pe:2024&dimension=C6BqK9IAR7I.dvXhBHwjKJP&stage=C6BqK9IAR7I&displayProperty=NAME&totalPages=false&outputType=EVENT
 
+    // Trainee events in 2024 broken down by designation/cadre, sorted largest first (hardcoded IDs)
     const fetchTrainingStaffTotalbyDesignation = async (setVariable) => {
         const query = {
             analytics: {
@@ -143,6 +161,8 @@ export const ReportOverview = () => {
         }
     };
 
+    // Total trainee events ("Total Trainees attending Events"). Note: takes the earliest year's row
+    // after sorting, not a sum across years.
     const fetchTrainingsStaffTotal = async (setVariable) => {
 
         //https://dhis2.sl.jhpiego.org/api/29/analytics/events/aggregate/vtSLYBYufMn.json?dimension=ou:Esaneu7V7rq&dimension=pe:2014;2015;2016;2017;2018;2019;2020;2021;2022;2023;2024&stage=C6BqK9IAR7I&displayProperty=NAME&totalPages=false&outputType=EVENT
@@ -183,6 +203,7 @@ export const ReportOverview = () => {
         }
     };
 
+    // Course events counted per year per partner (data element hGGDYuGuVeX) -> [[Year, partner1, ...], ...]
     const fetchTrainingsByPartner = async (setVariable) => {
         const query = {
             events: {
@@ -250,6 +271,7 @@ export const ReportOverview = () => {
         }
     };
 
+    // Unused here
     const ORG_UNITS_QUERY = {
         orgUnits: {
             resource: 'organisationUnits',
@@ -259,6 +281,8 @@ export const ReportOverview = () => {
         },
     };
 
+    // Course events counted per district. Location values are org unit paths; the last ID is
+    // looked up to get the district name -> [[District, Total], ...]
     const fetchTrainingsPerDistrict = async (setVariable) => {
     const eventsQuery = {
         events: {
@@ -349,6 +373,7 @@ export const ReportOverview = () => {
     }
 };
 
+// Same as above, split by year -> [[Year, district1, district2, ...], ...]
 const fetchTrainingsPerDistrictPerYear = async (setVariable) => {
     const eventsQuery = {
         events: {
@@ -462,6 +487,7 @@ console.log('District ID to Name Map:', districtIdToName);
     }
 };
 
+    // Course events per year (2014-2024) for the bar chart, and their sum for "Total Courses Held"
     const fetchTrainingsPerYear = async (setVariable) => {
         const query = {
             analytics: {
@@ -521,6 +547,8 @@ console.log('District ID to Name Map:', districtIdToName);
     const [TrainingsPerDistrictYear, setTrainingsPerDistrictYear] = useState(null);
 
     
+    // Kick off all dashboard fetches once on mount. (The TPY/TrainingTotal logs read state
+    // before the fetches finish, so they always show initial values.)
     useEffect(() => {
         console.log('Fetching analytics data');
         console.log(defIndTotUnk, defIndTotMal, defIndTotFem);
@@ -549,11 +577,13 @@ console.log('District ID to Name Map:', districtIdToName);
     }, []);
 
 
+    // Enrolees by sex chart data
     const data = [
         ["", "Total", "Female", "Male", "Unknown"],
         ["Total Enrollees", totF+totM+totU, totF, totM,totU],
       ];
 
+    // Chart options for each chart below
     const options = {
         chart: {
             title: "Trainees Enrolled",
@@ -649,6 +679,9 @@ console.log('District ID to Name Map:', districtIdToName);
     //     bar: { groupWidth: "90%" }
     //   };
 
+    // Charts crash on empty/invalid data (failed fetches set 0 or []), so only render when there are data rows
+    const hasRows = (d) => Array.isArray(d) && d.length > 1;
+
     if (loading1 || loading2 || loading3 || loading) return (
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
             <CircularLoader small />
@@ -657,111 +690,125 @@ console.log('District ID to Name Map:', districtIdToName);
     );
     if (error1 || error2 || error3 || error) return <span>Error1: {error?.message || error1?.message || error2?.message || error3?.message}</span>;
 
-    // return (
-    //     <div>
-    //         <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: '20px', overflowX: 'auto' }}>
-    //             <div style={{ textAlign: 'center', marginBottom: '20px', flex: '1 1 auto', minWidth: '200px' }}>
-    //                 <div style={{
-    //                     display: 'inline-block',
-    //                     padding: '10px 20px',
-    //                     fontWeight: 'bold',
-    //                     fontSize: '2em',
-    //                     borderRadius: '10px',
-    //                     backgroundColor: '#f0f0f0',
-    //                     textAlign: 'center'
-    //                 }}>
-    //                     {dataStaff.instances.trackedEntityInstances.length}
-    //                 </div>
-    //                 <p style={{ marginTop: '10px', fontSize: '1.2em' }}>Total Trainees Enrolled</p>
-    //             </div>
-    //             <div style={{ textAlign: 'center', marginBottom: '20px', flex: '1 1 auto', minWidth: '200px' }}>
-    //                 <div style={{
-    //                     display: 'inline-block',
-    //                     padding: '10px 20px',
-    //                     fontWeight: 'bold',
-    //                     fontSize: '2em',
-    //                     borderRadius: '10px',
-    //                     backgroundColor: '#f0f0f0',
-    //                     textAlign: 'center'
-    //                 }}>
-    //                     {TotalTrainingEvents}
-    //                 </div>
-    //                 <p style={{ marginTop: '10px', fontSize: '1.2em' }}>Total Courses Held</p>
-    //             </div>
-    //             <div style={{ textAlign: 'center', marginBottom: '20px', flex: '1 1 auto', minWidth: '200px' }}>
-    //                 <div style={{
-    //                     display: 'inline-block',
-    //                     padding: '10px 20px',
-    //                     fontWeight: 'bold',
-    //                     fontSize: '2em',
-    //                     borderRadius: '10px',
-    //                     backgroundColor: '#f0f0f0',
-    //                     textAlign: 'center'
-    //                 }}>
-    //                     {TrainingTotal}
-    //                 </div>
-    //                 <p style={{ marginTop: '10px', fontSize: '1.2em' }}>Total Trainees attending Events</p>
-    //             </div>
-    //         </div>
-    //         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-    //             <p style={{ marginTop: '10px', fontSize: '1.2em' }}>Total Trainees attending Events</p>
-    //             <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: '20px', overflowX: 'auto' }}>
-    //                 <div style={{ flex: '1 1 auto', minWidth: '200px' }}>
-    //                     <Chart
-    //                         chartType="Bar"
-    //                         width="100%"
-    //                         height="400px"
-    //                         data={data}
-    //                         options={options}
-    //                     />
-    //                 </div>
-    //                 <div style={{ flex: '1 1 auto', minWidth: '200px' }}>
-    //                     <Chart
-    //                         chartType="Bar"
-    //                         width="100%"
-    //                         height="400px"
-    //                         data={TPY}
-    //                         options={optionsTPY}
-    //                     />
-    //                 </div>
-    //                 <div style={{ flex: '1 1 auto', minWidth: '200px' }}>
-    //                     <Chart
-    //                         chartType="Bar"
-    //                         width="100%"
-    //                         height="400px"
-    //                         data={TrainingTotalDesignation}
-    //                         options={optionsDesignation}
-    //                     />
-    //                 </div>
-    //             </div>
-    //             <div style={{ overflowX: 'auto' }}>
-    //                 <Chart
-    //                     chartType="Bar"
-    //                     width="100%"
-    //                     height="400px"
-    //                     data={TPYP}
-    //                     options={optionsPartnersYear}
-    //                 />
-    //             </div>
-    //             <div style={{ overflowX: 'auto' }}>
-    //                 <Chart 
-    //                     chartType="Bar"
-    //                     width="100%"
-    //                     height="400px"
-    //                     data={TrainingsPerDistrict}
-    //                     options={optionsPerDistrict}
-    //                 />
-    //             </div>
-    //             <div style={{ overflowX: 'auto' }}>
-    //                 <Chart 
-    //                     chartType="Bar"
-    //                     width="100%"
-    //                     height="400px"
-    //                     data={TrainingsPerDistrictYear}
-    //                     options={optionsPerDistrictYear}
-    //                 />
-    //             </div>
-    //         </div>
-    //     </div>
-    // );
+    return (
+        <div>
+            {/* Headline totals */}
+            <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: '20px', overflowX: 'auto' }}>
+                <div style={{ textAlign: 'center', marginBottom: '20px', flex: '1 1 auto', minWidth: '200px' }}>
+                    <div style={{
+                        display: 'inline-block',
+                        padding: '10px 20px',
+                        fontWeight: 'bold',
+                        fontSize: '2em',
+                        borderRadius: '10px',
+                        backgroundColor: '#f0f0f0',
+                        textAlign: 'center'
+                    }}>
+                        {dataStaff?.instances?.trackedEntityInstances?.length ?? 0}
+                    </div>
+                    <p style={{ marginTop: '10px', fontSize: '1.2em' }}>Total Trainees Enrolled</p>
+                </div>
+                <div style={{ textAlign: 'center', marginBottom: '20px', flex: '1 1 auto', minWidth: '200px' }}>
+                    <div style={{
+                        display: 'inline-block',
+                        padding: '10px 20px',
+                        fontWeight: 'bold',
+                        fontSize: '2em',
+                        borderRadius: '10px',
+                        backgroundColor: '#f0f0f0',
+                        textAlign: 'center'
+                    }}>
+                        {TotalTrainingEvents}
+                    </div>
+                    <p style={{ marginTop: '10px', fontSize: '1.2em' }}>Total Courses Held</p>
+                </div>
+                <div style={{ textAlign: 'center', marginBottom: '20px', flex: '1 1 auto', minWidth: '200px' }}>
+                    <div style={{
+                        display: 'inline-block',
+                        padding: '10px 20px',
+                        fontWeight: 'bold',
+                        fontSize: '2em',
+                        borderRadius: '10px',
+                        backgroundColor: '#f0f0f0',
+                        textAlign: 'center'
+                    }}>
+                        {TrainingTotal}
+                    </div>
+                    <p style={{ marginTop: '10px', fontSize: '1.2em' }}>Total Trainees attending Events</p>
+                </div>
+            </div>
+            {/* Charts */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <p style={{ marginTop: '10px', fontSize: '1.2em' }}>Total Trainees attending Events</p>
+                <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: '20px', overflowX: 'auto' }}>
+                    <div style={{ flex: '1 1 auto', minWidth: '200px' }}>
+                        {hasRows(data) && (
+                            <Chart
+                                chartType="Bar"
+                                width="100%"
+                                height="400px"
+                                data={data}
+                                options={options}
+                            />
+                        )}
+                    </div>
+                    <div style={{ flex: '1 1 auto', minWidth: '200px' }}>
+                        {hasRows(TPY) && (
+                            <Chart
+                                chartType="Bar"
+                                width="100%"
+                                height="400px"
+                                data={TPY}
+                                options={optionsTPY}
+                            />
+                        )}
+                    </div>
+                    <div style={{ flex: '1 1 auto', minWidth: '200px' }}>
+                        {hasRows(TrainingTotalDesignation) && (
+                            <Chart
+                                chartType="Bar"
+                                width="100%"
+                                height="400px"
+                                data={TrainingTotalDesignation}
+                                options={optionsDesignation}
+                            />
+                        )}
+                    </div>
+                </div>
+                <div style={{ overflowX: 'auto' }}>
+                    {hasRows(TPYP) && (
+                        <Chart
+                            chartType="Bar"
+                            width="100%"
+                            height="400px"
+                            data={TPYP}
+                            options={optionsPartnersYear}
+                        />
+                    )}
+                </div>
+                <div style={{ overflowX: 'auto' }}>
+                    {hasRows(TrainingsPerDistrict) && (
+                        <Chart 
+                            chartType="Bar"
+                            width="100%"
+                            height="400px"
+                            data={TrainingsPerDistrict}
+                            options={optionsPerDistrict}
+                        />
+                    )}
+                </div>
+                <div style={{ overflowX: 'auto' }}>
+                    {hasRows(TrainingsPerDistrictYear) && (
+                        <Chart 
+                            chartType="Bar"
+                            width="100%"
+                            height="400px"
+                            data={TrainingsPerDistrictYear}
+                            options={optionsPerDistrictYear}
+                        />
+                    )}
+                </div>
+            </div>
+        </div>
+    );
 }

@@ -13,6 +13,14 @@ import React, { useState } from 'react';
 import { utilConfigConstantValueByName } from '../utils/utils';  
 
 
+/**
+ * CourseDetailsCourseView
+ * Read-only one-row summary of a single course date (event): one column per course
+ * program stage data element, with internal jtrain_* fields hidden and # Attendees last.
+ * Props: id - the course event ID.
+ */
+
+// Single course event with its data values
 const eventQuery = {
     events: {
       resource: 'events',
@@ -23,6 +31,7 @@ const eventQuery = {
     },
   };
   
+  // All org units - used to turn the Location value (an org unit path) into a name
   const ORG_UNITS_QUERY = {
     orgUnits: {
         resource: 'organisationUnits',
@@ -36,7 +45,8 @@ const eventQuery = {
 export const CourseDetailsCourseView = ({ id }) => {
 
   const defCourseProgStageId = utilConfigConstantValueByName('CourseProgramStageId')
-  const defStaffOrgUnitId  = utilConfigConstantValueByName('CourseProgramStageId')
+  const defStaffOrgUnitId  = utilConfigConstantValueByName('CourseProgramStageId') // unused (and reads the wrong key)
+    // Column definitions: the course stage's data elements
     const { loading, error, data } = useDataQuery({
         programStages: {
           resource: `programStages/${defCourseProgStageId}`,
@@ -59,7 +69,16 @@ export const CourseDetailsCourseView = ({ id }) => {
         </div>
       );
         if (eventError) return `Error: ${eventError.message}`;
-    
+
+    // Grid columns: hide internal jtrain fields (except the count), and put # Attendees last
+    const sortedDEs = [...(data?.programStages?.programStageDataElements || [])]
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .filter(({ dataElement }) => !dataElement.displayName.startsWith('jtrain') || dataElement.displayName === 'jtrain_course_attendees_count');
+    const gridDataElements = [
+        ...sortedDEs.filter(({ dataElement }) => dataElement.displayName !== 'jtrain_course_attendees_count'),
+        ...sortedDEs.filter(({ dataElement }) => dataElement.displayName === 'jtrain_course_attendees_count'),
+    ];
+
     return (
         <div>
           <table style={{ width: '100%' }}>
@@ -77,18 +96,7 @@ export const CourseDetailsCourseView = ({ id }) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                  {data.programStages.programStageDataElements
-                    .sort((a, b) => a.sortOrder - b.sortOrder)
-                    .map(({ dataElement }) => {
-                      // Skip rendering if displayName is 'jtrain_course_attendees'
-                      if (dataElement.displayName === 'jtrain_course_attendees') {
-                        return null;
-                  }
-
-                  if (dataElement.displayName === 'jtrain_course_eventid') {
-                    return null;
-                  }
-
+                  {gridDataElements.map(({ dataElement }) => {
               // Change displayName if it's 'jtrain_course_attendees_count'
               const displayName = dataElement.displayName === 'jtrain_course_attendees_count'
                 ? '# Attendees'
@@ -104,23 +112,12 @@ export const CourseDetailsCourseView = ({ id }) => {
                 <TableBody>
   {eventData?.events && (
     <TableRow>
-    {data.programStages.programStageDataElements
-  .sort((a, b) => a.sortOrder - b.sortOrder)
-  .map(({ dataElement }) => {
-    if (dataElement.displayName === 'jtrain_course_eventid') {
-      return null;
-    }
-
+    {gridDataElements.map(({ dataElement }) => {
     // Create a mapping of dataElement to value
     const dataElementToValue = eventData.events.dataValues.reduce((map, { dataElement, value }) => {
       map[dataElement] = value;
       return map;
     }, {});
-
-    // Skip rendering if displayName starts with 'jtrain' but is not 'jtrain_course_attendees_count'
-    if (dataElement.displayName.startsWith('jtrain') && dataElement.displayName !== 'jtrain_course_attendees_count') {
-      return null;
-    }
 
     if (dataElement.displayName === 'Location') {
       return <TableCell key={dataElement.id}>

@@ -32,6 +32,13 @@ import { utilConfigConstantValueByName } from '../utils/utils'
 // }
 
 
+/**
+ * CourseSearch (/coursesearch - "Course" tab)
+ * Search courses by name (and course type when configured), open a course, or add a new one.
+ */
+
+// All course TEIs in the Course program, sorted by Course Name (Vnm7OVecUi1).
+// Filtering happens client-side below.
 const query = {
     instances: {
         resource: 'trackedEntityInstances',
@@ -66,17 +73,22 @@ export const CourseSearch = () => {
     const defCourseOrgUnitId = utilConfigConstantValueByName('DefaultCourseOrgUnit')
     const defCourseProgramId = utilConfigConstantValueByName('CourseProgram')
     const defThemAreaId = utilConfigConstantValueByName('ThematicAreaOptionset')
-    
+    // Course type features are hidden if CourseTypeTEA isn't configured in appSettings
+    const defCourseTypeTEA = utilConfigConstantValueByName('CourseTypeTEA')
+
     
     
     const [showAddCourse, setShowAddCourse] = useState(false);
     const [message, setMessage] = useState(localStorage.getItem('message') || '');
     const [selectedThematicArea, setSelectedThematicArea] = useState('');
+    const [selectedCourseType, setSelectedCourseType] = useState('all');
 
+    // One-time flash message: shown once from localStorage, then cleared (nothing currently writes it)
     useEffect(() => {
         localStorage.removeItem('message');
     }, []);
 
+    // After a new course is saved: show confirmation, close the form, reload the list
     const reload = () => {
         setMessage('Course added successfully');
         setShowAddCourse(false);
@@ -92,6 +104,7 @@ export const CourseSearch = () => {
         },
     })
 
+    // Thematic area options (the filter dropdown that uses this is currently commented out)
     const thematicAreasQuery = {
         thematicAreas: {
             resource: `optionSets/${defThemAreaId}`,
@@ -147,6 +160,14 @@ export const CourseSearch = () => {
 
             <input type="text" value={searchTerm} onChange={handleSearchTermChange} placeholder="Course Name" />
 
+            {defCourseTypeTEA && (
+                <select value={selectedCourseType} onChange={(e) => setSelectedCourseType(e.target.value)}>
+                    <option value="all">All</option>
+                    <option value="mentorship">Mentorship</option>
+                    <option value="training">Training</option>
+                </select>
+            )}
+
 
 
             {loading && (
@@ -162,16 +183,20 @@ export const CourseSearch = () => {
                         <TableRowHead>
                             {/* <TableCellHead>Thematic Area</TableCellHead> */}
                             <TableCellHead>Course Name</TableCellHead>
+                            {defCourseTypeTEA && <TableCellHead>Course Type</TableCellHead>}
                             <TableCellHead>View</TableCellHead>
                         </TableRowHead>
                     </TableHead>
                     <TableBody>
                     {data.instances.trackedEntityInstances
                         
+            // Match on course name (contains), thematic area and course type; then show the first 10
             .filter(instance => {
                                     const attributes = getAttributes(instance);
+                                    const courseType = attributes.find(attr => attr.attribute === defCourseTypeTEA)?.value || '';
                                     return attributes.some(attr => attr.displayName === 'Course Name' && attr.value.toLowerCase().includes(searchTerm.toLowerCase())) &&
-                                        (selectedThematicArea === '' || attributes.some(attr => attr.displayName === 'Course Thematic Area' && attr.value === selectedThematicArea));
+                                        (selectedThematicArea === '' || attributes.some(attr => attr.displayName === 'Course Thematic Area' && attr.value === selectedThematicArea)) &&
+                                        (!defCourseTypeTEA || selectedCourseType === 'all' || courseType.toLowerCase() === selectedCourseType);
                                 })
                     .slice(0, 10)
                     .map(instance => {
@@ -184,6 +209,7 @@ export const CourseSearch = () => {
                                     return (
                                         <TableRow key={instance.trackedEntityInstance}>
                                             <TableCell>{attributesObj['Course Name']}</TableCell>
+                                            {defCourseTypeTEA && <TableCell>{attributes.find(attr => attr.attribute === defCourseTypeTEA)?.value || ''}</TableCell>}
                                             <TableCell>
                                                 <Link to={`/courseview/${instance.trackedEntityInstance}`}><IconView24/></Link>
                                             </TableCell>

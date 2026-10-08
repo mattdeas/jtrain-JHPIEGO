@@ -15,10 +15,18 @@ import { utilGetConstantValueByName,  utilConfigConstantValueByName } from '../u
 import { OrganisationUnitTree } from '@dhis2/ui';
 import { CircularLoader } from '@dhis2/ui';
 
+/**
+ * Staffadd (/staffadd)
+ * "Add New Trainee" form. Builds a field for each Staff program attribute (skipping jtrain_*),
+ * with an org unit tree for Location and dropdowns for option sets. On submit it creates the
+ * trainee TEI, enrols them in the Staff program, then returns to the trainee search.
+ */
+
 const today = new Date();
 //const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
 
+// Legacy constants query (loaded but no longer used - config now comes from the dataStore)
 const qryConstants = {
     // One query object in the whole query
     attributes: {
@@ -33,6 +41,7 @@ const qryConstants = {
     },
 }
 
+// Unused
 const query = {
     // "page" variable below can be dinamically passed via refetch (see "handlePageChange" below)
     instances: {
@@ -45,6 +54,7 @@ const query = {
 }
 
 
+  // Staff program attributes (the form fields), including option sets for dropdowns
   const qryProgramFields = {
     program: {
       resource: 'programs',
@@ -55,6 +65,7 @@ const query = {
     },
 };
 
+// Unused - handleFormSubmit calls engine.mutate directly
 const mutation = {
     resource: 'trackedEntityInstances',
     type: 'create',
@@ -63,6 +74,8 @@ const mutation = {
 
 
 
+// Existing TEI's attributes - pre-fills the form when a route :id is present.
+// /staffadd has no :id, so for new trainees this request has no ID and the form starts empty.
 const qryTrackedEntityInstance = {
     trackedEntityInstance: {
         resource: 'trackedEntityInstances',
@@ -108,6 +121,7 @@ export const Staffadd = () => {
         }));
     };
 
+    // Save: create the trainee TEI, enrol in the Staff program, then go back to search after 3s
     //const handleAdd = () => {
     const handleFormSubmit = async (event) => {
         event.preventDefault();
@@ -193,6 +207,7 @@ export const Staffadd = () => {
 
     const [formFields, setFormFields] = useState({});
 
+    // Store the loaded TEI's attributes (edit case) ...
     useEffect(() => {
         if (!loadingEntity && !errorEntity && dataEntity?.trackedEntityInstance?.attributes) {
             setTrackedEntityInstance(dataEntity.trackedEntityInstance.attributes);
@@ -208,7 +223,8 @@ export const Staffadd = () => {
     //     setFormFields(initialFormFields);
     // }, [trackedEntityInstance]);
 
-    const [selected, setSelected] = useState([]);
+    const [selected, setSelected] = useState([]); // selected org unit path(s) in the Location tree
+    // ... and copy them into the form fields
     useEffect(() => {
         if (trackedEntityInstance) {
             const initialFormFields = trackedEntityInstance.reduce((fields, attr) => ({
@@ -220,6 +236,7 @@ export const Staffadd = () => {
         }
     }, [trackedEntityInstance]);
 
+    // Current value for a field: typed value first, else the loaded TEI's value
     const findAttributeValue = (attributeId) => {
         // If the attribute value exists in formFields, return it
         if (formFields[attributeId]) {
@@ -235,6 +252,7 @@ export const Staffadd = () => {
         return '';
     };
 
+    // Location picked in the tree: store the org unit path as the Location attribute value
     const onTreeChange = ({ selected }) => {
       setSelected(selected);
       console.log('selected:' , selected)

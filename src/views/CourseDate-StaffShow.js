@@ -30,12 +30,14 @@ function debounce(func, wait) {
     };
 };
 
+// No-op debounced resize handler (placeholder)
 const handleResize = debounce(() => {
 }, 200);
 
 window.addEventListener('resize', handleResize);
 
 
+// All org units (loaded but not currently used in the output)
 const ORG_UNITS_QUERY = {
     orgUnits: {
         resource: 'organisationUnits',
@@ -46,7 +48,8 @@ const ORG_UNITS_QUERY = {
 };
 
 
-const qryStaffCourseDetails = {  
+// Trainee (Staff program) events linked to a course date via the CourseEventId data element
+const qryStaffCourseDetails = {
     events: {
         resource: 'events',
         params: ({ ou, program, filterEventDE, EventDE }) => ({
@@ -74,6 +77,13 @@ const qryStaffCourseDetails = {
   };
 
 
+/**
+ * CourseDateStaffShow
+ * Used on the Course view page when a course date is selected. Currently it just renders
+ * the "Course Details" summary (CourseDetailsCourseView) for that date; the trainee and
+ * trainee-event queries below are loaded but not displayed.
+ * Props: tei_id - course TEI ID; eventID - course date event ID; refreshCount - bump to refetch.
+ */
 export const CourseDateStaffShow = ({tei_id, eventID, reload, refreshCount}) => {
     const [eventIds, setEventIds] = useState([]);
     const [currentEventId, setCurrentEventId] = useState(null);
@@ -89,6 +99,7 @@ export const CourseDateStaffShow = ({tei_id, eventID, reload, refreshCount}) => 
     const defStaffCourseDE = utilConfigConstantValueByName('CourseEventId')
     
 
+    // Refetch when the parent signals a change
     useEffect(() => {
         refetch();
         refetchdataSCD();
@@ -100,7 +111,8 @@ export const CourseDateStaffShow = ({tei_id, eventID, reload, refreshCount}) => 
     }, [reload]);
   
     
-    const query = {  
+    // All trainee TEIs in the staff org unit
+    const query = {
             instances: {
                 resource: 'trackedEntityInstances',
                 params: () => ({
@@ -120,6 +132,7 @@ export const CourseDateStaffShow = ({tei_id, eventID, reload, refreshCount}) => 
         },
     });
 
+    // Builds an event update mutation
     const UpdateEvent = (program, programStage, orgUnit, event, dataValues, trackedEntityInstance) => ({
         resource: 'events',
         type: 'update',
@@ -137,6 +150,8 @@ export const CourseDateStaffShow = ({tei_id, eventID, reload, refreshCount}) => 
       
     const { loading: orgUnitsLoading, error: orgUnitsError, data: orgUnitsData } = useDataQuery(ORG_UNITS_QUERY);
 
+    // Unused and incomplete: engine and the def* IDs it references aren't defined in this file.
+    // See StaffShow (CourseDateAttendees-StaffShow.js) for the working remove-attendee logic.
     const handleDelete = async (trackedEntityInstance) => {
         // Delete the event
         console.log('handleDeleteeventID:', eventID);
@@ -188,6 +203,7 @@ export const CourseDateStaffShow = ({tei_id, eventID, reload, refreshCount}) => 
         refetchdataSCD();
       };
     
+    // Track the linked trainee events, and the first one as "current"
     useEffect(() => {
         //console.log('dataSCD:', dataSCD);
         if (dataSCD) {

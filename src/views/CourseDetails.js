@@ -15,6 +15,19 @@ import { utilGetConstantValueByName,  utilConfigConstantValueByName } from '../u
 import { IconView16, IconView24 } from '@dhis2/ui';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+
+/**
+ * CourseDetails
+ * Training Capture step 2: lists the dates (events) a course has run, filterable by date.
+ * Clicking View on a date hides the list, pushes that date's details up into the page
+ * header, and opens the attendee list + enrol panel (CourseDateAttendees).
+ *
+ * Props:
+ *  - course         : { trackedEntityInstance, courseName, startDateVar, endDateVar }
+ *  - updateHeadings : callback that appends the selected date's details to the page header
+ */
+
+// All org units - used to turn Location values (org unit paths) into names
 const ORG_UNITS_QUERY = {
     orgUnits: {
         resource: 'organisationUnits',
@@ -36,6 +49,7 @@ export const CourseDetails = ({ course, updateHeadings }) => {
     
 
 
+    // Course stage data elements - these become the grid columns
     const qryProgramDataElements = {
         programStages: {
             resource: `programStages/${defCourseProgramStageId}`,
@@ -45,6 +59,7 @@ export const CourseDetails = ({ course, updateHeadings }) => {
         },
     };
 
+    // All dates (events) for this course
     const eventQuery = {
         events: {
             resource: 'events',
@@ -75,11 +90,13 @@ export const CourseDetails = ({ course, updateHeadings }) => {
     const [values, setValues] = useState({ location: '', partner: '' });
     const [filterDate, setFilterDate] = useState('');
 
+    // Re-mount the attendee panel (passed to CourseDateAttendees as onDelete)
     const handleDelete = () => {
         setRefreshKey(prevKey => prevKey + 1);
     }
     const dProgramDE = useDataQuery(qryProgramDataElements);
 
+    // Location/partner text filters (their inputs are currently commented out)
     const handleTextChange = (event) => {
         const { name, value } = event.target;
         setValues({
@@ -106,6 +123,7 @@ export const CourseDetails = ({ course, updateHeadings }) => {
     if (error) return error.message;
     if (!data || !data.events) return 'No data';
 
+    // Flatten each event into { event, eventDate, [dataElementId]: value }
     const rows = data.events.events.map(({ event, eventDate, dataValues }) => {
         const row = { event, eventDate };
         dataValues.forEach(({ dataElement, value }) => {
@@ -114,8 +132,19 @@ export const CourseDetails = ({ course, updateHeadings }) => {
         return row;
     });
 
+    // Every data element ID used across this course's events (passed to the attendee panel)
     const dataElements = [...new Set(data.events.events.flatMap(({ dataValues }) => dataValues.map(({ dataElement }) => dataElement)))];
 
+    // Grid columns: hide internal jtrain fields, and put # Attendees last
+    const hiddenGridDEs = ['jtrain_course_attendees', 'jtrain_course_eventid'];
+    const allGridDEs = (dProgramDE.data?.programStages?.programStageDataElements || [])
+        .filter(de => !hiddenGridDEs.includes(de.dataElement.displayName));
+    const gridDataElements = [
+        ...allGridDEs.filter(de => de.dataElement.displayName !== 'jtrain_course_attendees_count'),
+        ...allGridDEs.filter(de => de.dataElement.displayName === 'jtrain_course_attendees_count'),
+    ];
+
+    // Turn the selected date's details into "Name - value - Name - value" for the page header
     const onButtonClick = (variablesToPassBack) => {
         let variablesString = Object.entries(variablesToPassBack)
             .map(([key, value]) => `${key} - ${value}`)
@@ -124,6 +153,7 @@ export const CourseDetails = ({ course, updateHeadings }) => {
     };
 
 
+    // Filter dates: by partner text and/or a date that falls within the course's start-end range
     const filteredRows = rows.filter(row => {
         // If no filters are applied, show all rows
         if (!partnerFilter && !filterDate) {
@@ -195,8 +225,7 @@ export const CourseDetails = ({ course, updateHeadings }) => {
                                         <Table>
                                             <TableHead>
                                                 <TableRowHead>
-                                                    {dProgramDE.data.programStages.programStageDataElements.map((dataElementObject, index) => {
-                                                        if (dataElementObject.dataElement.displayName === 'jtrain_course_attendees') return null;
+                                                    {gridDataElements.map((dataElementObject, index) => {
                                                         return (
                                                             <TableCellHead key={index}>
                                                                 {dataElementObject.dataElement.displayName === 'jtrain_course_attendees_count' ? '# Attendees' : dataElementObject.dataElement.displayName}
@@ -209,8 +238,7 @@ export const CourseDetails = ({ course, updateHeadings }) => {
                                             <TableBody>
                                                 {filteredRows.map(({ event, eventDate, ...values }) => (
                                                     <TableRow key={event} style={event === selectedRow ? { backgroundColor: 'blue' } : {}}>
-                                                        {dProgramDE.data.programStages.programStageDataElements.map(dataElementObject => {
-                                                            if (dataElementObject.dataElement.displayName === 'jtrain_course_attendees') return null;
+                                                        {gridDataElements.map(dataElementObject => {
                                                             if (dataElementObject.dataElement.displayName === 'Location')
                                                                 return (
                                                                     <TableCell key={dataElementObject.dataElement.id}>
@@ -225,6 +253,9 @@ export const CourseDetails = ({ course, updateHeadings }) => {
                                                             );
                                                         })}
                                                         <TableCell rowSpan={1}>
+                                                            {/* Select this date: build a header summary (non-jtrain fields, Location as a name),
+                                                                hide the list and open the attendee panel. Note: the "Course" text stripping
+                                                                is overwritten by the following else branch, so it has no effect. */}
                                                             <button onClick={() => {
                                                                 const selectedCourseData = {
                                                                     event: event,
@@ -264,7 +295,8 @@ export const CourseDetails = ({ course, updateHeadings }) => {
                             )}
                         </td>
                         
-                        <td rowSpan={1}>
+                        {/* Attendees + enrol panel for the selected date - takes the full width once a date is chosen (the date list is hidden then) */}
+                        <td rowSpan={1} style={{ verticalAlign: 'top', width: selectedCourseDate.event ? '100%' : undefined }}>
                             <div>
                                 {selectedCourseDate.event && <CourseDateAttendees key={refreshKey} eventID={selectedCourseDate.event} dElements={dataElements} onDelete={handleDelete} />}
                             </div>
